@@ -1,7 +1,15 @@
 # Importa os recursos principais do Flask para criar a API,
 # ler JSON da requisição, responder JSON e controlar sessão.
 import os
+import sys
+from pathlib import Path
 from flask import Flask, request, jsonify, session
+from flask import render_template
+
+# Garante imports absolutos quando o app é executado de dentro da pasta web.
+BASE_DIR = Path(__file__).resolve().parents[1]
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
 
 # Importa o serviço de autenticação e suas exceções específicas.
 from services.auth_service import (
@@ -32,6 +40,24 @@ app = Flask(__name__)
 # Em desenvolvimento, usa um valor padrão temporário.
 # Em produção, essa chave deve existir no ambiente.
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "dev-secret-key-change-me")
+
+@app.get("/")
+def home():
+    return render_template("index.html")
+
+@app.get("/register")
+def registro_form():
+    """Retorna a página de cadastro."""
+    return render_template("register.html")
+
+@app.get("/recovery")
+def recovery_form():
+    """Retorna a página de recuperação de senha."""
+    return render_template("recovery.html")
+
+# Instancia os serviços
+auth_service = AuthService()
+ativos_service = AtivosService()
 
 # Instancia os serviços da aplicação.
 auth_service = AuthService()
@@ -97,6 +123,9 @@ def register():
         return _erro_json(str(erro), 409)
     except AuthErro as erro:
         return _erro_json(str(erro), 400)
+    except Exception as erro:
+        print(f"Erro no registro: {erro}")
+        return _erro_json(f"Erro ao cadastrar usuário: {str(erro)}", 500)
 
 
 @app.post("/login")

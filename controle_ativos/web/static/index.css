@@ -1,0 +1,245 @@
+@import url('https://fonts.googleapis.com/css2?family=Datatype:wght@100..900&display=swap');
+
+
+/* Estilos para a página de login */
+
+* {
+    text-decoration: none; 
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+
+}
+.login {
+    background: linear-gradient(0deg, #0a0b0e 0%, #1C2331 100%);
+    font-family: "Datatype", monospace;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    color: #A7B0C2;
+}
+
+.h1_login {
+    color: #E6EAF2;
+    padding: 5px;
+    text-align: center;
+}
+
+.form_login{
+    color: #A7B0C2;
+    width: 30%;
+    padding: 5px;
+    background-color: #151922;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    border: 2px solid #2A3142;
+}
+
+input[type=email], input[type="password"] {
+    padding: 3px;
+    border: 2px solid #2A3142;
+    border-radius: 8px;
+    background-color: #1C2331 ;
+    color: #A7B0C2;
+}
+
+
+input[type=submit] {
+    background-color: #3B82F6  ;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    padding: 5px;
+    width: 15% ;
+    display: block;
+    margin-left: auto;
+}
+
+.links_login {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    color: #A7B0C2;
+}
+
+.links_login a {
+    color: #A7B0C2;
+    font-size: 20px;
+}
+
+/* Estilos para a página de registro */
+
+.register {
+    background: linear-gradient(0deg, #0a0b0e 0%, #1C2331 100%);
+    font-family: "Datatype", monospace;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    color: #A7B0C2;
+}
+
+
+.h1_register {
+    color: #E6EAF2;
+    padding: 5px;
+    text-align: center;
+}
+
+.form_Register{
+    color: #A7B0C2;
+    width: 30%;
+    padding: 5px;
+    background-color: #151922;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    border: 2px solid #2A3142;
+}
+input[type=email], input[type="password"] {
+    padding: 3px;
+    border: 2px solid #2A3142;
+    border-radius: 8px;
+    background-color: #1C2331 ;
+    color: #A7B0C2;
+}
+input[type=text] {
+    padding: 3px;
+    border: 2px solid #2A3142;
+    border-radius: 8px;
+    background-color: #1C2331 ;
+    color: #A7B0C2;
+}
+
+.botoes_cadastro {
+    display: flex;
+    justify-content: space-between;
+    gap: 70%;
+    margin-top: 10px;
+}
+
+/* Estilos para a página de recuperação de senha */
+
+.recovery {
+    background: linear-gradient(0deg, #0a0b0e 0%, #1C2331 100%);
+    font-family: "Datatype", monospace;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    color: #A7B0C2;
+}
+
+
+.h1_recovery {
+    color: #E6EAF2;
+    padding: 5px;
+    text-align: center;
+}
+
+.form_recovery{
+    color: #A7B0C2;
+    width: 30%;
+    padding: 5px;
+    background-color: #151922;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    border: 2px solid #2A3142;
+}
+input[type=email], input[type="password"] {
+    padding: 3px;
+    border: 2px solid #2A3142;
+    border-radius: 8px;
+    background-color: #1C2331 ;
+    color: #A7B0C2;
+}
+input[type=text] {
+    padding: 3px;
+    border: 2px solid #2A3142;
+    border-radius: 8px;
+    background-color: #1C2331 ;
+    color: #A7B0C2;
+}
+
+.botoes_cadastro {
+    display: flex;
+    justify-content: space-between;
+    gap: 70%;
+    margin-top: 10px;
+}
+
+
+
+/* Estilos para a página de dashboard */
+
+.dashboard {
+    margin: 0px;
+    background: linear-gradient(90deg, #0a0b0e 0%, #1C2331 100%);
+    font-family: "Datatype", monospace;
+    color: #A7B0C2;
+    
+}
+
+main {
+    display: flex;
+    flex-wrap: wrap;
+}
+.sidebar {
+    width: 25%;
+    background-color: #151922;
+    height: 100%;
+
+}
+
+.content_dashboard {
+    width: 75%;
+    background-color: #1C2331
+    };
+
+.sidebar a {
+    color: #A7B0C2;
+    margin: 5px 0;
+}
+
+
+.card_dashboard_total {
+    background-color: #151922;
+    padding: 10px;
+    border-radius: 5px;
+    color: #A7B0C2;
+    border: 2px solid #2A3142;
+    
+}
+
+.card_dashboard_em_uso {
+    background-color: #151922;
+    padding: 10px;
+    border-radius: 5px;
+    color: #A7B0C2;
+    border: 2px solid #2A3142;
+    
+}
+
+.card_dashboard_em_manutencao {
+    background-color: #151922;
+    padding: 10px;
+    border-radius: 5px;
+    color: #A7B0C2;
+    border: 2px solid #2A3142;
+    
+}
+
+.card_dashboard_disponiveis {
+    background-color: #151922;
+    padding: 10px;
+    border-radius: 5px;
+    color: #A7B0C2;
+    border: 2px solid #2A3142;
+    
+}
