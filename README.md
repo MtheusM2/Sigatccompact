@@ -37,7 +37,7 @@
 | **Curso** | Manutenção e Suporte em Informática |
 | **Disciplina** | Governança de TI |
 | **Semestre** | 2026.1 |
-| **Orientador(a)** | A definir / não informado no repositório |
+| **Orientador(a)** | Professora Tainá Barros Batista Oliveira |
 | **Tipo de Trabalho** | TCC – Trabalho de Conclusão de Curso |
 
 **Resumo:**
