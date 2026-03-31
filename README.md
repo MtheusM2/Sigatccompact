@@ -159,7 +159,7 @@ Desenvolver um sistema de controle de ativos com autenticação de usuários e p
 | 5 | Módulo de ativos com regras de negócio | PY | `services/ativos_service.py` | ✅ Concluído |
 | 6 | Interface terminal do sistema | PY | `main.py` e `services/sistema_ativos.py` | ✅ Concluído |
 | 7 | Base da camada web Flask | PY | `web/app.py` | 🔨 Em andamento |
-| 8 | Telas iniciais de autenticação | HTML/CSS | `templates/` e `static/` | 🔨 Em andamento |
+| 8 | Telas iniciais de autenticação | HTML/CSS | `templates/` e `static/` | ✅ Concluído |
 | 9 | Relatório técnico / monografia TCC | DOCX / PDF | `docs/` | 🔨 Em andamento |
 | 10 | Slides da defesa | PPTX | `apresentacao/slides-defesa.pptx` | 🔲 Pendente |
 
@@ -177,7 +177,7 @@ Desenvolver um sistema de controle de ativos com autenticação de usuários e p
 | 4 | Consolidação do CRUD de ativos e refinamento de regras | 24/03/2026 | 27/03/2026 | CRUD funcional em terminal | ✅ |
 | 5 | Estabilização técnica do backend | 27/03/2026 | 10/04/2026 | Backend consolidado e alinhado | 🔨 |
 | 6 | Evolução visual e refinamento da interface | 11/04/2026 | 20/04/2026 | Login refinado e estrutura principal | 🔲 |
-| 7 | Integração entre telas e backend | 21/04/2026 | 27/04/2026 | Fluxos web validados | 🔲 |
+| 7 | Integração entre telas e backend | 21/04/2026 | 27/04/2026 | Fluxos web validados | 🔨 |
 | 8 | Testes, documentação e evidências | 28/04/2026 | 30/04/2026 | Relatórios, prints e revisão final | 🔲 |
 | 9 | Preparação da apresentação | 01/05/2026 | 03/05/2026 | Slides e roteiro | 🔲 |
 | 10 | **Entrega / apresentação final** | 04/05/2026 | 04/05/2026 | Projeto final | 🔲 |
@@ -385,7 +385,7 @@ sigatccompact/
 | Nome | RA/Matrícula | Função no Projeto | Contato |
 |------|-------------|-------------------|---------|
 | Matheus Santos do Nascimento | 09862 | Back-end / Arquitetura / Integração técnica | matheus.nascimento237@etec.sp.gov.br |
-| Felipe dos Santos Nascimento | Não informado | Front-end / Interface visual | Não informado |
+| Felipe dos Santos Nascimento | 10624 | Front-end / Interface visual | felipe.nascimento227@etec.sp.gov.br |
 | Lays Yuri Matukawa | Não informado | Documentação acadêmica | Não informado |
 | Vitória Lopes Siqueira | Não informado | Revisão e documentação | Não informado |
 | Geovanny Iago Damasceno Mendes | Não informado | Organização e apoio documental | Não informado |
