@@ -384,7 +384,7 @@ sigatccompact/
 
 | Nome | RA/Matrícula | Função no Projeto | Contato |
 |------|-------------|-------------------|---------|
-| Matheus Santos do Nascimento | Não informado | Back-end / Arquitetura / Integração técnica | Não informado |
+| Matheus Santos do Nascimento | 09862 | Back-end / Arquitetura / Integração técnica | matheus.nascimento237@etec.sp.gov.br |
 | Felipe dos Santos Nascimento | Não informado | Front-end / Interface visual | Não informado |
 | Lays Yuri Matukawa | Não informado | Documentação acadêmica | Não informado |
 | Vitória Lopes Siqueira | Não informado | Revisão e documentação | Não informado |
