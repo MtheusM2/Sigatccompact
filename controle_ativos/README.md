@@ -53,9 +53,8 @@ controle_ativos/
 │   └── validators.py
 │
 ├── web/
-│   └── sistema_ativos.py
+│   └── app.py
 │
-├── app.py
 ├── main.py
 ├── .gitignore
 ├── .env
