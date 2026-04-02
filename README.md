@@ -386,7 +386,7 @@ sigatccompact/
 |------|-------------|-------------------|---------|
 | Matheus Santos do Nascimento | 09862 | Back-end / Arquitetura / Integração técnica | matheus.nascimento237@etec.sp.gov.br |
 | Felipe dos Santos Nascimento | 10624 | Front-end / Interface visual | felipe.nascimento227@etec.sp.gov.br |
-| Lays Yuri Matukawa | Não informado | Documentação acadêmica | Não informado |
+| Lays Yuri Matukawa | 10413 | Documentação acadêmica | lays.matukawa@etec.sp.gov.br |
 | Vitória Lopes Siqueira | 10568 | Revisão e documentação | vitoria.siqueira24@etec.sp.gov.br |
 | Geovanny Iago Damasceno Mendes | 10522 | Organização e apoio documental | geovanny.mendes@etec.sp.gov.br |
 
