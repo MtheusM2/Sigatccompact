@@ -388,7 +388,7 @@ sigatccompact/
 | Felipe dos Santos Nascimento | 10624 | Front-end / Interface visual | felipe.nascimento227@etec.sp.gov.br |
 | Lays Yuri Matukawa | Não informado | Documentação acadêmica | Não informado |
 | Vitória Lopes Siqueira | 10568 | Revisão e documentação | vitoria.siqueira24@etec.sp.gov.br |
-| Geovanny Iago Damasceno Mendes | Não informado | Organização e apoio documental | Não informado |
+| Geovanny Iago Damasceno Mendes | 10522 | Organização e apoio documental | geovanny.mendes@etec.sp.gov.br |
 
 **Orientador(a):** A definir / não informado no repositório
 
