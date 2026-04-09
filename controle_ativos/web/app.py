@@ -302,6 +302,5 @@ def remover_ativo(id_ativo):
 
 
 if __name__ == "__main__":
-    # Executa a aplicação Flask em modo debug.
-    # Em produção, o debug deve ficar desativado.
-    app.run(debug=True)
+    debug = os.environ.get("FLASK_DEBUG", "false").lower() == "true"
+    app.run(debug=debug)
