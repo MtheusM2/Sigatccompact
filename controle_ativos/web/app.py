@@ -37,9 +37,11 @@ from models.ativos import Ativo
 app = Flask(__name__)
 
 # Define a chave de sessão a partir de variável de ambiente.
-# Em desenvolvimento, usa um valor padrão temporário.
-# Em produção, essa chave deve existir no ambiente.
-app.secret_key = os.getenv("FLASK_SECRET_KEY", "dev-secret-key-change-me")
+# A aplicação não inicia sem uma chave explícita para evitar sessão previsível.
+secret_key = os.getenv("FLASK_SECRET_KEY")
+if not secret_key:
+    raise RuntimeError("Defina FLASK_SECRET_KEY no ambiente para iniciar a aplicação Flask.")
+app.secret_key = secret_key
 
 @app.get("/")
 def home():
