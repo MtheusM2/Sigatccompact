@@ -6,35 +6,39 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recuperação de Senha</title>
-
+    <title>Cadastro de Usuário</title>
+    <!-- <link rel="stylesheet" href="index.css"> -->
     <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
 
 
 </head>
 
-<body class="recovery">
+<body class="register">
 
-<div class="conteiner_recovery"></div>
-<h1 class="h1_recovery">Tela de Recuperação de Senha</h1>
+<div class="conteiner_register"></div>
+<h1 class="h1_register">Tela de Cadastro</h1>
 
-    <form class="form_recovery" id="formRecovery">
+    <form class="form_Register" id="formRegister">
 
         <label for="email">Email:</label>
         <input type="email" id="email" name="email" required>
+        <br>
+        
+        <label for="senha">Senha:</label>
+        <input type="password" id="senha" name="senha" required>
+        <br>
+        
+        <label for="pergunta_recuperacao">Pergunta de Recuperação:</label>
+        <input type="text" id="pergunta_recuperacao" name="pergunta_recuperacao" required>
         <br>
         
         <label for="resposta_recuperacao">Resposta de Recuperação:</label>
         <input type="text" id="resposta_recuperacao" name="resposta_recuperacao" required>
         <br>
         
-        <label for="senha">Nova Senha:</label>
-        <input type="password" id="senha" name="senha" required>
-        <br>
-
         <div class="botoes_cadastro">
             <input class="voltar" type="submit" value="Voltar" onclick="history.back();">
-            <input class="nome_botao_cadastro" type="submit" value="Recuperar Senha">
+            <input class="nome_botao_cadastro" type="submit" value="Cadastrar">
         </div>
 
         <!-- <a href="home.html">
@@ -46,33 +50,35 @@
     </div>
     
     <script>
-        document.getElementById('formRecovery').addEventListener('submit', async (e) => {
+        document.getElementById('formRegister').addEventListener('submit', async (e) => {
             e.preventDefault();
-
+            
             const email = document.getElementById('email').value;
+            const senha = document.getElementById('senha').value;
+            const pergunta = document.getElementById('pergunta_recuperacao').value;
             const resposta = document.getElementById('resposta_recuperacao').value;
-            const novaSenha = document.getElementById('senha').value;
-
+            
             try {
-                const response = await fetch('/forgot-password', {
+                const response = await fetch('/register', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
                         email: email,
-                        resposta_recuperacao: resposta,
-                        nova_senha: novaSenha
+                        senha: senha,
+                        pergunta_recuperacao: pergunta,
+                        resposta_recuperacao: resposta
                     })
                 });
-
+                
                 const data = await response.json();
-
-                if (response.ok && data.ok) {
-                    alert('Senha redefinida com sucesso!');
+                
+                if (data.ok) {
+                    alert('Usuário cadastrado com sucesso!');
                     window.location.href = '/';
                 } else {
-                    alert('Erro ao recuperar senha: ' + (data.erro || 'Falha na operação.'));
+                    alert('Erro ao cadastrar: ' + data.erro);
                 }
             } catch (error) {
                 alert('Erro na requisição: ' + error.message);

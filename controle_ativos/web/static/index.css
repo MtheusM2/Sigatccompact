@@ -186,29 +186,34 @@ input[type=text] {
     
 }
 
-main {
+.h_dashboard {
     display: flex;
-    flex-wrap: wrap;
-}
-.sidebar {
-    width: 25%;
+    flex-direction: column;
+    gap: 10px;
+    border: #0a0b0e solid 2px;
+    padding: 10px;
     background-color: #151922;
-    height: 100%;
-
+    
 }
 
-.content_dashboard {
-    width: 75%;
-    background-color: #1C2331
-    };
-
-.sidebar a {
+.ativosOpcoes {
+    display: flex;
+    background-color: #1C2331;
+    border: #2A3142 solid 2px;
+    border-radius: 8px;
     color: #A7B0C2;
-    margin: 5px 0;
 }
 
 
-.card_dashboard_total {
+/* Estilos para os cards de status dos ativos */
+.cards {
+    padding: 10px;
+    display: flex;
+    flex-direction: wrap;
+    margin-top: 20px;
+    gap: 20px;
+}
+.card_total {
     background-color: #151922;
     padding: 10px;
     border-radius: 5px;
@@ -217,7 +222,7 @@ main {
     
 }
 
-.card_dashboard_em_uso {
+.card_usados {
     background-color: #151922;
     padding: 10px;
     border-radius: 5px;
@@ -226,7 +231,7 @@ main {
     
 }
 
-.card_dashboard_em_manutencao {
+.card_manutencao {
     background-color: #151922;
     padding: 10px;
     border-radius: 5px;
@@ -235,11 +240,182 @@ main {
     
 }
 
-.card_dashboard_disponiveis {
+.card_disponiveis {
     background-color: #151922;
     padding: 10px;
     border-radius: 5px;
     color: #A7B0C2;
     border: 2px solid #2A3142;
     
+}
+
+/* Estilos para a página de cadastro de ativos */
+.container_cadastro_ativos {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 12vh;
+}
+
+.caixa_cadastro_ativos {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 15px;
+    color: #A7B0C2;
+    padding: 20px;
+    background-color: #151922;
+    border-radius: 5px;
+    border: 2px solid #2A3142;
+}
+
+.form_cadastro_ativos {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+    height: 45vh;
+}
+
+.status_cadastro {
+    width: 100%;
+    padding: 3px;
+    border: 2px solid #2A3142;
+    border-radius: 8px;
+    background-color: #1C2331 ;
+    color: #A7B0C2;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+input[type="date"] {
+    padding: 3px;
+    border: 2px solid #2A3142;
+    border-radius: 8px;
+    background-color: #1C2331 ;
+    color: #A7B0C2;
+    -webkit-appearance: none;
+    appearance: none;
+}
+.h2_cadastro_ativos {
+    color: #E6EAF2;
+    padding: 5px;
+    text-align: center;
+}
+
+.linha1 {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 15px;
+    gap: 30px;
+}
+
+.linha1 label {
+    margin-bottom: 5px;
+}
+
+.linha2 {
+    display: flex;
+    gap: 30px;
+}
+
+.linha3 {
+    display: flex;
+    gap: 40px;
+    justify-content: space-between;
+}
+
+.linhas {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.linhas label {
+    margin-bottom: 5px;
+}
+
+/* Estilos para a página de busca de ativos */
+
+.container_buscar_ativos {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 12vh;
+}
+
+.caixa_buscar_ativos {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 15px;
+    color: #A7B0C2;
+    padding: 20px;
+    background-color: #151922;
+    border-radius: 5px;
+    border: 2px solid #2A3142;
+}
+
+.form_buscar_ativos {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+    height: 45vh;
+}
+
+.status_buscar {
+    width: 100%;
+    padding: 3px;
+    border: 2px solid #2A3142;
+    border-radius: 8px;
+    background-color: #1C2331 ;
+    color: #A7B0C2;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+input[type="date"] {
+    padding: 3px;
+    border: 2px solid #2A3142;
+    border-radius: 8px;
+    background-color: #1C2331 ;
+    color: #A7B0C2;
+    -webkit-appearance: none;
+    appearance: none;
+}
+.h2_buscar_ativos {
+    color: #E6EAF2;
+    padding: 5px;
+    text-align: center;
+}
+
+.linha1 {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 15px;
+    gap: 30px;
+}
+
+.linha1 label {
+    margin-bottom: 5px;
+}
+
+.linha2 {
+    display: flex;
+    gap: 30px;
+}
+
+.linha3 {
+    display: flex;
+    gap: 40px;
+    justify-content: space-between;
+}
+
+.linhas {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.linhas label {
+    margin-bottom: 5px;
 }

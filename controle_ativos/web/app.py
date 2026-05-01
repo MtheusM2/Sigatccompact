@@ -2,6 +2,7 @@
 # ler JSON da requisição, responder JSON e controlar sessão.
 import os
 import sys
+import secrets
 from pathlib import Path
 from flask import Flask, request, jsonify, session
 from flask import render_template
@@ -43,17 +44,53 @@ app.secret_key = os.getenv("FLASK_SECRET_KEY", "dev-secret-key-change-me")
 
 @app.get("/")
 def home():
-    return render_template("index.html")
+    return render_template("auth/login.html")
 
 @app.get("/register")
 def registro_form():
     """Retorna a página de cadastro."""
-    return render_template("register.html")
+    return render_template("auth/register.html")
 
 @app.get("/recovery")
 def recovery_form():
     """Retorna a página de recuperação de senha."""
-    return render_template("recovery.html")
+    return render_template("auth/recovery.html")
+
+@app.get("/dashboard")
+def dashboard():
+    """Retorna a página do dashboard, que lista os ativos."""
+    return _render_pagina_sistema("dashboard.html")
+
+
+def _render_pagina_sistema(dashboard: str):
+    if "user_id" not in session:
+        return render_template("auth/login.html", erro="Faça login para acessar o dashboard.")
+    return render_template(dashboard)
+
+
+@app.get("/dashboard/status")
+def dashboard_status():
+    return _render_pagina_sistema("sistema/status_ativos.html")
+
+
+@app.get("/dashboard/buscar")
+def dashboard_buscar():
+    return _render_pagina_sistema("sistema/buscar_ativos.html")
+
+
+@app.get("/dashboard/cadastrar")
+def dashboard_cadastrar():
+    return _render_pagina_sistema("sistema/cadastrar_ativos.html")
+
+
+@app.get("/dashboard/editar")
+def dashboard_editar():
+    return _render_pagina_sistema("sistema/editar_ativos.html")
+
+
+@app.get("/dashboard/excluir")
+def dashboard_excluir():
+    return _render_pagina_sistema("sistema/excluir_ativos.html")
 
 # Instancia os serviços
 auth_service = AuthService()
@@ -100,6 +137,11 @@ def _ativo_para_dict(ativo: Ativo) -> dict:
         "data_saida": ativo.data_saida,
         "criado_por": ativo.criado_por
     }
+
+
+def _gerar_id_ativo() -> str:
+    """Gera um identificador curto para o ativo respeitando o limite do banco."""
+    return secrets.token_hex(10)
 
 
 @app.post("/register")
@@ -213,9 +255,11 @@ def criar_ativo():
     data = request.get_json() or {}
 
     try:
+        id_ativo = data.get("id") or _gerar_id_ativo()
+
         # Cria a entidade Ativo respeitando o contrato atual do domínio.
         ativo = Ativo(
-            id_ativo=data["id"],
+            id_ativo=id_ativo,
             tipo=data["tipo"],
             marca=data["marca"],
             modelo=data["modelo"],
