@@ -175,12 +175,12 @@ Desenvolver um sistema de controle de ativos com autenticação de usuários e p
 | 2 | Modelagem inicial e organização modular | 02/03/2026 | 15/03/2026 | Arquitetura por camadas | ✅ |
 | 3 | Implementação de autenticação e persistência | 16/03/2026 | 24/03/2026 | Módulo de usuários + banco MySQL | ✅ |
 | 4 | Consolidação do CRUD de ativos e refinamento de regras | 24/03/2026 | 27/03/2026 | CRUD funcional em terminal | ✅ |
-| 5 | Estabilização técnica do backend | 27/03/2026 | 10/04/2026 | Backend consolidado e alinhado | 🔨 |
-| 6 | Evolução visual e refinamento da interface | 11/04/2026 | 20/04/2026 | Login refinado e estrutura principal | 🔲 |
-| 7 | Integração entre telas e backend | 21/04/2026 | 27/04/2026 | Fluxos web validados | 🔨 |
-| 8 | Testes, documentação e evidências | 28/04/2026 | 30/04/2026 | Relatórios, prints e revisão final | 🔲 |
-| 9 | Preparação da apresentação | 01/05/2026 | 03/05/2026 | Slides e roteiro | 🔲 |
-| 10 | **Entrega / apresentação final** | 04/05/2026 | 04/05/2026 | Projeto final | 🔲 |
+| 5 | Estabilização técnica do backend | 27/03/2026 | 10/06/2026 | Backend consolidado e alinhado | 🔨 |
+| 6 | Evolução visual e refinamento da interface | 11/04/2026 | 20/05/2026 | Login refinado e estrutura principal | 🔲 |
+| 7 | Integração entre telas e backend | 21/04/2026 | 27/05/2026 | Fluxos web validados | 🔨 |
+| 8 | Testes, documentação e evidências | 28/04/2026 | 30/06/2026 | Relatórios, prints e revisão final | 🔲 |
+| 9 | Preparação da apresentação | 01/05/2026 | 03/06/2026 | Slides e roteiro | 🔲 |
+| 10 | **Entrega / apresentação final** | 04/05/2026 | 04/06/2026 | Projeto final | 🔲 |
 
 ---
 
