@@ -22,6 +22,21 @@ Status do projeto
 - Funcionalidades principais implementadas (CRUD de ativos, autenticação, dashboard).
 - Segurança em evolução: migração gradual para Bearer Token; rate limit e política de senha implementados.
 
+Entregáveis e atividades (status atualizado)
+
+- [x] Levantamento do problema e escopo do TCC.
+- [x] Estruturação da documentação técnica em `docs/`.
+- [x] Diagrama AS-IS do processo analisado (documentado em [Arquitetura](docs/arquitetura.md)).
+- [x] Definição do fluxo alvo (TO-BE) para evolução da solução.
+- [x] Implementação das funcionalidades centrais (cadastro, consulta, edição, exclusão).
+- [x] Endurecimento inicial de segurança (política de senha, rate limit, token guard).
+- [x] Suíte de testes automatizados e validação da aplicação.
+- [x] Inclusão de índice principal e organização final para apresentação do TCC.
+
+Cronograma detalhado
+
+O cronograma completo, com progresso por fase, atividades concluídas, pendências e próximos marcos, está em [docs/cronograma.md](docs/cronograma.md).
+
 Principais tecnologias
 
 - Python 3.11+
@@ -44,6 +59,7 @@ Principais tecnologias
 | [Testes](docs/testes.md) | Suíte de testes e comandos. |
 | [Operação e Uso](docs/operacao-uso.md) | Fluxos de operação para usuários. |
 | [Roadmap](docs/roadmap.md) | Melhorias planejadas. |
+| [Cronograma](docs/cronograma.md) | Planejamento e progresso por fase (concluído e pendente). |
 | [Análise Técnica (TCC)](docs/tcc-analise-tecnica.md) | Documento para apresentação acadêmica. |
 
 Como começar (resumo rápido)

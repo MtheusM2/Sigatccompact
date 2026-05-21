@@ -11,12 +11,13 @@ Ordem de leitura sugerida (para banca / avaliadores):
 5. [Segurança](seguranca.md) (medidas e riscos)
 6. [Governança](governanca.md) (valor para TI)
 7. [Testes](testes.md) (suíte automatizada)
-8. [Roadmap](roadmap.md) (evoluções planejadas)
-9. [Análise Técnica do TCC](tcc-analise-tecnica.md) (documento para apresentação)
+8. [Cronograma](cronograma.md) (progresso, pendências e marcos)
+9. [Roadmap](roadmap.md) (evoluções planejadas)
+10. [Análise Técnica do TCC](tcc-analise-tecnica.md) (documento para apresentação)
 
 Divisão: documentos técnicos e documentos acadêmicos
 
-- Técnicos: Visão Geral, Funcionalidades, Arquitetura, Banco de Dados, Segurança, Testes, Operação e Instalação, Roadmap.
+- Técnicos: Visão Geral, Funcionalidades, Arquitetura, Banco de Dados, Segurança, Testes, Operação e Instalação, Cronograma, Roadmap.
 - Acadêmicos: Análise Técnica do TCC, materiais de apresentação (em `apresentacao/`).
 
 Observação sobre autenticação
