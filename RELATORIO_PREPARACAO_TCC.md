@@ -2,7 +2,7 @@
 
 **Data:** 11 de Maio de 2025  
 **Projeto:** Sistema de Controle de Ativos  
-**Status:** ✅ Pronto para Apresentação
+**Status:** Em andamento
 
 ---
 
