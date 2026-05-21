@@ -1,262 +1,121 @@
-# Sistema de Controle de Ativos
+# DataAssets — Sistema de Controle de Ativos
 
-Sistema de controle de ativos desenvolvido em **Python**, com arquitetura modular, autenticação de usuários e integração com **MySQL**.
+[![Status](https://img.shields.io/badge/Status-Em%20desenvolvimento-yellowgreen)]() [![TCC](https://img.shields.io/badge/Tipo-TCC-blue)]() [![Tech](https://img.shields.io/badge/Stack-Python%20|%20Flask%20|%20MySQL-lightgrey)]()
 
-O projeto foi estruturado para permitir evolução progressiva do backend, melhoria de segurança, organização em camadas e futura integração com interface web em **Flask**.
+Resumo
 
----
+Projeto acadêmico (TCC) para controle de ativos de TI. Fornece cadastro, consulta, edição e remoção de ativos, com autenticação de usuários e uma base para migração progressiva para APIs com Bearer Token.
 
-## Objetivo do projeto
+Problema que resolve
 
-Este sistema tem como finalidade gerenciar ativos corporativos, permitindo:
+Reduz a dependência de planilhas dispersas, melhora rastreabilidade de equipamentos e organiza um inventário único para a gestão de ativos.
 
-- cadastro de usuários
-- autenticação com login e senha
-- recuperação de senha com pergunta de segurança
-- cadastro de ativos
-- edição de ativos
-- remoção de ativos
-- listagem e filtragem de ativos
-- persistência em banco de dados MySQL
+Objetivos
 
----
+- Inventário centralizado de ativos.
+- Controle de ciclo de vida dos equipamentos.
+- Apoio à governança de TI e auditoria básica.
 
-## Tecnologias utilizadas
-
-- **Python 3**
-- **MySQL**
-- **Flask**
-- **mysql-connector-python**
-- **python-dotenv**
-
----
-
-## Estrutura do projeto
-
-```text
-controle_ativos/
-├── database/
-│   ├── connection.py
-│   ├── init_db.py
-│   └── schema.sql
-│
-├── models/
-│   ├── ativos.py
-│   └── usuario.py
-│
-├── services/
-│   ├── ativos_service.py
-│   └── auth_service.py
-│
-├── utils/
-│   ├── crypto.py
-│   └── validators.py
-│
-├── web/
-│   └── app.py
-│
-├── main.py
-├── .gitignore
-├── .env
-└── README.md
-
-
-Arquitetura do sistema
-
-O projeto segue uma estrutura modular separada por responsabilidades:
-
-models/: representa as entidades do sistema
-services/: concentra a lógica de negócio
-database/: gerencia conexão e estrutura do banco
-utils/: contém funções auxiliares, validações e segurança
-web/: camada de interface e evolução futura para integração web
-main.py: ponto de entrada da aplicação CLI
-app.py: base para evolução da aplicação web com Flask
-Funcionalidades implementadas
-Autenticação
-cadastro de usuário
-login
-recuperação de senha
-validação de email
-hash de senha
-hash de resposta de segurança
-Ativos
-cadastro de ativo
-edição de ativo
-exclusão de ativo
-listagem de ativos
-filtros por critérios
-controle de status
-associação do ativo ao usuário criador
-Regras de negócio principais
-cada ativo possui identificador único
-o status do ativo deve respeitar valores válidos
-o ativo pode possuir:
-responsável
-departamento
-data de entrada
-data de saída
-regras de validação são centralizadas
-o sistema restringe operações conforme o usuário autenticado
-Pré-requisitos
-
-Antes de executar o projeto, você precisa ter instalado:
-
-Python 3.11 ou superior
-MySQL Server
-Git
-ambiente virtual Python (venv)
-Como clonar o projeto
-git clone https://github.com/MtheusM2/controle-ativos.git
-cd controle-ativos
-Como criar e ativar o ambiente virtual
-Windows PowerShell
-python -m venv .venv
-.venv\Scripts\Activate.ps1
-Windows CMD
-python -m venv .venv
-.venv\Scripts\activate.bat
-Como instalar as dependências
-pip install mysql-connector-python
-pip install python-dotenv
-pip install flask
-
-Ou, se estiver usando requirements.txt:
-
-pip install -r requirements.txt
-Configuração do ambiente
-
-Crie um arquivo .env na raiz do projeto com o seguinte conteúdo:
-
-DB_HOST=localhost
-DB_PORT=3306
-DB_USER=root
-DB_PASSWORD=sua_senha_aqui
-DB_NAME=controle_ativos
-FLASK_SECRET_KEY=sua_chave_secreta
-APP_PEPPER=seu_pepper
-
-Importante: o arquivo .env não deve ser enviado para o GitHub.
-
-Como criar o banco de dados
-
-Garanta que o MySQL esteja em execução e depois execute o script de inicialização do banco:
-
-python database/init_db.py
-
-Esse script irá utilizar o arquivo schema.sql para criar a estrutura necessária.
-
-Como executar o sistema CLI
-python main.py
-Como executar a aplicação Flask
-python app.py
 Status do projeto
 
-Atualmente o sistema possui:
+- Desenvolvimento para TCC.
+- Funcionalidades principais implementadas (CRUD de ativos, autenticação, dashboard).
+- Segurança em evolução: migração gradual para Bearer Token; rate limit e política de senha implementados.
 
-backend funcional
-autenticação integrada
-MySQL funcionando
-validações centralizadas
-estrutura modular organizada
-base preparada para evolução web
+Principais tecnologias
 
-Próximas evoluções planejadas:
+- Python 3.11+
+- Flask
+- MySQL
+- HTML/CSS/JavaScript
+- Pytest
 
-padronização completa do backend
-melhoria de UX no terminal
-filtros avançados
-tratamento de erros mais profissional
-melhorias de segurança e LGPD
-API REST
-interface web completa
-testes automatizados
-documentação complementar
-Segurança
+Índice de documentação
 
-O projeto adota algumas práticas de segurança, como:
+| Documento | Descrição |
+|---|---|
+| [Visão Geral](docs/visao-geral.md) | Propósito do projeto, público e escopo. |
+| [Funcionalidades](docs/funcionalidades.md) | Lista de funcionalidades implementadas e em evolução. |
+| [Arquitetura](docs/arquitetura.md) | Organização técnica e fluxo da aplicação. |
+| [Banco de Dados](docs/banco-de-dados.md) | Estrutura básica e cuidados com dados. |
+| [Segurança](docs/seguranca.md) | Medidas aplicadas e riscos conhecidos. |
+| [Autenticação por Token](docs/autenticacao-token.md) | Fluxo de tokens e uso do decorator `@token_required`. |
+| [Instalação e Configuração](docs/instalacao-configuracao.md) | Como preparar ambiente local. |
+| [Testes](docs/testes.md) | Suíte de testes e comandos. |
+| [Operação e Uso](docs/operacao-uso.md) | Fluxos de operação para usuários. |
+| [Roadmap](docs/roadmap.md) | Melhorias planejadas. |
+| [Análise Técnica (TCC)](docs/tcc-analise-tecnica.md) | Documento para apresentação acadêmica. |
 
-hash de senha
-hash de resposta de recuperação
-uso de variáveis de ambiente
-separação entre código e configuração sensível
+Como começar (resumo rápido)
 
-Melhorias futuras previstas:
+1. Criar ambiente virtual:
 
-política de privacidade
-controle de permissões mais refinado
-fortalecimento das regras de acesso
-revisão de exposição de dados sensíveis
-Boas práticas adotadas
-separação por camadas
-centralização de validações
-uso de serviços para regras de negócio
-organização modular
-versionamento com Git e GitHub
-preparação para crescimento do sistema
-Como contribuir
-faça um fork do projeto
-crie uma branch para sua funcionalidade
-faça as alterações
-envie um commit descritivo
-abra um pull request
-Autor
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+```
 
-Desenvolvido por Matheus
-Projeto com foco em evolução técnica, arquitetura modular e profissionalização do backend.
+2. Instalar dependências:
 
-Licença
-
-Este projeto está em desenvolvimento para fins educacionais e de evolução profissional.
-
-
----
-
-# Como adicionar no projeto
-
-## 1. Criar o arquivo
-Na raiz do projeto, crie:
-
-```text
-README.md
-2. Colar o conteúdo
-
-Cole exatamente o texto acima.
-
-3. Salvar
-
-Salve o arquivo.
-
-4. Subir para o GitHub
-
-No terminal:
-
-git add README.md
-git commit -m "docs: adiciona README profissional do projeto"
-git push
-O que vai deixar ele ainda mais profissional
-
-Eu recomendo também criar estes dois arquivos:
-
-.env.example
-
-Esse arquivo mostra a estrutura das variáveis sem expor seus segredos:
-
-DB_HOST=localhost
-DB_PORT=3306
-DB_USER=root
-DB_PASSWORD=sua_senha_aqui
-DB_NAME=controle_ativos
-FLASK_SECRET_KEY=sua_chave_secreta
-APP_PEPPER=seu_pepper
-requirements.txt
-
-Se ainda não tiver, crie com:
-
-flask
-mysql-connector-python
-python-dotenv
-
-Assim, o README fica coerente com instalação por:
-
+```bash
 pip install -r requirements.txt
+```
+
+3. Configurar variáveis de ambiente: copie `.env.example` para `.env` e preencha os valores (não versionar `.env`).
+
+4. Inicializar banco (MySQL) e criar esquema:
+
+```bash
+python controle_ativos/database/init_db.py
+```
+
+5. Executar a aplicação localmente (desenvolvimento):
+
+```bash
+python controle_ativos/web/app.py
+```
+
+6. Executar testes:
+
+```bash
+python -m pytest -q
+```
+
+Avisos de segurança
+
+- Nunca versionar `.env` ou arquivos com credenciais.
+- Use `.env.example` com placeholders para documentação.
+- Não inclua tokens ou senhas reais nos documentos.
+
+Estrutura do repositório (resumo)
+
+```
+controle_ativos/
+	├─ web/ (Flask app and templates)
+	├─ services/ (business logic)
+	├─ models/ (data models)
+	├─ database/ (connection and schema)
+	└─ utils/ (helpers, crypto, validators)
+
+docs/ (documentação organizada para TCC)
+tests/ (pytest)
+```
+
+
+Contribuição e contato
+
+Este repositório é mantido pelo autor do TCC. Para contribuições, siga o fluxo de branches e Pull Requests. Para dúvidas, abra uma issue.
+
+Equipe
+
+| Nome | Função / Responsabilidade |
+|---|---|
+| Mateus Santos | Backend e Segurança |
+| Felipe | Frontend |
+| Giovane | Documentação: proposta de vendas |
+| Laís | Documentação completa (monografia) |
+| Vitória | Documentação: problemas e propostas de solução |
+
+Licença / Observação acadêmica
+
+Projeto desenvolvido para fins de Trabalho de Conclusão de Curso (TCC). Consulte `docs/tcc-analise-tecnica.md` para a análise técnica.
