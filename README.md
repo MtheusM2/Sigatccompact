@@ -46,7 +46,7 @@ O projeto Sigatccompact surgiu a partir da necessidade de modernizar o controle 
 
 Como resposta, foi desenvolvida uma base técnica em Python com persistência em MySQL, autenticação de usuários, validações centralizadas e arquitetura modular separada por responsabilidades. O sistema já contempla cadastro, login, recuperação de senha, CRUD de ativos, filtros por múltiplos critérios, ordenação e controle de acesso por usuário autenticado. Além da operação em terminal, o projeto já possui camada web em Flask com rotas para autenticação e manipulação de ativos, além de telas HTML/CSS em evolução. O resultado atual é uma fundação funcional e rastreável, pronta para consolidação final, integração visual, testes intensivos e documentação acadêmica. 
 
-**Palavras-chave:** `governança de TI`, `COBIT 2019`, `gestão de ativos`, `controle patrimonial escolar`, `instituição de ensino`
+
 
 ---
 
