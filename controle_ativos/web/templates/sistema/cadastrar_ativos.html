@@ -1,0 +1,82 @@
+<div class="container_cadastro_ativos"></div>
+<h2 class="h2_cadastro_ativos">Cadastro de Ativos</h2>
+
+<form class="form_cadastro_ativos" id="cadastrar_ativos_form">
+    <div class="caixa_cadastro_ativos">
+        <div class="linha1">
+            <div class="linhas">
+                
+                <label for="tipo">Tipo:</label>
+                <select class="status_cadastro" name="tipo" id="tipo">
+                    <option value="Notebook">Notebook</option>
+                    <option value="Desktop">Desktop</option>
+                    <option value="Monitor">Monitor</option>
+                    <option value="Impressora">Impressora</option>
+                    <option value="Periférico">Periférico</option>
+                </select>
+            </div>
+
+            <div class="linhas">
+        <label for="marca">Marca:</label>
+        <input type="text" id="marca" name="marca" required>
+            </div>
+
+            <div class="linhas">
+        <label for="modelo">Modelo:</label>
+        <input type="text" id="modelo" name="modelo" required>
+            </div>
+        </div>
+        <br>
+
+        <div class="linha2">
+            <div class="linhas">
+        <label for="usuario_responsavel">Usuário Responsável:</label>
+        <input type="text" id="usuario_responsavel" name="usuario_responsavel" required>
+            </div>
+
+            <div class="linhas">
+        <label for="departamento">Departamento:</label>
+        <select class="status_cadastro" name="departamento" id="departamento">
+                    <option value="TI">TI</option>
+                    <option value="RH">RH</option>
+                    <option value="Administração">Administração</option>
+                </select>
+            </div>
+            
+            <div class="linhas">
+            <label for="status">Status:</label>
+                <select class="status_cadastro" name="status" id="status">
+                    <option value="Disponível">Disponível</option>
+                    <option value="Em Uso">Em Uso</option>
+                    <option value="Em Manutenção">Em Manutenção</option>
+                    <option value="Reservado">Reservado</option>
+                    <option value="Baixado">Baixado</option>
+                </select>
+            </div>
+        </div>
+        <br>
+
+        <div class="linha3">
+            <div class="linhas">
+                <label for="data_entrada">Data de Entrada:</label>
+                <input type="date" id="data_entrada" name="data_entrada" required>
+            </div>
+            <div class="linhas">
+                <label for="data_saida">Data de Saída:</label>
+                <input type="date" id="data_saida" name="data_saida">
+            </div>
+        </div>
+        <br>
+        <div class="botoes_cadastro">
+            <input id="btn_cadastrar" name="btn_cadastrar" class="nome_botao_cadastro" type="submit" value="Cadastrar">
+        </div>
+        
+        
+    
+
+        <!-- <a href="home.html">
+            <button type="button">Entrar</button>
+        </a> -->
+    </div>
+    </form>
+

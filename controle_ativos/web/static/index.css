@@ -1,0 +1,421 @@
+@import url('https://fonts.googleapis.com/css2?family=Datatype:wght@100..900&display=swap');
+
+
+/* Estilos para a página de login */
+
+* {
+    text-decoration: none; 
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+
+}
+.login {
+    background: linear-gradient(0deg, #0a0b0e 0%, #1C2331 100%);
+    font-family: "Datatype", monospace;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    color: #A7B0C2;
+}
+
+.h1_login {
+    color: #E6EAF2;
+    padding: 5px;
+    text-align: center;
+}
+
+.form_login{
+    color: #A7B0C2;
+    width: 30%;
+    padding: 5px;
+    background-color: #151922;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    border: 2px solid #2A3142;
+}
+
+input[type=email], input[type="password"] {
+    padding: 3px;
+    border: 2px solid #2A3142;
+    border-radius: 8px;
+    background-color: #1C2331 ;
+    color: #A7B0C2;
+}
+
+
+input[type=submit] {
+    background-color: #3B82F6  ;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    padding: 5px;
+    width: 15% ;
+    display: block;
+    margin-left: auto;
+}
+
+.links_login {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    color: #A7B0C2;
+}
+
+.links_login a {
+    color: #A7B0C2;
+    font-size: 20px;
+}
+
+/* Estilos para a página de registro */
+
+.register {
+    background: linear-gradient(0deg, #0a0b0e 0%, #1C2331 100%);
+    font-family: "Datatype", monospace;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    color: #A7B0C2;
+}
+
+
+.h1_register {
+    color: #E6EAF2;
+    padding: 5px;
+    text-align: center;
+}
+
+.form_Register{
+    color: #A7B0C2;
+    width: 30%;
+    padding: 5px;
+    background-color: #151922;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    border: 2px solid #2A3142;
+}
+input[type=email], input[type="password"] {
+    padding: 3px;
+    border: 2px solid #2A3142;
+    border-radius: 8px;
+    background-color: #1C2331 ;
+    color: #A7B0C2;
+}
+input[type=text] {
+    padding: 3px;
+    border: 2px solid #2A3142;
+    border-radius: 8px;
+    background-color: #1C2331 ;
+    color: #A7B0C2;
+}
+
+.botoes_cadastro {
+    display: flex;
+    justify-content: space-between;
+    gap: 70%;
+    margin-top: 10px;
+}
+
+/* Estilos para a página de recuperação de senha */
+
+.recovery {
+    background: linear-gradient(0deg, #0a0b0e 0%, #1C2331 100%);
+    font-family: "Datatype", monospace;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    color: #A7B0C2;
+}
+
+
+.h1_recovery {
+    color: #E6EAF2;
+    padding: 5px;
+    text-align: center;
+}
+
+.form_recovery{
+    color: #A7B0C2;
+    width: 30%;
+    padding: 5px;
+    background-color: #151922;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    border: 2px solid #2A3142;
+}
+input[type=email], input[type="password"] {
+    padding: 3px;
+    border: 2px solid #2A3142;
+    border-radius: 8px;
+    background-color: #1C2331 ;
+    color: #A7B0C2;
+}
+input[type=text] {
+    padding: 3px;
+    border: 2px solid #2A3142;
+    border-radius: 8px;
+    background-color: #1C2331 ;
+    color: #A7B0C2;
+}
+
+.botoes_cadastro {
+    display: flex;
+    justify-content: space-between;
+    gap: 70%;
+    margin-top: 10px;
+}
+
+
+
+/* Estilos para a página de dashboard */
+
+.dashboard {
+    margin: 0px;
+    background: linear-gradient(90deg, #0a0b0e 0%, #1C2331 100%);
+    font-family: "Datatype", monospace;
+    color: #A7B0C2;
+    
+}
+
+.h_dashboard {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border: #0a0b0e solid 2px;
+    padding: 10px;
+    background-color: #151922;
+    
+}
+
+.ativosOpcoes {
+    display: flex;
+    background-color: #1C2331;
+    border: #2A3142 solid 2px;
+    border-radius: 8px;
+    color: #A7B0C2;
+}
+
+
+/* Estilos para os cards de status dos ativos */
+.cards {
+    padding: 10px;
+    display: flex;
+    flex-direction: wrap;
+    margin-top: 20px;
+    gap: 20px;
+}
+.card_total {
+    background-color: #151922;
+    padding: 10px;
+    border-radius: 5px;
+    color: #A7B0C2;
+    border: 2px solid #2A3142;
+    
+}
+
+.card_usados {
+    background-color: #151922;
+    padding: 10px;
+    border-radius: 5px;
+    color: #A7B0C2;
+    border: 2px solid #2A3142;
+    
+}
+
+.card_manutencao {
+    background-color: #151922;
+    padding: 10px;
+    border-radius: 5px;
+    color: #A7B0C2;
+    border: 2px solid #2A3142;
+    
+}
+
+.card_disponiveis {
+    background-color: #151922;
+    padding: 10px;
+    border-radius: 5px;
+    color: #A7B0C2;
+    border: 2px solid #2A3142;
+    
+}
+
+/* Estilos para a página de cadastro de ativos */
+.container_cadastro_ativos {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 12vh;
+}
+
+.caixa_cadastro_ativos {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 15px;
+    color: #A7B0C2;
+    padding: 20px;
+    background-color: #151922;
+    border-radius: 5px;
+    border: 2px solid #2A3142;
+}
+
+.form_cadastro_ativos {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+    height: 45vh;
+}
+
+.status_cadastro {
+    width: 100%;
+    padding: 3px;
+    border: 2px solid #2A3142;
+    border-radius: 8px;
+    background-color: #1C2331 ;
+    color: #A7B0C2;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+input[type="date"] {
+    padding: 3px;
+    border: 2px solid #2A3142;
+    border-radius: 8px;
+    background-color: #1C2331 ;
+    color: #A7B0C2;
+    -webkit-appearance: none;
+    appearance: none;
+}
+.h2_cadastro_ativos {
+    color: #E6EAF2;
+    padding: 5px;
+    text-align: center;
+}
+
+.linha1 {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 15px;
+    gap: 30px;
+}
+
+.linha1 label {
+    margin-bottom: 5px;
+}
+
+.linha2 {
+    display: flex;
+    gap: 30px;
+}
+
+.linha3 {
+    display: flex;
+    gap: 40px;
+    justify-content: space-between;
+}
+
+.linhas {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.linhas label {
+    margin-bottom: 5px;
+}
+
+/* Estilos para a página de busca de ativos */
+
+.container_buscar_ativos {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 12vh;
+}
+
+.caixa_buscar_ativos {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 15px;
+    color: #A7B0C2;
+    padding: 20px;
+    background-color: #151922;
+    border-radius: 5px;
+    border: 2px solid #2A3142;
+}
+
+.form_buscar_ativos {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+    height: 45vh;
+}
+
+.status_buscar {
+    width: 100%;
+    padding: 3px;
+    border: 2px solid #2A3142;
+    border-radius: 8px;
+    background-color: #1C2331 ;
+    color: #A7B0C2;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+input[type="date"] {
+    padding: 3px;
+    border: 2px solid #2A3142;
+    border-radius: 8px;
+    background-color: #1C2331 ;
+    color: #A7B0C2;
+    -webkit-appearance: none;
+    appearance: none;
+}
+.h2_buscar_ativos {
+    color: #E6EAF2;
+    padding: 5px;
+    text-align: center;
+}
+
+.linha1 {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 15px;
+    gap: 30px;
+}
+
+.linha1 label {
+    margin-bottom: 5px;
+}
+
+.linha2 {
+    display: flex;
+    gap: 30px;
+}
+
+.linha3 {
+    display: flex;
+    gap: 40px;
+    justify-content: space-between;
+}
+
+.linhas {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.linhas label {
+    margin-bottom: 5px;
+}

@@ -85,11 +85,11 @@ Desenvolver um sistema de controle de ativos com autenticação de usuários e p
 4. [🔨] Consolidar a camada web em Flask com integração progressiva entre rotas, sessão e interface HTML/CSS.
 5. [🔨] Organizar a documentação técnica e acadêmica do projeto para entrega final do TCC.
 
----
+[![Status](https://img.shields.io/badge/Status-Em%20desenvolvimento-yellowgreen)]() [![TCC](https://img.shields.io/badge/Tipo-TCC-blue)]() [![Tech](https://img.shields.io/badge/Stack-Python%20|%20Flask%20|%20MySQL-lightgrey)]()
 
-## 📐 Framework / Metodologia Adotada
+Resumo
 
-### Framework de Governança
+Projeto acadêmico (TCC) para controle de ativos de TI. Fornece cadastro, consulta, edição e remoção de ativos, com autenticação de usuários e uma base para migração progressiva para APIs com Bearer Token.
 
 | Framework | Versão | Processos/Domínios Utilizados | Papel no Projeto |
 |-----------|--------|-------------------------------|------------------|
@@ -107,7 +107,7 @@ Desenvolver um sistema de controle de ativos com autenticação de usuários e p
 | **Qualidade e controle operacional** | Exige regras claras, validações e previsibilidade de processo | Centralização de validadores, padronização de exceções e tratamento das regras de status e datas |
 | **Melhoria contínua** | Promove evolução incremental baseada em lacunas e riscos | Projeto evoluiu de CRUD simples para arquitetura modular com MySQL, segurança reforçada e base web em refinamento |
 
-### Metodologia de Pesquisa
+Reduz a dependência de planilhas dispersas, melhora rastreabilidade de equipamentos e organiza um inventário único para a gestão de ativos.
 
 - **Tipo:** Pesquisa aplicada com estudo de caso
 - **Abordagem:** Qualitativa, com apoio técnico-documental
@@ -163,11 +163,16 @@ Desenvolver um sistema de controle de ativos com autenticação de usuários e p
 | 9 | Relatório técnico / monografia TCC | DOCX / PDF | `docs/` | 🔨 Em andamento |
 | 10 | Slides da defesa | PPTX | `apresentacao/slides-defesa.pptx` | 🔲 Pendente |
 
-**Legenda:** 🔲 Pendente · 🔨 Em andamento · ✅ Concluído
+- [x] Levantamento do problema e escopo do TCC.
+- [x] Estruturação da documentação técnica em `docs/`.
+- [x] Diagrama AS-IS do processo analisado (documentado em [Arquitetura](docs/arquitetura.md)).
+- [x] Definição do fluxo alvo (TO-BE) para evolução da solução.
+- [x] Implementação das funcionalidades centrais (cadastro, consulta, edição, exclusão).
+- [x] Endurecimento inicial de segurança (política de senha, rate limit, token guard).
+- [x] Suíte de testes automatizados e validação da aplicação.
+- [x] Inclusão de índice principal e organização final para apresentação do TCC.
 
----
-
-## 📅 Cronograma
+Cronograma detalhado
 
 | Fase | Atividade | Início | Fim | Entregável Associado | Status |
 |------|-----------|--------|-----|---------------------|--------|
@@ -230,6 +235,33 @@ sigatccompact/
 ├── .gitignore
 └── requirements.txt
 ```
+controle_ativos/
+	├─ web/ (Flask app and templates)
+	├─ services/ (business logic)
+	├─ models/ (data models)
+	├─ database/ (connection and schema)
+	└─ utils/ (helpers, crypto, validators)
+
+docs/ (documentação organizada para TCC)
+tests/ (pytest)
+```
+
+
+Contribuição e contato
+
+Este repositório é mantido pelo autor do TCC. Para contribuições, siga o fluxo de branches e Pull Requests. Para dúvidas, abra uma issue.
+
+Equipe
+
+| Nome | Função / Responsabilidade |
+|---|---|
+| Mateus Santos | Backend e Segurança |
+| Felipe | Frontend |
+| Giovane | Documentação: proposta de vendas |
+| Laís | Documentação completa (monografia) |
+| Vitória | Documentação: problemas e propostas de solução |
+
+Licença / Observação acadêmica
 
 ---
 

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de login</title>
+    <!-- <link rel="stylesheet" href="index.css"> -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+
+
+</head>
+
+<body class="login">
+
+<div class="conteiner_login"></div>
+<h1 class="h1_login">Tela de Login</h1>
+
+    <form class="form_login" id="formLogin">
+
+        <label for="email">Email:</label>
+        <input type="email" name="email" required>
+        <br>
+        <label for="senha">Senha:</label>
+        <input type="password" name="senha">
+        
+        <div class="links_login">
+            <a href="{{ url_for('recovery_form') }}">esqueci a senha</a> 
+            <a href="{{ url_for('registro_form') }}">se cadastre aqui</a>
+        </div>
+
+        
+        <br>
+        <br>
+        <div class="entrar_login">
+            <input type="submit" value="Entrar">
+        </div>
+
+        <!-- <a href="home.html">
+            <button type="button">Entrar</button>
+        </a> -->
+
+    </form>
+
+    </div>
+    <script>
+document.getElementById("formLogin").addEventListener("submit", async function(e) {
+    e.preventDefault(); // impede recarregar a página
+
+    const usuario = document.querySelector('input[name="email"]').value;
+    const senha = document.querySelector('input[name="senha"]').value;
+
+    try {
+        const resposta = await fetch("/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                email: usuario,   // ⚠️ aqui precisa bater com seu backend
+                senha: senha
+            })
+        });
+
+        let data = {};
+        const contentType = resposta.headers.get("content-type") || "";
+
+        if (contentType.includes("application/json")) {
+            data = await resposta.json();
+        }
+
+        if (resposta.ok && data.ok) {
+            alert("Login realizado com sucesso!");
+            window.location.href = "/dashboard";
+        } else {
+            const mensagem = data.erro || `Erro no servidor (${resposta.status}).`;
+            alert("Erro: " + mensagem);
+        }
+
+    } catch (erro) {
+        alert("Não foi possível conectar ao servidor.");
+    }
+});
+</script>
+</body>
+
+</html>
