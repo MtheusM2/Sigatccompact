@@ -1,32 +1,27 @@
-from models.usuario import Usuario
-from database.connection import cursor_mysql
-from utils.crypto import gerar_hash, verificar_hash, normalizar_resposta_recuperacao
-from utils.validators import validar_email, validar_senha, validar_texto_obrigatorio
+from controle_ativos.models.usuario import Usuario
+from controle_ativos.database.connection import cursor_mysql
+from controle_ativos.utils.crypto import gerar_hash, verificar_hash, normalizar_resposta_recuperacao
+from controle_ativos.utils.validators import validar_email, validar_senha, validar_texto_obrigatorio
 
 
 class AuthErro(Exception):
     """Erro base de autenticação."""
-    pass
 
 
 class UsuarioJaExiste(AuthErro):
     """Erro para usuário duplicado."""
-    pass
 
 
 class UsuarioNaoEncontrado(AuthErro):
     """Erro para usuário inexistente."""
-    pass
 
 
 class CredenciaisInvalidas(AuthErro):
     """Erro para login inválido."""
-    pass
 
 
 class RecuperacaoInvalida(AuthErro):
     """Erro para recuperação inválida."""
-    pass
 
 
 def _normalizar_email(email: str) -> str:
@@ -101,7 +96,7 @@ class AuthService:
             raise CredenciaisInvalidas("E-mail ou senha inválidos.")
 
         return Usuario(
-            id=row["id"],
+            usuario_id=row["id"],
             email=row["email"],
             senha_hash=row["senha_hash"],
             pergunta_recuperacao=row["pergunta_recuperacao"],

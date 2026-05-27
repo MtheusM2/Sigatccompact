@@ -2,21 +2,21 @@
 
 Visão geral
 
-O projeto usa tokens opacos para proteger APIs. O token é gerado no login e enviado ao cliente; apenas o hash do token é armazenado no banco de dados.
+Este documento descreve uma proposta futura de autenticação por token opaco. No estado atual do projeto, a autenticação operacional usa sessão Flask.
 
 Fluxo (conceitual)
 
 1. Usuário realiza login com credenciais.
 2. O servidor valida as credenciais e gera um token opaco (valor aleatório).
-3. O servidor armazena apenas o hash do token no banco (ex.: `auth_tokens`).
-4. O cliente armazena o token em `sessionStorage` (frontend) e o envia em requisições protegidas:
+3. O servidor poderia armazenar apenas o hash do token no banco em uma evolução futura (ex.: tabela `auth_tokens`).
+4. O cliente poderia armazenar o token em `sessionStorage` (frontend) e o enviar em requisições protegidas:
 
 ```
 Authorization: Bearer <token>
 ```
 
-5. O decorator `@token_required` valida o header `Authorization`, compara o hash e popula `g.usuario_id` para uso nos handlers.
-6. No logout, o token é revogado/invalidado no banco; tokens revogados deixam de funcionar.
+5. Um decorator `@token_required` poderia validar o header `Authorization`, comparar o hash e popular `g.usuario_id` para uso nos handlers.
+6. No logout, o token seria revogado/invalidado no banco; tokens revogados deixariam de funcionar.
 
 Vantagens
 
@@ -26,4 +26,4 @@ Vantagens
 Observações operacionais
 
 - Não coloque exemplos de tokens reais na documentação.
-- A migração para Bearer Token está em andamento; algumas rotas ainda aceitam sessões por compatibilidade.
+- A migração para Bearer Token permanece como possibilidade futura; algumas rotas ainda aceitam sessões por compatibilidade no estado atual.

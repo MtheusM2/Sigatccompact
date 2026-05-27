@@ -4,16 +4,19 @@ import os
 import sys
 import secrets
 from pathlib import Path
+import mysql.connector
 from flask import Flask, request, jsonify, session
 from flask import render_template
 
-# Garante imports absolutos quando o app é executado de dentro da pasta web.
-BASE_DIR = Path(__file__).resolve().parents[1]
-if str(BASE_DIR) not in sys.path:
-    sys.path.insert(0, str(BASE_DIR))
+# Garante imports absolutos quando o app é importado ou executado de dentro da pasta web.
+# O import `controle_ativos...` precisa da raiz do repositório no sys.path,
+# não da própria pasta `controle_ativos`.
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 # Importa o serviço de autenticação e suas exceções específicas.
-from services.auth_service import (
+from controle_ativos.services.auth_service import (
     AuthService,
     AuthErro,
     UsuarioJaExiste,
@@ -23,7 +26,7 @@ from services.auth_service import (
 )
 
 # Importa o serviço de ativos e suas exceções específicas.
-from services.ativos_service import (
+from controle_ativos.services.ativos_service import (
     AtivosService,
     AtivoErro,
     AtivoJaExiste,
@@ -32,7 +35,7 @@ from services.ativos_service import (
 )
 
 # Importa o model de domínio do ativo.
-from models.ativos import Ativo
+from controle_ativos.models.ativos import Ativo
 
 # Cria a aplicação Flask.
 app = Flask(__name__)
@@ -59,15 +62,15 @@ def recovery_form():
     return render_template("auth/recovery.html")
 
 @app.get("/dashboard")
-def dashboard():
+def dashboard_page():
     """Retorna a página do dashboard, que lista os ativos."""
     return _render_pagina_sistema("dashboard.html")
 
 
-def _render_pagina_sistema(dashboard: str):
+def _render_pagina_sistema(template_name: str):
     if "user_id" not in session:
         return render_template("auth/login.html", erro="Faça login para acessar o dashboard.")
-    return render_template(dashboard)
+    return render_template(template_name)
 
 
 @app.get("/dashboard/status")
@@ -94,11 +97,6 @@ def dashboard_editar():
 def dashboard_excluir():
     return _render_pagina_sistema("sistema/excluir_ativos.html")
 
-# Instancia os serviços
-auth_service = AuthService()
-ativos_service = AtivosService()
-
-# Instancia os serviços da aplicação.
 auth_service = AuthService()
 ativos_service = AtivosService()
 
@@ -167,7 +165,7 @@ def register():
         return _erro_json(str(erro), 409)
     except AuthErro as erro:
         return _erro_json(str(erro), 400)
-    except Exception as erro:
+    except mysql.connector.Error as erro:
         print(f"Erro no registro: {erro}")
         return _erro_json(f"Erro ao cadastrar usuário: {str(erro)}", 500)
 
@@ -187,6 +185,7 @@ def login():
 
         session["user_id"] = usuario.id
         session["email"] = usuario.email
+        # session["empresa_id"] = usuario.empresa_id  # reservado para futura multi-tenant
 
         return jsonify({"ok": True, "email": usuario.email})
     except KeyError as erro:

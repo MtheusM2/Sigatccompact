@@ -11,9 +11,10 @@ Ordem de leitura sugerida (para banca / avaliadores):
 5. [Segurança](seguranca.md) (medidas e riscos)
 6. [Governança](governanca.md) (valor para TI)
 7. [Testes](testes.md) (suíte automatizada)
-8. [Cronograma](cronograma.md) (progresso, pendências e marcos)
-9. [Roadmap](roadmap.md) (evoluções planejadas)
-10. [Análise Técnica do TCC](tcc-analise-tecnica.md) (documento para apresentação)
+8. [Validação de Rotas e Testes](validacao-rotas-e-testes.md) (mapa de cobertura e lacunas)
+9. [Cronograma](cronograma.md) (progresso, pendências e marcos)
+10. [Roadmap](roadmap.md) (evoluções planejadas)
+11. [Análise Técnica do TCC](tcc-analise-tecnica.md) (documento para apresentação)
 
 Divisão: documentos técnicos e documentos acadêmicos
 
@@ -22,4 +23,4 @@ Divisão: documentos técnicos e documentos acadêmicos
 
 Observação sobre autenticação
 
-O projeto está em migração gradual de sessão Flask para Bearer Token (opaco). Algumas rotas e páginas ainda mantêm compatibilidade temporária com sessão para não quebrar a navegação existente. Para detalhes do fluxo de tokens, veja [Autenticação por Token](autenticacao-token.md).
+O projeto opera atualmente com sessão Flask para autenticação e navegação. A ideia de Bearer Token pode ser retomada futuramente, mas não faz parte do fluxo ativo do estado atual.

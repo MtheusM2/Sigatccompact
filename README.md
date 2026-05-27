@@ -44,7 +44,7 @@
 
 O projeto Sigatccompact surgiu a partir da necessidade de modernizar o controle patrimonial e administrativo de ativos em ambiente escolar, com foco inicial na realidade da ETEC Jaraguá. A proposta parte de um problema recorrente em instituições educacionais: controles descentralizados, baixa padronização cadastral, dificuldade de localizar equipamentos por setor e pouca visibilidade sobre o estado real dos bens, como itens em uso, manutenção, reserva ou baixa.
 
-Como resposta, foi desenvolvida uma base técnica em Python com persistência em MySQL, autenticação de usuários, validações centralizadas e arquitetura modular separada por responsabilidades. O sistema já contempla cadastro, login, recuperação de senha, CRUD de ativos, filtros por múltiplos critérios, ordenação e controle de acesso por usuário autenticado. Além da operação em terminal, o projeto já possui camada web em Flask com rotas para autenticação e manipulação de ativos, além de telas HTML/CSS em evolução. O resultado atual é uma fundação funcional e rastreável, pronta para consolidação final, integração visual, testes intensivos e documentação acadêmica. 
+Como resposta, foi desenvolvida uma base técnica em Python com persistência em MySQL, autenticação de usuários, validações centralizadas e arquitetura modular separada por responsabilidades. O sistema já contempla cadastro, login, recuperação de senha, CRUD de ativos, filtros por múltiplos critérios, ordenação e controle de acesso por usuário autenticado. Além da operação em terminal, o projeto já possui camada web em Flask com rotas para autenticação e manipulação de ativos, telas HTML/CSS em evolução, carregamento de `.env` pela raiz do repositório e compatibilidade para bancos locais legados. O resultado atual é uma fundação funcional e rastreável, pronta para consolidação final, integração visual, validações complementares e documentação acadêmica. 
 
 
 
@@ -82,8 +82,9 @@ Desenvolver um sistema de controle de ativos com autenticação de usuários e p
 1. [x] Desenvolver a estrutura modular do sistema separando modelos, serviços, banco de dados, utilitários e interface.
 2. [x] Implementar autenticação com cadastro, login e recuperação de senha por pergunta de segurança.
 3. [x] Implementar CRUD de ativos com regras de negócio, validações, filtros e ordenação.
-4. [🔨] Consolidar a camada web em Flask com integração progressiva entre rotas, sessão e interface HTML/CSS.
+4. [🔨] Consolidar a camada web em Flask com integração entre rotas, sessão e interface HTML/CSS inicial.
 5. [🔨] Organizar a documentação técnica e acadêmica do projeto para entrega final do TCC.
+6. [x] Estabilizar carregamento de `.env`, inicialização do banco e compatibilidade de schema sem exigir `empresa_id`.
 
 [![Status](https://img.shields.io/badge/Status-Em%20desenvolvimento-yellowgreen)]() [![TCC](https://img.shields.io/badge/Tipo-TCC-blue)]() [![Tech](https://img.shields.io/badge/Stack-Python%20|%20Flask%20|%20MySQL-lightgrey)]()
 
@@ -168,8 +169,9 @@ Reduz a dependência de planilhas dispersas, melhora rastreabilidade de equipame
 - [x] Diagrama AS-IS do processo analisado (documentado em [Arquitetura](docs/arquitetura.md)).
 - [x] Definição do fluxo alvo (TO-BE) para evolução da solução.
 - [x] Implementação das funcionalidades centrais (cadastro, consulta, edição, exclusão).
-- [x] Endurecimento inicial de segurança (política de senha, rate limit, token guard).
+- [x] Endurecimento inicial de segurança (hash de senha, política mínima de senha, sessão Flask e variáveis de ambiente).
 - [x] Suíte de testes automatizados e validação da aplicação.
+- [x] Compatibilização do banco local para não depender de `empresa_id` no fluxo atual.
 - [x] Inclusão de índice principal e organização final para apresentação do TCC.
 
 Cronograma detalhado
@@ -180,10 +182,10 @@ Cronograma detalhado
 | 2 | Modelagem inicial e organização modular | 02/03/2026 | 15/03/2026 | Arquitetura por camadas | ✅ |
 | 3 | Implementação de autenticação e persistência | 16/03/2026 | 24/03/2026 | Módulo de usuários + banco MySQL | ✅ |
 | 4 | Consolidação do CRUD de ativos e refinamento de regras | 24/03/2026 | 27/03/2026 | CRUD funcional em terminal | ✅ |
-| 5 | Estabilização técnica do backend | 27/03/2026 | 10/06/2026 | Backend consolidado e alinhado | 🔨 |
+| 5 | Estabilização técnica do backend | 27/03/2026 | 10/06/2026 | Backend consolidado e alinhado | ✅ |
 | 6 | Evolução visual e refinamento da interface | 11/04/2026 | 20/05/2026 | Login refinado e estrutura principal | 🔲 |
-| 7 | Integração entre telas e backend | 21/04/2026 | 27/05/2026 | Fluxos web validados | 🔨 |
-| 8 | Testes, documentação e evidências | 28/04/2026 | 30/06/2026 | Relatórios, prints e revisão final | 🔲 |
+| 7 | Integração entre telas e backend | 21/04/2026 | 27/05/2026 | Fluxos web parcialmente validados | 🔨 |
+| 8 | Testes, documentação e evidências | 28/04/2026 | 30/06/2026 | Relatórios, prints e revisão final | 🔨 |
 | 9 | Preparação da apresentação | 01/05/2026 | 03/06/2026 | Slides e roteiro | 🔲 |
 | 10 | **Entrega / apresentação final** | 04/05/2026 | 04/06/2026 | Projeto final | 🔲 |
 
@@ -231,7 +233,7 @@ sigatccompact/
 │   └── monografia-tcc.pdf
 │
 ├── main.py
-├── .env
+├── .env                  # local, não versionado
 ├── .gitignore
 └── requirements.txt
 ```
@@ -297,12 +299,12 @@ Licença / Observação acadêmica
 1. O projeto já ultrapassou a fase de protótipo conceitual e possui base técnica funcional para autenticação, persistência e gestão de ativos.
 2. A arquitetura modular adotada favorece manutenção, evolução e alinhamento entre banco, regras de negócio e interfaces.
 3. O sistema já demonstra aderência prática ao problema proposto, atacando a falta de padronização e rastreabilidade de ativos.
-4. A principal limitação atual não está no núcleo do backend, mas na consolidação da interface web, na bateria de testes finais e na documentação definitiva.
+4. A principal limitação atual não está no núcleo do backend, mas na conclusão da camada web, na documentação acadêmica definitiva e nas evidências finais para apresentação.
 
 ### Trabalhos Futuros
 
 - Concluir a integração web ponta a ponta com autenticação e gestão de ativos em interface gráfica.
-- Implementar testes automatizados e documentação complementar de API e fluxos.
+- Ampliar testes de integração/end-to-end e documentação complementar de API e fluxos.
 - Evoluir o sistema para dashboard, relatórios gerenciais e possíveis módulos adicionais, como estoque e movimentação.
 - Revisar controles de segurança, LGPD, perfis de acesso e trilhas de auditoria.
 
@@ -325,8 +327,7 @@ Licença / Observação acadêmica
 
 ## 📖 Glossário de Termos Técnicos
 
-<details open>
-<summary><strong>🎯 Termos Específicos deste Projeto</strong></summary>
+### Termos Específicos deste Projeto
 
 | Termo | Definição no contexto deste projeto |
 |-------|-------------------------------------|
@@ -338,10 +339,7 @@ Licença / Observação acadêmica
 | **Camada de serviço** | Parte do sistema onde ficam as regras de negócio e o controle das operações principais. |
 | **Camada web** | Estrutura em Flask responsável pela futura interface visual e exposição dos fluxos do sistema. |
 
-</details>
-
-<details open>
-<summary><strong>🏛️ Governança e Gestão de TI</strong></summary>
+### Governança e Gestão de TI
 
 | Termo | Definição |
 |-------|-----------|
@@ -352,10 +350,7 @@ Licença / Observação acadêmica
 | **Maturidade** | Nível de evolução de um processo ou solução ao longo do tempo. |
 | **Stakeholder** | Parte interessada afetada pelo projeto, como equipe, escola, orientador e usuários. |
 
-</details>
-
-<details>
-<summary><strong>📗 COBIT 2019</strong></summary>
+### COBIT 2019
 
 | Termo | Definição |
 |-------|-----------|
@@ -366,10 +361,7 @@ Licença / Observação acadêmica
 | **MEA** | Domínio de monitorar, avaliar e analisar. |
 | **RACI** | Matriz de responsabilidades: Responsible, Accountable, Consulted, Informed. |
 
-</details>
-
-<details>
-<summary><strong>📘 ITIL v4</strong></summary>
+### ITIL v4
 
 | Termo | Definição |
 |-------|-----------|
@@ -380,10 +372,7 @@ Licença / Observação acadêmica
 | **Service Desk** | Ponto central de contato entre usuário e suporte. |
 | **Catálogo de Serviços** | Lista estruturada de serviços oferecidos pela TI. |
 
-</details>
-
-<details>
-<summary><strong>🔒 Segurança da Informação</strong></summary>
+### Segurança da Informação
 
 | Termo | Definição |
 |-------|-----------|
@@ -394,10 +383,7 @@ Licença / Observação acadêmica
 | **Sessão** | Mecanismo para manter o usuário autenticado entre requisições na camada web. |
 | **Variável de ambiente** | Configuração sensível separada do código-fonte, usada para credenciais e segredos. |
 
-</details>
-
-<details>
-<summary><strong>⚙️ Desenvolvimento e Arquitetura</strong></summary>
+### Desenvolvimento e Arquitetura
 
 | Termo | Definição |
 |-------|-----------|
@@ -407,8 +393,6 @@ Licença / Observação acadêmica
 | **Schema SQL** | Definição estrutural do banco de dados. |
 | **Context manager** | Recurso usado para gerenciar abertura e fechamento seguro de conexões e cursores. |
 | **Validação centralizada** | Estratégia de manter regras de consistência em utilitários únicos para reduzir duplicidade. |
-
-</details>
 
 ---
 
@@ -432,8 +416,7 @@ Este trabalho é de natureza acadêmica e foi desenvolvido como requisito parcia
 
 ---
 
-<details>
-<summary>📝 <strong>Checklist de Entrega do TCC</strong></summary>
+## Checklist de Entrega do TCC
 
 ### Documentação
 - [x] README.md preenchido e atualizado
@@ -471,4 +454,3 @@ Este trabalho é de natureza acadêmica e foi desenvolvido como requisito parcia
 - [ ] Todos os arquivos referenciados no README existem na estrutura final do GitHub
 - [ ] Revisão final de conformidade com LGPD
 
-</details>

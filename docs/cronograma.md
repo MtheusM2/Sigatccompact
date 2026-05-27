@@ -5,9 +5,10 @@ Este cronograma consolida o andamento do TCC com base no estado atual do reposit
 ## Resumo executivo
 
 - O núcleo funcional do sistema está implementado (Flask + MySQL com operações centrais de ativos).
-- O projeto possui autenticação, CRUD de ativos, dashboard, interface web Flask e documentação técnica reorganizada em `docs/`.
-- A interface web Flask já existe com páginas de login, dashboard e áreas do sistema; ela continua em evolução e ainda trabalha majoritariamente com sessão nas páginas HTML.
-- Há evolução de segurança documentada, porém a migração para Bearer Token permanece **gradual** e não deve ser tratada como 100% finalizada.
+- O projeto possui autenticação, CRUD de ativos, base de dashboard, interface web Flask em andamento e documentação técnica reorganizada em `docs/`.
+- A interface web Flask já existe com páginas de login, cadastro, recuperação, dashboard e áreas do sistema; porém ainda não está concluída ponta a ponta.
+- O carregamento de `.env` foi estabilizado para usar a raiz do repositório, e o banco local foi compatibilizado para não depender de `empresa_id` ou `nome` obrigatórios.
+- A documentação de segurança foi atualizada para refletir a autenticação por sessão Flask como fluxo operacional vigente.
 - A documentação foi reorganizada e o `README.md` principal foi mantido como página inicial enxuta.
 - A suíte de testes automatizados possui último estado conhecido registrado em `docs/testes.md`.
 - Permanecem pendências acadêmicas e de maturidade (revisão final da monografia, apresentação e evolução profissional do sistema).
@@ -21,19 +22,19 @@ Este cronograma consolida o andamento do TCC com base no estado atual do reposit
 | 3 | Proposta de processo alvo / TO-BE | Concluído | 100% | `docs/arquitetura.md`, `docs/roadmap.md` |
 | 4 | Modelagem da arquitetura do sistema | Concluído | 100% | `docs/arquitetura.md` |
 | 5 | Implementação do núcleo funcional | Concluído | 100% | `controle_ativos/web/app.py`, `controle_ativos/services/` |
-| 6 | Cadastro, consulta, edição e exclusão de ativos | Concluído | 100% | `controle_ativos/web/app.py`, `controle_ativos/services/ativos_service.py` |
+| 6 | Cadastro, consulta, edição e exclusão de ativos no backend | Concluído | 100% | `controle_ativos/web/app.py`, `controle_ativos/services/ativos_service.py` |
 | 7 | Autenticação inicial de usuários | Concluído | 100% | `controle_ativos/services/auth_service.py`, `controle_ativos/web/app.py` |
-| 8 | Migração gradual para Bearer Token | Em andamento | 55% | `docs/seguranca.md`, `docs/autenticacao-token.md`, `controle_ativos/web/app.py` |
-| 9 | Serviço de tokens opacos | Planejado | 20% | `docs/autenticacao-token.md`, `controle_ativos/security/` |
-| 10 | Guard/decorator `@token_required` | Planejado | 20% | `docs/autenticacao-token.md`, `controle_ativos/security/` |
-| 11 | Login com emissão de token | Planejado | 20% | `docs/autenticacao-token.md`, `controle_ativos/web/app.py` |
-| 12 | Logout com revogação de token | Planejado | 20% | `docs/autenticacao-token.md`, `controle_ativos/web/app.py` |
-| 13 | Proteção parcial de rotas sensíveis | Parcial | 50% | `controle_ativos/web/app.py`, `docs/seguranca.md` |
-| 14 | Rate limit no login | Planejado | 20% | `docs/seguranca.md`, `controle_ativos/web/app.py` |
-| 15 | Política de senha forte | Parcial | 50% | `controle_ativos/utils/validators.py`, `docs/seguranca.md` |
-| 16 | Mensagens genéricas para reduzir enumeração | Parcial | 40% | `controle_ativos/web/app.py`, `docs/seguranca.md` |
-| 17 | Banco de dados e migrations | Parcial | 50% | `controle_ativos/database/schema.sql`, `controle_ativos/database/init_db.py`, `controle_ativos/database/migrations/` |
-| 18 | Testes automatizados | Concluído | 80% | `docs/testes.md`, `controle_ativos/tests/` |
+| 8 | Autenticação por sessão Flask | Concluído | 100% | `controle_ativos/web/app.py`, `controle_ativos/services/auth_service.py` |
+| 9 | Rate limit no login | Planejado | 20% | `docs/seguranca.md`, `controle_ativos/web/app.py` |
+| 10 | Política de senha forte | Parcial | 50% | `controle_ativos/utils/validators.py`, `docs/seguranca.md` |
+| 11 | Mensagens genéricas para reduzir enumeração | Parcial | 40% | `controle_ativos/web/app.py`, `docs/seguranca.md` |
+| 12 | Proteção parcial de rotas sensíveis | Parcial | 75% | `controle_ativos/web/app.py`, `controle_ativos/tests/test_app_routes_validation.py` |
+| 13 | Separação futura entre UI e API | Planejado | 20% | `docs/arquitetura.md`, `docs/roadmap.md` |
+| 14 | Logs de auditoria mais detalhados | Planejado | 20% | `docs/seguranca.md`, `docs/roadmap.md` |
+| 15 | Organização do schema e compatibilidade local | Concluído | 90% | `controle_ativos/database/schema.sql`, `controle_ativos/database/init_db.py` |
+| 16 | Benchmark e validação automatizada | Concluído | 85% | `controle_ativos/tests/`, `docs/testes.md` |
+| 17 | Banco de dados e compatibilidade de schema | Concluído | 90% | `controle_ativos/database/schema.sql`, `controle_ativos/database/init_db.py` |
+| 18 | Testes automatizados | Concluído | 90% | `docs/testes.md`, `controle_ativos/tests/` |
 | 19 | Organização da documentação em `docs/` | Concluído | 100% | `docs/README.md` |
 | 20 | README principal como índice do projeto | Concluído | 100% | `README.md` |
 | 21 | Documentação de governança de TI | Concluído | 100% | `docs/governanca.md` |
@@ -41,26 +42,28 @@ Este cronograma consolida o andamento do TCC com base no estado atual do reposit
 | 23 | Roadmap e limitações | Concluído | 100% | `docs/roadmap.md`, `docs/tcc-analise-tecnica.md` |
 | 24 | Revisão final acadêmica / monografia | Em andamento | 70% | `docs/tcc-analise-tecnica.md` |
 | 25 | Preparação para apresentação | Em andamento | 65% | `docs/apresentacao/` |
-| 26 | Interface web Flask (login, dashboard e páginas do sistema) | Concluído (em evolução) | 85% | `controle_ativos/web/app.py`, `controle_ativos/web/templates/`, `controle_ativos/web/static/` |
+| 26 | Interface web Flask (login, dashboard e páginas do sistema) | Em andamento | 65% | `controle_ativos/web/app.py`, `controle_ativos/web/templates/`, `controle_ativos/web/static/` |
 
 ## Atividades concluídas
 
 - Definição do escopo do TCC e objetivos do projeto.
 - Implementação da aplicação Flask com persistência MySQL.
+- Correção do carregamento de `.env` a partir da raiz do projeto.
+- Compatibilização de schema legado para não exigir `empresa_id` ou `nome` no fluxo atual.
 - Estrutura modular do backend (`web/`, `services/`, `models/`, `database/`, `utils/`).
 - Implementação do CRUD de ativos e dashboard básico.
-- Interface web inicial em Flask com templates para login, dashboard e páginas do sistema.
+- Interface web inicial em Flask com templates para login, cadastro, recuperação, dashboard e cadastro de ativos.
 - Autenticação inicial de usuários (registro, login, recuperação e logout por sessão).
 - Documentação técnica reorganizada em `docs/`.
 - Índice principal no `README.md` mantido como entrada limpa do projeto.
 - Documentação de segurança, autenticação por token, banco de dados, governança, operação, instalação e roadmap.
 - Equipe e responsabilidades registradas no `README.md`.
-- Suíte de testes automatizados com último estado conhecido registrado em `docs/testes.md`.
+- Suíte de testes automatizados com 59 testes aprovados no último estado conhecido registrado em `docs/testes.md`.
 
 ## Atividades em andamento
 
-- Migração completa de sessão Flask para Bearer Token.
 - Evolução e refinamento da interface web, mantendo compatibilidade temporária com a camada de sessão.
+- Integração das telas de status, busca, edição e exclusão de ativos com dados reais do backend.
 - Consolidação de evidências de segurança diretamente em código-fonte versionado.
 - Implementação/estabilização da pasta `security/` com fontes efetivamente versionadas.
 - Separação progressiva entre páginas HTML e APIs.
@@ -74,10 +77,12 @@ Este cronograma consolida o andamento do TCC com base no estado atual do reposit
 - Revisar texto acadêmico final (padronização e consistência).
 - Conferir links finais da documentação.
 - Validar repositório limpo sem `.env` versionado.
+- Implementar rate limit real no login, caso permaneça dentro do escopo da entrega.
 - Resolver pendências de merge/PR, quando existirem.
 - Evoluir permissões por perfil (admin/usuário).
 - Evoluir logs e auditoria detalhada.
 - Revisar melhorias de importação/exportação, se aplicável.
+- Finalizar templates vazios/parciais da camada web, especialmente edição e exclusão de ativos.
 - Planejar deploy interno controlado, se fizer parte da entrega final.
 
 ## Itens fora do escopo atual
@@ -97,10 +102,11 @@ Esses pontos podem evoluir depois, mas não fazem parte da entrega obrigatória 
 1. Revisar documentação acadêmica e monografia.
 2. Conferir consistência entre `README.md`, `docs/` e o código.
 3. Rodar `python -m pytest -q` para atualizar o estado conhecido dos testes.
-4. Realizar smoke test manual dos fluxos principais.
-5. Conferir `.gitignore` e ausência de `.env` versionado.
-6. Finalizar Pull Request para a branch principal.
-7. Preparar slides e roteiro de apresentação.
+4. Executar `python controle_ativos/database/init_db.py` em ambiente local antes do smoke test.
+5. Realizar smoke test manual dos fluxos web já integrados: login, cadastro, recuperação e cadastro de ativos.
+6. Conferir `.gitignore` e ausência de `.env` versionado.
+7. Finalizar Pull Request para a branch principal.
+8. Preparar slides e roteiro de apresentação.
 
 ## Observações
 

@@ -1,4 +1,4 @@
-from services.auth_service import (
+from controle_ativos.services.auth_service import (
     AuthService,
     AuthErro,
     UsuarioJaExiste,
@@ -6,8 +6,8 @@ from services.auth_service import (
     CredenciaisInvalidas,
     RecuperacaoInvalida
 )
-from services.ativos_service import AtivosService
-from services.sistema_ativos import SistemaAtivos
+from controle_ativos.services.ativos_service import AtivosService
+from controle_ativos.services.sistema_ativos import SistemaAtivos
 
 
 def _input_cancelavel(mensagem: str) -> str | None:

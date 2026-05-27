@@ -1,46 +1,44 @@
-# Fase 1 — Instruções mínimas para testes e higiene do repositório
+# Requirements oficiais e testes
 
-Este arquivo descreve os comandos mínimos para executar os testes e limpar artefatos rastreados pelo Git.
+Esta página resume como instalar o ambiente, executar os testes e rodar a auditoria de dependências do projeto DataAssets.
 
-Requisitos mínimos:
-- Python 3.x instalado
-- Dependências do projeto já instaladas no ambiente (se houver)
+O projeto usa dois arquivos de dependências:
+- `requirements.txt` para execução do sistema em produção/local.
+- `requirements-dev.txt` para desenvolvimento, testes e CI.
 
-Executar testes (PowerShell):
+Instalação do ambiente (PowerShell):
+
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -r requirements-dev.txt
+```
+
+Rodar testes:
 
 ```powershell
 python -m pytest -q
 ```
 
-Verificação rápida de artefatos rastreados (PowerShell):
-
-```powershell
-# listar arquivos rastreados que correspondam a padrões indesejados
-git ls-files | Select-String '__pycache__|\.pyc$|^\.env$|\.log$' | ForEach-Object { Write-Host $_.Line }
-```
-
-Remover artefatos rastreados do índice Git (não faz commit):
-
-```powershell
-# remove arquivos correspondentes do índice sem apagar do disco
-git ls-files | Where-Object { $_ -match '__pycache__|\\.pyc$' } | ForEach-Object { git rm --cached --ignore-unmatch $_ }
-```
-
-Adicionar/atualizar `.gitignore` (exemplo mínimo já presente no repositório):
+Estado verificado em 2026-05-27:
 
 ```text
-# python
-__pycache__/
-*.py[cod]
-.venv/
-.env
-*.log
+59 passed
+```
 
+Observacao: os testes de performance ficam desativados por padrao. Para executar benchmarks locais, defina `RUN_PERF_TESTS=1` e garanta que o MySQL esteja disponivel com schema compativel.
+
+Auditoria:
+
+```powershell
+bandit -r controle_ativos -x "controle_ativos/tests,tests,controle_ativos/.venv,.venv,venv" -lll
+pip-audit -r requirements.txt --strict
 ```
 
 Notas importantes:
-- Não commitamos mudanças de segurança nesta fase (CSRF, PBKDF2, salt/pepper, regras de negócio).
-- As instruções acima apenas removem arquivos do índice; se quiser persistir as mudanças, faça `git add .` seguido de `git commit` localmente.
-- Se encontrar `index.lock`, verifique processos Git em execução ou remova `.git/index.lock` com cuidado.
-
-Contato: mantenha backup antes de remover arquivos massivamente do índice.
+- `requirements.txt` deve conter apenas dependências necessárias para executar o sistema.
+- `requirements-dev.txt` deve conter o arquivo principal mais as ferramentas de teste e segurança.
+- `.venv` não deve ser versionado.
+- Toda dependência nova deve entrar no arquivo correto, nunca via instalação manual no workflow.
+- Se precisar limpar bytecode rastreado, use `git rm --cached` para remover apenas do índice.

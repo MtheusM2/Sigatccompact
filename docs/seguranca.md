@@ -8,13 +8,13 @@ Medidas aplicadas
 
 - Hash de senhas no armazenamento (não armazenar senhas em texto claro).
 - Política mínima de senha forte (validadores no código).
-- Rate limit simples aplicado ao endpoint de login para reduzir tentativas automatizadas.
-- Tokens opacos para autenticação de API: tokens são gerados e armazenados no banco apenas como hash.
-- Logout realiza revogação do token (remoção/invalidade no banco).
+- Sessão Flask para navegação e autenticação operacional nas rotas do sistema.
+- Logout limpa a sessão do usuário autenticado.
+- `FLASK_SECRET_KEY`, `APP_PEPPER` e credenciais de banco são lidos por variáveis de ambiente via `.env` local não versionado.
 
 Compatibilidade e migração
 
-O sistema está em migração gradual de sessão Flask para Bearer Token. Algumas páginas HTML mantêm compatibilidade temporária com sessão para não quebrar a navegação existente.
+O sistema usa sessão Flask no estado atual do projeto. A migração para Bearer Token pode ser retomada no futuro, mas não faz parte do fluxo ativo hoje.
 
 Riscos conhecidos
 
@@ -23,7 +23,8 @@ Riscos conhecidos
 
 Próximos passos de segurança
 
-- Concluir migração completa para Bearer Token em APIs e avaliar separação entre UI e API.
+- Implementar rate limit no endpoint de login para reduzir tentativas automatizadas.
+- Avaliar futuramente se a migração para Bearer Token ainda faz sentido para o escopo final do TCC.
 - Implementar rotação de chaves/pepper e armazenamento seguro para secrets.
 - Adicionar logs de auditoria e controle de acesso por função.
 

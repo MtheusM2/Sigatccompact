@@ -5,14 +5,15 @@ Funcionalidades implementadas
 - Autenticação de usuários (login/logout).
 - Cadastro de usuários e recuperação de conta (fluxos básicos).
 - CRUD de ativos: cadastro, listagem/consulta, edição e exclusão.
-- Dashboard com visão resumida de ativos.
+- Dashboard básico em evolução; os cards de status ainda precisam ser ligados a dados reais.
 - Validações de entrada centralizadas (validators).
 - Importação/exportação (quando disponível no repositório).
 - Suíte de testes automatizados (pytest).
 
 Funcionalidades em evolução
 
-- Migração gradual para autenticação por Bearer Token (APIs protegidas já aceitam tokens). 
+- Autenticação por sessão Flask nas rotas web e APIs atuais.
+- Integração completa das telas web de busca, edição e exclusão de ativos.
 - Melhorias de segurança (rate limit, política de senha).
 
 Funcionalidades planejadas
