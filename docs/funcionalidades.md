@@ -12,7 +12,7 @@ Funcionalidades implementadas
 
 Funcionalidades em evolução
 
-- Migração gradual para autenticação por Bearer Token (APIs protegidas já aceitam tokens). 
+- Autenticação por sessão Flask nas rotas web e APIs atuais.
 - Melhorias de segurança (rate limit, política de senha).
 
 Funcionalidades planejadas

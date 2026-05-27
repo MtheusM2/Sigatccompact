@@ -20,7 +20,7 @@ Arquitetura e componentes
 
 Segurança e testes
 
-Aplica-se hash de senhas, políticas de validação e tokens opacos para APIs; a suíte de testes automatizados fornece verificação de comportamento (ver `docs/testes.md`).
+Aplica-se hash de senhas, políticas de validação e autenticação por sessão Flask no estado atual; a suíte de testes automatizados fornece verificação de comportamento (ver `docs/testes.md`). A autenticação por token permanece como possibilidade futura de evolução.
 
 Limitações
 

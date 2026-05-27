@@ -6,8 +6,8 @@ Este cronograma consolida o andamento do TCC com base no estado atual do reposit
 
 - O núcleo funcional do sistema está implementado (Flask + MySQL com operações centrais de ativos).
 - O projeto possui autenticação, CRUD de ativos, dashboard, interface web Flask e documentação técnica reorganizada em `docs/`.
-- A interface web Flask já existe com páginas de login, dashboard e áreas do sistema; ela continua em evolução e ainda trabalha majoritariamente com sessão nas páginas HTML.
-- Há evolução de segurança documentada, porém a migração para Bearer Token permanece **gradual** e não deve ser tratada como 100% finalizada.
+- A interface web Flask já existe com páginas de login, dashboard e áreas do sistema; ela trabalha com sessão no estado atual do projeto.
+- A documentação de segurança foi atualizada para refletir a autenticação por sessão Flask como fluxo operacional vigente.
 - A documentação foi reorganizada e o `README.md` principal foi mantido como página inicial enxuta.
 - A suíte de testes automatizados possui último estado conhecido registrado em `docs/testes.md`.
 - Permanecem pendências acadêmicas e de maturidade (revisão final da monografia, apresentação e evolução profissional do sistema).
@@ -23,15 +23,15 @@ Este cronograma consolida o andamento do TCC com base no estado atual do reposit
 | 5 | Implementação do núcleo funcional | Concluído | 100% | `controle_ativos/web/app.py`, `controle_ativos/services/` |
 | 6 | Cadastro, consulta, edição e exclusão de ativos | Concluído | 100% | `controle_ativos/web/app.py`, `controle_ativos/services/ativos_service.py` |
 | 7 | Autenticação inicial de usuários | Concluído | 100% | `controle_ativos/services/auth_service.py`, `controle_ativos/web/app.py` |
-| 8 | Migração gradual para Bearer Token | Em andamento | 55% | `docs/seguranca.md`, `docs/autenticacao-token.md`, `controle_ativos/web/app.py` |
-| 9 | Serviço de tokens opacos | Planejado | 20% | `docs/autenticacao-token.md`, `controle_ativos/security/` |
-| 10 | Guard/decorator `@token_required` | Planejado | 20% | `docs/autenticacao-token.md`, `controle_ativos/security/` |
-| 11 | Login com emissão de token | Planejado | 20% | `docs/autenticacao-token.md`, `controle_ativos/web/app.py` |
-| 12 | Logout com revogação de token | Planejado | 20% | `docs/autenticacao-token.md`, `controle_ativos/web/app.py` |
-| 13 | Proteção parcial de rotas sensíveis | Parcial | 50% | `controle_ativos/web/app.py`, `docs/seguranca.md` |
-| 14 | Rate limit no login | Planejado | 20% | `docs/seguranca.md`, `controle_ativos/web/app.py` |
-| 15 | Política de senha forte | Parcial | 50% | `controle_ativos/utils/validators.py`, `docs/seguranca.md` |
-| 16 | Mensagens genéricas para reduzir enumeração | Parcial | 40% | `controle_ativos/web/app.py`, `docs/seguranca.md` |
+| 8 | Autenticação por sessão Flask | Concluído | 100% | `controle_ativos/web/app.py`, `controle_ativos/services/auth_service.py` |
+| 9 | Rate limit no login | Planejado | 20% | `docs/seguranca.md`, `controle_ativos/web/app.py` |
+| 10 | Política de senha forte | Parcial | 50% | `controle_ativos/utils/validators.py`, `docs/seguranca.md` |
+| 11 | Mensagens genéricas para reduzir enumeração | Parcial | 40% | `controle_ativos/web/app.py`, `docs/seguranca.md` |
+| 12 | Proteção parcial de rotas sensíveis | Parcial | 50% | `controle_ativos/web/app.py`, `docs/seguranca.md` |
+| 13 | Separação futura entre UI e API | Planejado | 20% | `docs/arquitetura.md`, `docs/roadmap.md` |
+| 14 | Logs de auditoria mais detalhados | Planejado | 20% | `docs/seguranca.md`, `docs/roadmap.md` |
+| 15 | Organização do schema e migrations | Parcial | 50% | `controle_ativos/database/schema.sql`, `controle_ativos/database/init_db.py` |
+| 16 | Benchmark e validação automatizada | Concluído | 80% | `controle_ativos/tests/`, `docs/testes.md` |
 | 17 | Banco de dados e migrations | Parcial | 50% | `controle_ativos/database/schema.sql`, `controle_ativos/database/init_db.py`, `controle_ativos/database/migrations/` |
 | 18 | Testes automatizados | Concluído | 80% | `docs/testes.md`, `controle_ativos/tests/` |
 | 19 | Organização da documentação em `docs/` | Concluído | 100% | `docs/README.md` |
@@ -59,7 +59,6 @@ Este cronograma consolida o andamento do TCC com base no estado atual do reposit
 
 ## Atividades em andamento
 
-- Migração completa de sessão Flask para Bearer Token.
 - Evolução e refinamento da interface web, mantendo compatibilidade temporária com a camada de sessão.
 - Consolidação de evidências de segurança diretamente em código-fonte versionado.
 - Implementação/estabilização da pasta `security/` com fontes efetivamente versionadas.

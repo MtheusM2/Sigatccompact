@@ -2,9 +2,9 @@
 
 Próximos passos técnicos
 
-1. Concluir migração completa para Bearer Token em todas as APIs.
-2. Separar API e UI (endpoints REST e frontend desacoplado).
-3. Implementar permissões por função (admin/usuário).
+1. Separar API e UI com mais clareza, sem alterar o fluxo atual baseado em sessão.
+2. Implementar permissões por função (admin/usuário).
+3. Avaliar futuramente se a migração para Bearer Token ainda faz sentido para a entrega final.
 
 Melhorias de segurança
 
