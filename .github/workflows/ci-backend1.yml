@@ -9,8 +9,7 @@
 # - Alertar quando código for alterado sem teste novo/alterado, mas sem bloquear a PR.
 #
 # Observação importante:
-# - O cache do pip foi removido porque o repositório ainda não possui requirements.txt,
-#   pyproject.toml ou setup.py oficiais. O cache estava quebrando o workflow no setup-python.
+# - O workflow agora usa requirements.txt e requirements-dev.txt oficiais.
 
 name: CI Backend - Testes e Segurança
 
@@ -109,9 +108,11 @@ jobs:
       - name: Configurar Python
         uses: actions/setup-python@v5
         with:
-          # Sem cache por enquanto, pois o projeto ainda não tem requirements.txt oficial.
-          # Isso evita o erro: "No file matched to [requirements*.txt...]".
           python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: |
+            requirements-dev.txt
+            requirements.txt
 
       - name: Verificar se o backend existe nesta branch
         id: backend
@@ -224,38 +225,19 @@ jobs:
 
           python -m pip install --upgrade pip
 
-          # Detecta automaticamente o requirements.txt, se ele existir no futuro.
-          REQ_FILE=""
-
-          if [[ -f "controle_ativos/requirements.txt" ]]; then
-            REQ_FILE="controle_ativos/requirements.txt"
+          if [[ -f "requirements-dev.txt" ]]; then
+            echo "Instalando dependências de: requirements-dev.txt"
+            python -m pip install -r requirements-dev.txt
+            echo "REQ_FILE=requirements.txt" >> "$GITHUB_ENV"
           elif [[ -f "requirements.txt" ]]; then
-            REQ_FILE="requirements.txt"
-          fi
-
-          if [[ -n "$REQ_FILE" ]]; then
-            echo "Instalando dependências de: $REQ_FILE"
-            python -m pip install -r "$REQ_FILE"
-            echo "REQ_FILE=$REQ_FILE" >> "$GITHUB_ENV"
+            echo "Instalando dependências de: requirements.txt"
+            python -m pip install -r requirements.txt
+            python -m pip install pytest pytest-cov bandit pip-audit
+            echo "REQ_FILE=requirements.txt" >> "$GITHUB_ENV"
           else
-            echo "::warning::Nenhum requirements.txt encontrado. Instalando dependências mínimas para CI."
-            echo "REQ_FILE=" >> "$GITHUB_ENV"
-
-            # Dependências mínimas comuns para o projeto Flask/MySQL e testes atuais.
-            # Depois, o ideal é substituir isso por um requirements.txt oficial.
-            python -m pip install \
-              flask \
-              werkzeug \
-              python-dotenv \
-              mysql-connector-python \
-              openpyxl \
-              reportlab \
-              waitress \
-              PyJWT
+            echo "::error::Nenhum requirements.txt encontrado. Crie requirements.txt e requirements-dev.txt."
+            exit 1
           fi
-
-          # Ferramentas usadas apenas no CI.
-          python -m pip install pytest pytest-cov bandit pip-audit
 
       - name: Preparar banco MySQL de teste
         if: steps.backend.outputs.exists == 'true'
@@ -421,14 +403,12 @@ jobs:
         run: |
           set -euo pipefail
 
-          # Sem requirements.txt oficial, não faz sentido auditar dependências instaladas só para o CI.
-          # Quando o requirements.txt existir, esta etapa passa a bloquear vulnerabilidades conhecidas.
-          if [[ -n "${REQ_FILE:-}" && -f "$REQ_FILE" ]]; then
-            pip-audit -r "$REQ_FILE" --strict
-          else
-            echo "::warning::pip-audit pulado porque não existe requirements.txt oficial no projeto."
-            echo "Recomendação: criar requirements.txt na próxima fase de organização."
+          if [[ ! -f "requirements.txt" ]]; then
+            echo "::error::requirements.txt ausente. A auditoria exige requirements.txt oficial."
+            exit 1
           fi
+
+          pip-audit -r requirements.txt --strict
 
       - name: Rodar todos os testes
         if: steps.backend.outputs.exists == 'true'
