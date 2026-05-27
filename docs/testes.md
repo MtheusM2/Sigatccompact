@@ -9,9 +9,9 @@ Garantir comportamento esperado de validações, autenticação, rotas e serviç
 Tipos de testes presentes
 
 - Testes de validação (senha, e-mail, campos).
-- Testes de autenticação e token.
-- Testes de logout e revogação de token.
-- Testes de rate limit (login).
+- Testes de autenticação por sessão e serviços.
+- Testes de logout e limpeza de sessão.
+- Testes de configuração de segurança do Flask.
 - Testes de rotas e serviços de negócio.
 
 Executar suíte

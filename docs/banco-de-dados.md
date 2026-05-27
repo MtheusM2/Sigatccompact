@@ -11,10 +11,14 @@ Estado atual do schema
 
 - O esquema do repositório está centrado em `usuarios` e `ativos`, com FK de `criado_por` para usuário autenticado.
 - A autenticação operacional atual usa sessão Flask; não há tabela de tokens no schema atual.
+- O fluxo atual de cadastro de usuários não depende de `empresa_id` nem de `nome`.
+- Bancos locais legados que ainda possuam `usuarios.empresa_id`, `usuarios.nome` ou `ativos.empresa_id` são compatibilizados pelo `init_db.py` para permitir `NULL`, sem apagar colunas nem dados existentes.
 
 Migrações e inicialização
 
 O esquema inicial está em `controle_ativos/database/schema.sql` e o script de criação em `controle_ativos/database/init_db.py`.
+
+O script de inicialização é idempotente para o estado atual do projeto: pode ser executado novamente para criar tabelas ausentes e relaxar campos legados obrigatórios que não fazem parte do fluxo operacional atual.
 
 Cuidados com credenciais
 

@@ -8,9 +8,9 @@ Medidas aplicadas
 
 - Hash de senhas no armazenamento (não armazenar senhas em texto claro).
 - Política mínima de senha forte (validadores no código).
-- Rate limit simples aplicado ao endpoint de login para reduzir tentativas automatizadas.
 - Sessão Flask para navegação e autenticação operacional nas rotas do sistema.
 - Logout limpa a sessão do usuário autenticado.
+- `FLASK_SECRET_KEY`, `APP_PEPPER` e credenciais de banco são lidos por variáveis de ambiente via `.env` local não versionado.
 
 Compatibilidade e migração
 
@@ -23,6 +23,7 @@ Riscos conhecidos
 
 Próximos passos de segurança
 
+- Implementar rate limit no endpoint de login para reduzir tentativas automatizadas.
 - Avaliar futuramente se a migração para Bearer Token ainda faz sentido para o escopo final do TCC.
 - Implementar rotação de chaves/pepper e armazenamento seguro para secrets.
 - Adicionar logs de auditoria e controle de acesso por função.
