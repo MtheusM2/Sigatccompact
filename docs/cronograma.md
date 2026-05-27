@@ -5,8 +5,8 @@ Este cronograma consolida o andamento do TCC com base no estado atual do reposit
 ## Resumo executivo
 
 - O núcleo funcional do sistema está implementado (Flask + MySQL com operações centrais de ativos).
-- O projeto possui autenticação, CRUD de ativos, dashboard, interface web Flask e documentação técnica reorganizada em `docs/`.
-- A interface web Flask já existe com páginas de login, dashboard e áreas do sistema; ela trabalha com sessão no estado atual do projeto.
+- O projeto possui autenticação, CRUD de ativos, base de dashboard, interface web Flask em andamento e documentação técnica reorganizada em `docs/`.
+- A interface web Flask já existe com páginas de login, cadastro, recuperação, dashboard e áreas do sistema; porém ainda não está concluída ponta a ponta.
 - O carregamento de `.env` foi estabilizado para usar a raiz do repositório, e o banco local foi compatibilizado para não depender de `empresa_id` ou `nome` obrigatórios.
 - A documentação de segurança foi atualizada para refletir a autenticação por sessão Flask como fluxo operacional vigente.
 - A documentação foi reorganizada e o `README.md` principal foi mantido como página inicial enxuta.
@@ -22,7 +22,7 @@ Este cronograma consolida o andamento do TCC com base no estado atual do reposit
 | 3 | Proposta de processo alvo / TO-BE | Concluído | 100% | `docs/arquitetura.md`, `docs/roadmap.md` |
 | 4 | Modelagem da arquitetura do sistema | Concluído | 100% | `docs/arquitetura.md` |
 | 5 | Implementação do núcleo funcional | Concluído | 100% | `controle_ativos/web/app.py`, `controle_ativos/services/` |
-| 6 | Cadastro, consulta, edição e exclusão de ativos | Concluído | 100% | `controle_ativos/web/app.py`, `controle_ativos/services/ativos_service.py` |
+| 6 | Cadastro, consulta, edição e exclusão de ativos no backend | Concluído | 100% | `controle_ativos/web/app.py`, `controle_ativos/services/ativos_service.py` |
 | 7 | Autenticação inicial de usuários | Concluído | 100% | `controle_ativos/services/auth_service.py`, `controle_ativos/web/app.py` |
 | 8 | Autenticação por sessão Flask | Concluído | 100% | `controle_ativos/web/app.py`, `controle_ativos/services/auth_service.py` |
 | 9 | Rate limit no login | Planejado | 20% | `docs/seguranca.md`, `controle_ativos/web/app.py` |
@@ -42,7 +42,7 @@ Este cronograma consolida o andamento do TCC com base no estado atual do reposit
 | 23 | Roadmap e limitações | Concluído | 100% | `docs/roadmap.md`, `docs/tcc-analise-tecnica.md` |
 | 24 | Revisão final acadêmica / monografia | Em andamento | 70% | `docs/tcc-analise-tecnica.md` |
 | 25 | Preparação para apresentação | Em andamento | 65% | `docs/apresentacao/` |
-| 26 | Interface web Flask (login, dashboard e páginas do sistema) | Concluído (em evolução) | 90% | `controle_ativos/web/app.py`, `controle_ativos/web/templates/`, `controle_ativos/web/static/` |
+| 26 | Interface web Flask (login, dashboard e páginas do sistema) | Em andamento | 65% | `controle_ativos/web/app.py`, `controle_ativos/web/templates/`, `controle_ativos/web/static/` |
 
 ## Atividades concluídas
 
@@ -52,7 +52,7 @@ Este cronograma consolida o andamento do TCC com base no estado atual do reposit
 - Compatibilização de schema legado para não exigir `empresa_id` ou `nome` no fluxo atual.
 - Estrutura modular do backend (`web/`, `services/`, `models/`, `database/`, `utils/`).
 - Implementação do CRUD de ativos e dashboard básico.
-- Interface web inicial em Flask com templates para login, dashboard e páginas do sistema.
+- Interface web inicial em Flask com templates para login, cadastro, recuperação, dashboard e cadastro de ativos.
 - Autenticação inicial de usuários (registro, login, recuperação e logout por sessão).
 - Documentação técnica reorganizada em `docs/`.
 - Índice principal no `README.md` mantido como entrada limpa do projeto.
@@ -63,6 +63,7 @@ Este cronograma consolida o andamento do TCC com base no estado atual do reposit
 ## Atividades em andamento
 
 - Evolução e refinamento da interface web, mantendo compatibilidade temporária com a camada de sessão.
+- Integração das telas de status, busca, edição e exclusão de ativos com dados reais do backend.
 - Consolidação de evidências de segurança diretamente em código-fonte versionado.
 - Implementação/estabilização da pasta `security/` com fontes efetivamente versionadas.
 - Separação progressiva entre páginas HTML e APIs.
@@ -81,6 +82,7 @@ Este cronograma consolida o andamento do TCC com base no estado atual do reposit
 - Evoluir permissões por perfil (admin/usuário).
 - Evoluir logs e auditoria detalhada.
 - Revisar melhorias de importação/exportação, se aplicável.
+- Finalizar templates vazios/parciais da camada web, especialmente edição e exclusão de ativos.
 - Planejar deploy interno controlado, se fizer parte da entrega final.
 
 ## Itens fora do escopo atual
@@ -101,7 +103,7 @@ Esses pontos podem evoluir depois, mas não fazem parte da entrega obrigatória 
 2. Conferir consistência entre `README.md`, `docs/` e o código.
 3. Rodar `python -m pytest -q` para atualizar o estado conhecido dos testes.
 4. Executar `python controle_ativos/database/init_db.py` em ambiente local antes do smoke test.
-5. Realizar smoke test manual dos fluxos principais.
+5. Realizar smoke test manual dos fluxos web já integrados: login, cadastro, recuperação e cadastro de ativos.
 6. Conferir `.gitignore` e ausência de `.env` versionado.
 7. Finalizar Pull Request para a branch principal.
 8. Preparar slides e roteiro de apresentação.
