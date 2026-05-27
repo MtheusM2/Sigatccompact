@@ -7,9 +7,9 @@ USE controle_ativos;
 CREATE TABLE IF NOT EXISTS usuarios (
   id INT NOT NULL AUTO_INCREMENT,
   email VARCHAR(255) NOT NULL,
-  senha_hash VARCHAR(255) NOT NULL,
+  senha_hash VARCHAR(512) NOT NULL,
   pergunta_recuperacao VARCHAR(255) NOT NULL,
-  resposta_recuperacao_hash VARCHAR(255) NOT NULL,
+  resposta_recuperacao_hash VARCHAR(512) NOT NULL,
   criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   atualizado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (id),

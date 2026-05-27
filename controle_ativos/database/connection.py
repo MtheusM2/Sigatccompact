@@ -17,9 +17,10 @@ from dotenv import load_dotenv
 # =========================
 # CARREGAMENTO DO ARQUIVO .ENV
 # =========================
-# Descobre a pasta raiz do projeto a partir deste arquivo:
-# database/connection.py -> sobe um nível e encontra a raiz do projeto.
-BASE_DIR = Path(__file__).resolve().parent.parent
+# Descobre a raiz do repositório a partir deste arquivo:
+# controle_ativos/database/connection.py -> sobe dois níveis até controle_ativos
+# e mais um nível até a raiz do projeto, onde o .env local deve ficar.
+BASE_DIR = Path(__file__).resolve().parents[2]
 
 # Monta o caminho absoluto do arquivo .env.
 ENV_FILE = BASE_DIR / ".env"

@@ -10,10 +10,18 @@ def _run_python_import(with_secret: bool):
     env = os.environ.copy()
     if with_secret:
         env['FLASK_SECRET_KEY'] = 'test-secret-for-ci'
+        snippet = 'import importlib; importlib.import_module("controle_ativos.web.app")'
     else:
         env.pop('FLASK_SECRET_KEY', None)
+        # Simula ambiente sem FLASK_SECRET_KEY e sem .env carregado.
+        # O teste continua validando que a app exige segredo explícito.
+        snippet = (
+            'import importlib, dotenv; '
+            'dotenv.load_dotenv = lambda *args, **kwargs: False; '
+            'importlib.import_module("controle_ativos.web.app")'
+        )
 
-    cmd = [sys.executable, '-c', 'import importlib; importlib.import_module("controle_ativos.web.app")']
+    cmd = [sys.executable, '-c', snippet]
     proc = subprocess.run(cmd, capture_output=True, text=True, env=env)
     return proc.returncode, proc.stdout + proc.stderr
 
