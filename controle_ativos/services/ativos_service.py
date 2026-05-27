@@ -1,6 +1,8 @@
-from models.ativos import Ativo
-from database.connection import cursor_mysql
-from utils.validators import (
+import mysql.connector
+
+from controle_ativos.models.ativos import Ativo
+from controle_ativos.database.connection import cursor_mysql
+from controle_ativos.utils.validators import (
     STATUS_VALIDOS,
     validar_ativo,
     validar_id_ativo,
@@ -11,22 +13,18 @@ from utils.validators import (
 
 class AtivoErro(Exception):
     """Erro base relacionado a ativos."""
-    pass
 
 
 class AtivoJaExiste(AtivoErro):
     """Erro para ativo duplicado."""
-    pass
 
 
 class AtivoNaoEncontrado(AtivoErro):
     """Erro para ativo inexistente."""
-    pass
 
 
 class PermissaoNegada(AtivoErro):
     """Erro para acesso não autorizado."""
-    pass
 
 
 def _row_para_ativo(row: dict) -> Ativo:
@@ -77,34 +75,35 @@ class AtivosService:
         try:
             validar_ativo(ativo_norm)
         except ValueError as erro:
-            raise AtivoErro(str(erro))
+            raise AtivoErro(str(erro)) from erro
 
         with cursor_mysql(dictionary=True) as (_conn, cur):
-            cur.execute("SELECT id FROM ativos WHERE id = %s", (ativo_norm.id_ativo,))
-            if cur.fetchone() is not None:
-                raise AtivoJaExiste("Já existe um ativo cadastrado com este ID.")
-
-            cur.execute(
-                """
-                INSERT INTO ativos (
-                    id, tipo, marca, modelo, usuario_responsavel,
-                    departamento, status, data_entrada, data_saida, criado_por
+            try:
+                cur.execute(
+                    """
+                    INSERT INTO ativos (
+                        id, tipo, marca, modelo, usuario_responsavel,
+                        departamento, status, data_entrada, data_saida, criado_por
+                    )
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    """,
+                    (
+                        ativo_norm.id_ativo,
+                        ativo_norm.tipo,
+                        ativo_norm.marca,
+                        ativo_norm.modelo,
+                        ativo_norm.usuario_responsavel,
+                        ativo_norm.departamento,
+                        ativo_norm.status,
+                        ativo_norm.data_entrada,
+                        ativo_norm.data_saida,
+                        user_id
+                    )
                 )
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                """,
-                (
-                    ativo_norm.id_ativo,
-                    ativo_norm.tipo,
-                    ativo_norm.marca,
-                    ativo_norm.modelo,
-                    ativo_norm.usuario_responsavel,
-                    ativo_norm.departamento,
-                    ativo_norm.status,
-                    ativo_norm.data_entrada,
-                    ativo_norm.data_saida,
-                    user_id
-                )
-            )
+            except mysql.connector.IntegrityError as erro:
+                if getattr(erro, "errno", None) == 1062:
+                    raise AtivoJaExiste("Já existe um ativo cadastrado com este ID.") from erro
+                raise
 
     def listar_ativos(self, user_id: int) -> list[Ativo]:
         with cursor_mysql(dictionary=True) as (_conn, cur):
@@ -250,7 +249,7 @@ class AtivosService:
         try:
             validar_ativo(novo_norm)
         except ValueError as erro:
-            raise AtivoErro(str(erro))
+            raise AtivoErro(str(erro)) from erro
 
         with cursor_mysql(dictionary=True) as (_conn, cur):
             cur.execute(

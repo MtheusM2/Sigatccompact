@@ -1,12 +1,12 @@
-from models.ativos import Ativo
-from services.ativos_service import (
+from controle_ativos.models.ativos import Ativo
+from controle_ativos.services.ativos_service import (
     AtivosService,
     AtivoErro,
     AtivoJaExiste,
     AtivoNaoEncontrado,
     PermissaoNegada
 )
-from utils.validators import STATUS_VALIDOS
+from controle_ativos.utils.validators import STATUS_VALIDOS
 
 
 class SistemaAtivos:

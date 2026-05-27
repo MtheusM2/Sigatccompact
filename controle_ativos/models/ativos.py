@@ -26,6 +26,7 @@ class Ativo:
         self.data_entrada = data_entrada
         self.data_saida = data_saida
         self.criado_por = criado_por
+        # empresa_id reservado para futura evolução multi-tenant.
 
     def to_dict(self):
         """
