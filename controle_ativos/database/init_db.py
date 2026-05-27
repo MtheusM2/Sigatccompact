@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from database.connection import conexao_mysql
+from controle_ativos.database.connection import conexao_mysql
 
 
 def inicializar_banco():

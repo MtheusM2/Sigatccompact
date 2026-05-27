@@ -30,6 +30,7 @@ CREATE TABLE IF NOT EXISTS ativos (
   criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   atualizado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
+  KEY idx_ativos_criado_por (criado_por),
   KEY idx_ativos_status (status),
   KEY idx_ativos_departamento (departamento),
   KEY idx_ativos_usuario_responsavel (usuario_responsavel),

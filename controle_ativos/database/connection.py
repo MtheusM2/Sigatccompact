@@ -1,5 +1,6 @@
 # Importa funções para ler variáveis de ambiente.
 import os
+from threading import Lock
 
 # Importa utilitário para trabalhar com caminhos de forma segura.
 from pathlib import Path
@@ -7,8 +8,7 @@ from pathlib import Path
 # Importa o decorador para criar context managers com "with".
 from contextlib import contextmanager
 
-# Importa o conector do MySQL.
-import mysql.connector
+from mysql.connector.pooling import MySQLConnectionPool
 
 # Importa o carregador de variáveis de ambiente do arquivo .env.
 from dotenv import load_dotenv
@@ -27,6 +27,9 @@ ENV_FILE = BASE_DIR / ".env"
 # Carrega o arquivo .env de forma explícita.
 # Isso evita depender do diretório atual do terminal.
 load_dotenv(dotenv_path=ENV_FILE)
+
+_POOL_LOCK = Lock()
+_CONNECTION_POOLS = {}
 
 
 def _db_config(com_database: bool = True) -> dict:
@@ -60,6 +63,33 @@ def _db_config(com_database: bool = True) -> dict:
     return cfg
 
 
+def _obter_pool(com_database: bool = True):
+    """
+    Retorna um pool de conexões MySQL reutilizável.
+    """
+    chave = "com_db" if com_database else "sem_db"
+    pool = _CONNECTION_POOLS.get(chave)
+
+    if pool is not None:
+        return pool
+
+    with _POOL_LOCK:
+        pool = _CONNECTION_POOLS.get(chave)
+        if pool is None:
+            cfg = _db_config(com_database=com_database)
+            pool_nome = os.getenv("DB_POOL_NAME", "controle_ativos")
+            pool_tamanho = int(os.getenv("DB_POOL_SIZE", "5"))
+
+            pool = MySQLConnectionPool(
+                pool_name=f"{pool_nome}_{chave}",
+                pool_size=pool_tamanho,
+                **cfg
+            )
+            _CONNECTION_POOLS[chave] = pool
+
+    return pool
+
+
 @contextmanager
 def conexao_mysql(com_database: bool = True):
     """
@@ -68,7 +98,7 @@ def conexao_mysql(com_database: bool = True):
     conn = None
 
     try:
-        conn = mysql.connector.connect(**_db_config(com_database=com_database))
+        conn = _obter_pool(com_database=com_database).get_connection()
         conn.autocommit = False
         yield conn
         conn.commit()
