@@ -111,6 +111,7 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
           cache-dependency-path: |
+            controle_ativos/requirements.txt
             requirements-dev.txt
             requirements.txt
 
@@ -188,7 +189,7 @@ jobs:
           # Arquivos considerados código relevante do backend.
           CODE_CHANGED="$(
             grep -E \
-              '(^controle_ativos/.*\.(py|html|js|css)$|^controle_ativos/database/migrations/.*\.sql$|^requirements.*\.txt$|^pyproject\.toml$|^setup\.py$)' \
+              '(^controle_ativos/.*\.(py|html|js|css)$|^controle_ativos/database/migrations/.*\.sql$|^controle_ativos/requirements.*\.txt$|^requirements.*\.txt$|^pyproject\.toml$|^setup\.py$)' \
               changed-files.txt || true
           )"
 
@@ -225,7 +226,11 @@ jobs:
 
           python -m pip install --upgrade pip
 
-          if [[ -f "requirements-dev.txt" ]]; then
+          if [[ -f "controle_ativos/requirements.txt" ]]; then
+            echo "Instalando dependências de: controle_ativos/requirements.txt"
+            python -m pip install -r controle_ativos/requirements.txt
+            echo "REQ_FILE=controle_ativos/requirements.txt" >> "$GITHUB_ENV"
+          elif [[ -f "requirements-dev.txt" ]]; then
             echo "Instalando dependências de: requirements-dev.txt"
             python -m pip install -r requirements-dev.txt
             echo "REQ_FILE=requirements.txt" >> "$GITHUB_ENV"
@@ -235,7 +240,7 @@ jobs:
             python -m pip install pytest pytest-cov bandit pip-audit
             echo "REQ_FILE=requirements.txt" >> "$GITHUB_ENV"
           else
-            echo "::error::Nenhum requirements.txt encontrado. Crie requirements.txt e requirements-dev.txt."
+            echo "::error::Nenhum requirements.txt encontrado. Crie controle_ativos/requirements.txt."
             exit 1
           fi
 
@@ -403,12 +408,12 @@ jobs:
         run: |
           set -euo pipefail
 
-          if [[ ! -f "requirements.txt" ]]; then
-            echo "::error::requirements.txt ausente. A auditoria exige requirements.txt oficial."
+          if [[ -z "${REQ_FILE:-}" || ! -f "$REQ_FILE" ]]; then
+            echo "::error::requirements.txt oficial ausente. A auditoria exige controle_ativos/requirements.txt."
             exit 1
           fi
 
-          pip-audit -r requirements.txt --strict
+          pip-audit -r "$REQ_FILE" --strict
 
       - name: Rodar todos os testes
         if: steps.backend.outputs.exists == 'true'
