@@ -4,6 +4,7 @@ import os
 import pytest
 
 from controle_ativos.models.ativos import Ativo
+from controle_ativos.utils.security import CSRF_SESSION_KEY
 
 
 os.environ.setdefault("FLASK_SECRET_KEY", "test-secret-for-routes")
@@ -14,6 +15,13 @@ app_module = importlib.import_module("controle_ativos.web.app")
 def client():
     app_module.app.config.update(TESTING=True)
     return app_module.app.test_client()
+
+
+def _csrf_headers(client, token_override=None):
+    client.get("/")
+    with client.session_transaction() as sess:
+        token = token_override if token_override is not None else sess[CSRF_SESSION_KEY]
+    return {"X-CSRF-Token": token}
 
 
 def _login(client, user_id=1):
@@ -54,7 +62,11 @@ def test_dashboard_autenticado_renderiza_pagina(client):
 
 
 def test_register_rejeita_payload_sem_email(client):
-    response = client.post("/register", json={"senha": "Senha@12345"})
+    response = client.post(
+        "/register",
+        json={"senha": "Senha@12345"},
+        headers=_csrf_headers(client),
+    )
 
     assert response.status_code == 400
     assert response.get_json()["ok"] is False
@@ -85,6 +97,7 @@ def test_register_caminho_sucesso_delega_para_auth_service(client, monkeypatch):
             "pergunta_recuperacao": "Cor?",
             "resposta_recuperacao": "Azul",
         },
+        headers=_csrf_headers(client),
     )
 
     assert response.status_code == 201
@@ -93,7 +106,11 @@ def test_register_caminho_sucesso_delega_para_auth_service(client, monkeypatch):
 
 
 def test_login_rejeita_payload_sem_senha(client):
-    response = client.post("/login", json={"email": "tester@example.com"})
+    response = client.post(
+        "/login",
+        json={"email": "tester@example.com"},
+        headers=_csrf_headers(client),
+    )
 
     assert response.status_code == 400
     assert response.get_json()["ok"] is False
@@ -110,6 +127,7 @@ def test_login_caminho_sucesso_grava_sessao(client, monkeypatch):
     response = client.post(
         "/login",
         json={"email": "tester@example.com", "senha": "Senha@12345"},
+        headers=_csrf_headers(client),
     )
 
     assert response.status_code == 200
@@ -123,6 +141,7 @@ def test_forgot_password_rejeita_payload_incompleto(client):
     response = client.post(
         "/forgot-password",
         json={"email": "tester@example.com", "resposta_recuperacao": "azul"},
+        headers=_csrf_headers(client),
     )
 
     assert response.status_code == 400
@@ -145,6 +164,7 @@ def test_forgot_password_caminho_sucesso_delega_para_auth_service(client, monkey
             "resposta_recuperacao": "Azul",
             "nova_senha": "Senha@12345",
         },
+        headers=_csrf_headers(client),
     )
 
     assert response.status_code == 200
@@ -167,10 +187,30 @@ def test_forgot_password_caminho_sucesso_delega_para_auth_service(client, monkey
     ],
 )
 def test_rotas_de_ativos_exigem_usuario_autenticado(client, method, path):
-    response = getattr(client, method)(path, json={})
+    if method == "get":
+        response = getattr(client, method)(path, json={})
+        assert response.status_code == 401
+        assert response.get_json() == {"ok": False, "erro": "Não autenticado."}
+    else:
+        response = getattr(client, method)(path, json={})
+        assert response.status_code == 400
+        assert response.get_json() == {"ok": False, "erro": "CSRF inválido."}
 
-    assert response.status_code == 401
-    assert response.get_json() == {"ok": False, "erro": "Não autenticado."}
+
+def test_rotas_mutaveis_sem_token_rejeitam_csrf(client):
+    response = client.post("/register", json={"email": "a@b.com"})
+    assert response.status_code == 400
+    assert response.get_json() == {"ok": False, "erro": "CSRF inválido."}
+
+
+def test_rotas_mutaveis_com_token_invalido_rejeitam_csrf(client):
+    response = client.post(
+        "/login",
+        json={"email": "tester@example.com", "senha": "Senha@12345"},
+        headers=_csrf_headers(client, token_override="invalido"),
+    )
+    assert response.status_code == 400
+    assert response.get_json() == {"ok": False, "erro": "CSRF inválido."}
 
 
 def test_criar_ativo_rejeita_campo_obrigatorio_ausente(client):
@@ -186,6 +226,7 @@ def test_criar_ativo_rejeita_campo_obrigatorio_ausente(client):
             "status": "Disponível",
             "data_entrada": "2026-05-27",
         },
+        headers=_csrf_headers(client),
     )
 
     assert response.status_code == 400
@@ -236,6 +277,7 @@ def test_criar_ativo_caminho_sucesso_delega_para_service(client, monkeypatch):
             "status": "Disponível",
             "data_entrada": "2026-05-27",
         },
+        headers=_csrf_headers(client),
     )
 
     assert response.status_code == 201
@@ -259,7 +301,11 @@ def test_atualizar_ativo_caminho_sucesso_serializa_ativo(client, monkeypatch):
     _login(client)
     monkeypatch.setattr(app_module.ativos_service, "atualizar_ativo", lambda **kwargs: _ativo())
 
-    response = client.put("/ativos/AT-001", json={"modelo": "XPS"})
+    response = client.put(
+        "/ativos/AT-001",
+        json={"modelo": "XPS"},
+        headers=_csrf_headers(client),
+    )
 
     assert response.status_code == 200
     assert response.get_json()["ativo"]["id"] == "AT-001"
@@ -273,7 +319,11 @@ def test_atualizar_ativo_traduz_erro_do_servico(client, monkeypatch):
 
     monkeypatch.setattr(app_module.ativos_service, "atualizar_ativo", _fake_atualizar_ativo)
 
-    response = client.put("/ativos/AT-001", json={"status": "Inexistente"})
+    response = client.put(
+        "/ativos/AT-001",
+        json={"status": "Inexistente"},
+        headers=_csrf_headers(client),
+    )
 
     assert response.status_code == 400
     assert response.get_json() == {
@@ -304,7 +354,10 @@ def test_remover_ativo_traduz_erro_do_servico(client, monkeypatch):
 
     monkeypatch.setattr(app_module.ativos_service, "remover_ativo", _fake_remover_ativo)
 
-    response = client.delete("/ativos/AT-001")
+    response = client.delete(
+        "/ativos/AT-001",
+        headers=_csrf_headers(client),
+    )
 
     assert response.status_code == 400
     assert response.get_json() == {
@@ -323,7 +376,10 @@ def test_remover_ativo_caminho_sucesso_delega_para_service(client, monkeypatch):
 
     monkeypatch.setattr(app_module.ativos_service, "remover_ativo", _fake_remover_ativo)
 
-    response = client.delete("/ativos/AT-001")
+    response = client.delete(
+        "/ativos/AT-001",
+        headers=_csrf_headers(client),
+    )
 
     assert response.status_code == 200
     assert response.get_json() == {"ok": True}

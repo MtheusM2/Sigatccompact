@@ -16,8 +16,18 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-# Importa o decorator de segurança centralizado (depois de garantir sys.path)
-from controle_ativos.utils.security import login_required
+# Importa os helpers de segurança centralizados (depois de garantir sys.path)
+from controle_ativos.utils.security import (
+    AUTH_RATE_LIMIT_MESSAGE,
+    clear_auth_rate_limit,
+    client_ip,
+    login_required,
+    csrf_token,
+    is_auth_rate_limited,
+    normalize_email_for_rate_limit,
+    register_auth_rate_limit_failure,
+    validate_csrf_request,
+)
 
 # Importa o serviço de autenticação e suas exceções específicas.
 from controle_ativos.services.auth_service import (
@@ -62,6 +72,18 @@ app.config.update(
         "PERMANENT_SESSION_LIFETIME": timedelta(minutes=30),
     }
 )
+
+
+@app.context_processor
+def inject_csrf_token():
+    return {"csrf_token": csrf_token}
+
+
+@app.before_request
+def protect_csrf():
+    csrf_error = validate_csrf_request()
+    if csrf_error is not None:
+        return csrf_error
 
 
 @app.get("/")
@@ -126,6 +148,9 @@ def dashboard_excluir():
 
 auth_service = AuthService()
 ativos_service = AtivosService()
+
+LOGIN_PUBLIC_FAILURE_MESSAGE = "E-mail ou senha inválidos."
+RECOVERY_PUBLIC_FAILURE_MESSAGE = "Não foi possível confirmar seus dados de recuperação."
 
 
 def usuario_logado_id():
@@ -203,6 +228,16 @@ def login():
     Autentica um usuário e grava seus dados básicos na sessão.
     """
     data = request.get_json() or {}
+    ip_origem = client_ip()
+    email_normalizado = normalize_email_for_rate_limit(data.get("email"))
+
+    if is_auth_rate_limited("login", ip_origem, email_normalizado):
+        app.logger.warning(
+            "Login bloqueado por rate limit: ip=%s email=%s",
+            ip_origem,
+            email_normalizado or "-",
+        )
+        return _erro_json(AUTH_RATE_LIMIT_MESSAGE, 429)
 
     try:
         usuario = auth_service.autenticar(
@@ -215,12 +250,20 @@ def login():
         session["user_id"] = usuario.id
         session["email"] = usuario.email
         # session["empresa_id"] = usuario.empresa_id  # reservado para futura multi-tenant
+        clear_auth_rate_limit("login", ip_origem, email_normalizado)
 
         return jsonify({"ok": True, "email": usuario.email})
     except KeyError as erro:
         return _erro_json(f"Campo obrigatório ausente: {erro.args[0]}", 400)
     except (UsuarioNaoEncontrado, CredenciaisInvalidas) as erro:
-        return _erro_json(str(erro), 401)
+        register_auth_rate_limit_failure("login", ip_origem, email_normalizado)
+        app.logger.warning(
+            "Falha de login: ip=%s email=%s motivo=%s",
+            ip_origem,
+            email_normalizado or "-",
+            type(erro).__name__,
+        )
+        return _erro_json(LOGIN_PUBLIC_FAILURE_MESSAGE, 401)
     except AuthErro as erro:
         return _erro_json(str(erro), 400)
 
@@ -240,6 +283,16 @@ def forgot_password():
     Redefine a senha do usuário mediante resposta correta da recuperação.
     """
     data = request.get_json() or {}
+    ip_origem = client_ip()
+    email_normalizado = normalize_email_for_rate_limit(data.get("email"))
+
+    if is_auth_rate_limited("forgot-password", ip_origem, email_normalizado):
+        app.logger.warning(
+            "Recuperacao bloqueada por rate limit: ip=%s email=%s",
+            ip_origem,
+            email_normalizado or "-",
+        )
+        return _erro_json(AUTH_RATE_LIMIT_MESSAGE, 429)
 
     try:
         auth_service.redefinir_senha(
@@ -247,11 +300,19 @@ def forgot_password():
             resposta=data["resposta_recuperacao"],
             nova_senha=data["nova_senha"],
         )
+        clear_auth_rate_limit("forgot-password", ip_origem, email_normalizado)
         return jsonify({"ok": True})
     except KeyError as erro:
         return _erro_json(f"Campo obrigatório ausente: {erro.args[0]}", 400)
-    except RecuperacaoInvalida as erro:
-        return _erro_json(str(erro), 401)
+    except (UsuarioNaoEncontrado, RecuperacaoInvalida) as erro:
+        register_auth_rate_limit_failure("forgot-password", ip_origem, email_normalizado)
+        app.logger.warning(
+            "Falha de recuperacao: ip=%s email=%s motivo=%s",
+            ip_origem,
+            email_normalizado or "-",
+            type(erro).__name__,
+        )
+        return _erro_json(RECOVERY_PUBLIC_FAILURE_MESSAGE, 401)
     except AuthErro as erro:
         return _erro_json(str(erro), 400)
 
