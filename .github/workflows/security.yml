@@ -1,0 +1,58 @@
+name: Segurança
+
+on:
+  pull_request:
+  push:
+  schedule:
+    - cron: "0 3 * * 1"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  PYTHON_VERSION: "3.12"
+
+jobs:
+  bandit-e-pip-audit:
+    name: Bandit e pip-audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
+
+      - name: Instalar dependências de segurança
+        run: |
+          set -euo pipefail
+
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+          if [[ -f requirements-dev.txt ]]; then
+            python -m pip install -r requirements-dev.txt
+          fi
+
+      - name: Executar Bandit
+        run: python -m bandit -r controle_ativos -x "controle_ativos/tests,tests,controle_ativos/.venv,.venv,venv" -lll
+
+      - name: Executar pip-audit
+        run: |
+          set -euo pipefail
+
+          pip-audit -r requirements.txt -r requirements-dev.txt --strict
