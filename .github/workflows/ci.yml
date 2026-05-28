@@ -45,6 +45,7 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
           cache-dependency-path: |
+            controle_ativos/requirements.txt
             requirements.txt
             requirements-dev.txt
 
@@ -52,8 +53,14 @@ jobs:
         run: |
           set -euo pipefail
 
+          requirements_file="requirements.txt"
+
+          if [[ ! -f "$requirements_file" ]]; then
+            requirements_file="controle_ativos/requirements.txt"
+          fi
+
           python -m pip install --upgrade pip
-          python -m pip install -r requirements.txt
+          python -m pip install -r "$requirements_file"
           if [[ -f requirements-dev.txt ]]; then
             python -m pip install -r requirements-dev.txt
           fi
