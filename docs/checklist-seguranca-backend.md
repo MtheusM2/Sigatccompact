@@ -7,8 +7,8 @@ Legenda: `[x] Atendido`, `[ ] Pendente`, `[~] Parcial`, `[-] Nao aplicavel`.
 - [x] Cadastro de usuario valida e-mail e senha minima.
 - [x] Login valida senha por hash, nao por texto puro.
 - [x] Logout limpa a sessao com `session.clear()`.
-- [~] Mensagens de login parcialmente genericas; usuario inexistente ainda pode ser enumerado.
-- [ ] Rate limit ou bloqueio temporario apos falhas.
+- [x] Mensagens de login e recuperacao sao genericas; usuario inexistente nao e enumerado.
+- [x] Rate limit ou bloqueio temporario apos falhas.
 - [ ] Controle de usuario inativo/bloqueado.
 - [ ] Reautenticacao para acoes criticas futuras.
 
@@ -22,10 +22,10 @@ Legenda: `[x] Atendido`, `[ ] Pendente`, `[~] Parcial`, `[-] Nao aplicavel`.
 
 ## Cookies
 
-- [ ] `SESSION_COOKIE_HTTPONLY` configurado explicitamente.
-- [ ] `SESSION_COOKIE_SAMESITE` configurado explicitamente.
-- [ ] `SESSION_COOKIE_SECURE` habilitado para producao/HTTPS.
-- [~] Uso de sessao Flask existe, mas depende de defaults para cookies.
+- [x] `SESSION_COOKIE_HTTPONLY` configurado explicitamente.
+- [x] `SESSION_COOKIE_SAMESITE` configurado explicitamente.
+- [x] `SESSION_COOKIE_SECURE` habilitado para producao/HTTPS.
+- [x] Uso de sessao Flask com politica explicita de cookies.
 
 ## CSRF
 
@@ -77,8 +77,8 @@ Legenda: `[x] Atendido`, `[ ] Pendente`, `[~] Parcial`, `[-] Nao aplicavel`.
 
 ## Logs/auditoria
 
-- [ ] Log estruturado de login.
-- [ ] Log estruturado de falha de login.
+- [~] Log estruturado de login.
+- [x] Log tecnico de falha de login e recuperacao sem senha/resposta/segredo.
 - [ ] Log de logout.
 - [ ] Log de criacao, edicao e exclusao de ativos.
 - [-] Evolucao futura: Exportacao de logs de auditoria quando a auditoria persistida for implementada.
@@ -113,12 +113,12 @@ Legenda: `[x] Atendido`, `[ ] Pendente`, `[~] Parcial`, `[-] Nao aplicavel`.
 
 ## Testes
 
-- [x] Suite atual: 59 testes aprovados e 1 ignorado.
+- [x] Suite atual: 75 testes aprovados.
 - [x] Testes cobrem rotas de ativos sem autenticacao.
 - [x] Testes cobrem segredo de sessao obrigatorio.
 - [x] Testes cobrem hash de senha.
-- [ ] Testes de CSRF.
-- [ ] Testes de cookies.
-- [ ] Testes de rate limit.
+- [x] Testes de CSRF.
+- [x] Testes de cookies.
+- [x] Testes de rate limit.
 - [ ] Testes de acesso cruzado usuario A vs usuario B.
 - [ ] Testes de logs/auditoria.

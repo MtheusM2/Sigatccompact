@@ -7,8 +7,8 @@
 | 1 | Criar decorator central `login_required` e aplicar em rotas privadas. | Falha por esquecimento de verificacao manual. | P0 | Toda rota privada retorna 401/redirect padronizado sem sessao; testes cobrem rotas atuais. |
 | 2 | Configurar cookies de sessao explicitamente. | Sessao exposta a CSRF/roubo por configuracao implicita. | P0 | `SESSION_COOKIE_HTTPONLY=True`, `SESSION_COOKIE_SAMESITE="Lax"` e `SESSION_COOKIE_SECURE` habilitavel por ambiente HTTPS. |
 | 3 | Adicionar protecao CSRF em POST/PUT/DELETE. | Requisicoes forjadas de outro site. | P0 | Formularios e chamadas `fetch` enviam token; requisicoes mutaveis sem token retornam 400/403. |
-| 4 | Unificar resposta publica de falha de login/recuperacao. | Enumeracao de usuarios. | P0 | Usuario inexistente e senha incorreta retornam mensagem generica e mesmo status publico. |
-| 5 | Implementar rate limit simples para login e recuperacao. | Tentativas automatizadas e forca bruta. | P0 | Apos N falhas por IP/e-mail em janela curta, endpoint retorna bloqueio temporario documentado. |
+| 4 | Unificar resposta publica de falha de login/recuperacao. | Enumeracao de usuarios. | P0 | Usuario inexistente e senha incorreta retornam mensagem generica e mesmo status publico. (implementado) |
+| 5 | Implementar rate limit simples para login e recuperacao. | Tentativas automatizadas e forca bruta. | P0 | Apos N falhas por IP/e-mail em janela curta, endpoint retorna bloqueio temporario documentado. (implementado) |
 | 6 | Limpar sessao antes de gravar login e manter `session.clear()` no logout. | Fixacao/reuso indevido de sessao. | P0 | Teste confirma sessao antiga removida no login e logout. |
 | 7 | Padronizar tratamento de erros e remover detalhe tecnico do cliente. | Exposicao de internals e respostas inconsistentes. | P1 | Cliente recebe mensagens genericas; detalhes tecnicos ficam somente em log tecnico. |
 | 8 | Criar logs/auditoria basica para eventos sensiveis atuais. | Falta de rastreabilidade para login e CRUD. | P1 | Eventos de login, falha de login, logout e CRUD sao registrados sem senha/resposta/segredo. |
@@ -43,8 +43,8 @@ Importacao, exportacao e upload nao existem no backend atual e nao fazem parte d
 1. Decorator `login_required` e padronizacao de erro nao autenticado. (implementado)
 2. Configuracao explicita de cookies e segredo/pepper por ambiente. (implementado)
 3. CSRF em formularios e endpoints mutaveis. (implementado)
-4. Mensagens genericas de login/recuperacao.
-5. Rate limit em login/recuperacao.
+4. Mensagens genericas de login/recuperacao. (implementado)
+5. Rate limit em login/recuperacao. (implementado)
 6. Limpeza de sessao antes do login e no logout. (implementado)
 7. Tratamento global de erros.
 8. Logs/auditoria basica de eventos sensiveis atuais.
@@ -70,7 +70,7 @@ Importacao, exportacao e upload nao existem no backend atual e nao fazem parte d
 | ----- | ------------------ | --------- |
 | Sem RBAC no estado atual. | Aceito ate concluir base de sessao/CSRF. | CRUD fica limitado por `criado_por`; RBAC entra depois. |
 | Sem CSRF hoje. | Nao aceito para evolucao; corrigir antes do RBAC. | Implementar token em formularios e endpoints mutaveis. |
-| Sem rate limit. | Nao aceito para evolucao; corrigir na Fase 1. | Bloqueio simples por IP/e-mail. |
+| Sem rate limit. | Corrigido na Fase 1.3. | Bloqueio simples por IP/e-mail em memoria para login e recuperacao. |
 | Sem auditoria detalhada. | Aceito temporariamente no TCC interno. | Criar logs basicos antes de perfis administrativos. |
 | Importacao/exportacao/upload nao implementados no backend atual. | Fora do escopo imediato e nao bloqueia RBAC. | Nao criar fluxo de arquivos agora; projetar validacao e confirmacao apenas se a funcionalidade for adicionada futuramente. |
 | Exportacao de relatorios de logs. | Evolucao futura dependente de auditoria persistida. | Considerar somente apos criacao da tabela/service de auditoria, com acesso controlado por `SUPER_ADMIN` ou `ADMIN`. |

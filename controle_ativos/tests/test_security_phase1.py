@@ -4,6 +4,8 @@ from datetime import timedelta
 
 import pytest
 
+import controle_ativos.utils.security as security_utils
+
 from controle_ativos.utils.security import CSRF_SESSION_KEY
 
 
@@ -30,6 +32,17 @@ def _login_dummy(monkeypatch):
         email = "tester@example.com"
 
     monkeypatch.setattr(app_module.auth_service, "autenticar", lambda **kwargs: _UsuarioFake())
+
+
+class _Clock:
+    def __init__(self, current=1_000.0):
+        self.current = current
+
+    def monotonic(self):
+        return self.current
+
+    def advance(self, seconds):
+        self.current += seconds
 
 
 def test_login_cleans_old_session(client, monkeypatch):
@@ -106,6 +119,132 @@ def test_login_with_valid_csrf_continues_working(client, monkeypatch):
 
     assert response.status_code == 200
     assert response.get_json() == {"ok": True, "email": "tester@example.com"}
+
+
+@pytest.mark.parametrize(
+    "erro_publico",
+    [
+        app_module.UsuarioNaoEncontrado("usuario ausente"),
+        app_module.CredenciaisInvalidas("senha incorreta"),
+    ],
+)
+def test_login_exibe_mensagem_generica_para_falhas_distintas(client, monkeypatch, erro_publico):
+    def _fake_autenticar(**kwargs):
+        raise erro_publico
+
+    monkeypatch.setattr(app_module.auth_service, "autenticar", _fake_autenticar)
+
+    response = client.post(
+        "/login",
+        json={"email": "tester@example.com", "senha": "Senha@12345"},
+        headers=_csrf_headers(client),
+    )
+
+    assert response.status_code == 401
+    assert response.get_json() == {"ok": False, "erro": "E-mail ou senha inválidos."}
+
+
+def test_login_bloqueia_temporariamente_apos_multiplas_falhas(client, monkeypatch):
+    clock = _Clock()
+    monkeypatch.setattr(security_utils.time, "monotonic", clock.monotonic)
+
+    def _fake_autenticar(**kwargs):
+        raise app_module.CredenciaisInvalidas("senha incorreta")
+
+    monkeypatch.setattr(app_module.auth_service, "autenticar", _fake_autenticar)
+
+    headers = _csrf_headers(client)
+    payload = {"email": "tester@example.com", "senha": "Senha@12345"}
+
+    for _ in range(security_utils.AUTH_RATE_LIMIT_MAX_FAILURES):
+        response = client.post("/login", json=payload, headers=headers)
+        assert response.status_code == 401
+        assert response.get_json() == {"ok": False, "erro": "E-mail ou senha inválidos."}
+
+    response = client.post("/login", json=payload, headers=headers)
+    assert response.status_code == 429
+    assert response.get_json() == {
+        "ok": False,
+        "erro": security_utils.AUTH_RATE_LIMIT_MESSAGE,
+    }
+
+    clock.advance(security_utils.AUTH_RATE_LIMIT_BLOCK_SECONDS + 1)
+
+    class _UsuarioLiberado:
+        id = 15
+        email = "tester@example.com"
+
+    monkeypatch.setattr(app_module.auth_service, "autenticar", lambda **kwargs: _UsuarioLiberado())
+
+    response = client.post("/login", json=payload, headers=headers)
+    assert response.status_code == 200
+    assert response.get_json() == {"ok": True, "email": "tester@example.com"}
+
+
+@pytest.mark.parametrize(
+    "erro_publico",
+    [
+        app_module.UsuarioNaoEncontrado("usuario ausente"),
+        app_module.RecuperacaoInvalida("resposta incorreta"),
+    ],
+)
+def test_recuperacao_exibe_mensagem_generica_sem_enumerar_usuario(
+    client,
+    monkeypatch,
+    erro_publico,
+):
+    def _fake_redefinir_senha(**kwargs):
+        raise erro_publico
+
+    monkeypatch.setattr(app_module.auth_service, "redefinir_senha", _fake_redefinir_senha)
+
+    response = client.post(
+        "/forgot-password",
+        json={
+            "email": "tester@example.com",
+            "resposta_recuperacao": "Azul",
+            "nova_senha": "Senha@12345",
+        },
+        headers=_csrf_headers(client),
+    )
+
+    assert response.status_code == 401
+    assert response.get_json() == {
+        "ok": False,
+        "erro": "Não foi possível confirmar seus dados de recuperação.",
+    }
+
+
+def test_recuperacao_bloqueia_temporariamente_apos_multiplas_falhas(client, monkeypatch):
+    clock = _Clock()
+    monkeypatch.setattr(security_utils.time, "monotonic", clock.monotonic)
+
+    def _fake_redefinir_senha(**kwargs):
+        raise app_module.RecuperacaoInvalida("resposta incorreta")
+
+    monkeypatch.setattr(app_module.auth_service, "redefinir_senha", _fake_redefinir_senha)
+
+    headers = _csrf_headers(client)
+    payload = {
+        "email": "tester@example.com",
+        "resposta_recuperacao": "Azul",
+        "nova_senha": "Senha@12345",
+    }
+
+    for _ in range(security_utils.AUTH_RATE_LIMIT_MAX_FAILURES):
+        response = client.post("/forgot-password", json=payload, headers=headers)
+        assert response.status_code == 401
+        assert response.get_json() == {
+            "ok": False,
+            "erro": "Não foi possível confirmar seus dados de recuperação.",
+        }
+
+    response = client.post("/forgot-password", json=payload, headers=headers)
+    assert response.status_code == 429
+    assert response.get_json() == {
+        "ok": False,
+        "erro": security_utils.AUTH_RATE_LIMIT_MESSAGE,
+    }
 
 
 def test_session_cookie_configured_explicitly():

@@ -12,12 +12,12 @@ Importacao, exportacao e upload de arquivos estao fora do escopo atual porque na
 
 | Risco | Impacto | Severidade | Situacao atual | Mitigacao futura |
 | ----- | ------- | ---------- | -------------- | ---------------- |
-| Ausencia de CSRF em formularios e endpoints mutaveis. | Um site externo poderia tentar acionar POST/PUT/DELETE usando a sessao do navegador. | Alto | Nao ha token identificado nos templates ou rotas. | Implementar CSRF antes do RBAC. |
-| Cookies de sessao nao configurados explicitamente. | Dependencia de defaults e falta de politica clara para HTTPS/producao. | Alto | Nao ha `SESSION_COOKIE_HTTPONLY`, `SESSION_COOKIE_SAMESITE` ou `SESSION_COOKIE_SECURE` no app. | Definir configuracao por ambiente. |
-| Falta de decorator central de autenticacao. | Novas rotas podem esquecer validacao de sessao. | Alto | Rotas atuais verificam manualmente ou via helper de renderizacao. | Criar `login_required` e padrao deny-by-default. |
+| Ausencia de CSRF em formularios e endpoints mutaveis. | Um site externo poderia tentar acionar POST/PUT/DELETE usando a sessao do navegador. | Alto | Corrigido com token por sessao e validacao global nas rotas mutaveis. | Manter cobertura de testes ao criar novos endpoints mutaveis. |
+| Cookies de sessao nao configurados explicitamente. | Dependencia de defaults e falta de politica clara para HTTPS/producao. | Alto | Corrigido com `SESSION_COOKIE_HTTPONLY`, `SESSION_COOKIE_SAMESITE` e `SESSION_COOKIE_SECURE`. | Revisar apenas se o ambiente HTTPS mudar. |
+| Falta de decorator central de autenticacao. | Novas rotas podem esquecer validacao de sessao. | Alto | Corrigido com `login_required` aplicado nas rotas privadas. | Manter padrao deny-by-default em rotas novas. |
 | Sem RBAC/perfis. | Usuario autenticado tem o mesmo nivel funcional nas rotas de ativos. | Alto | Nao ha perfil no schema nem decorators de permissao. | Implementar RBAC apos base P0. |
-| Sem rate limit/bloqueio temporario. | Login e recuperacao ficam mais expostos a tentativa automatizada. | Alto | Nao ha contador de falhas. | Limite simples por IP/e-mail. |
-| Possivel enumeracao de usuario. | Mensagens diferentes podem indicar se e-mail existe. | Medio | Usuario inexistente gera mensagem especifica no service. | Unificar mensagens publicas. |
+| Sem rate limit/bloqueio temporario. | Login e recuperacao ficam mais expostos a tentativa automatizada. | Alto | Corrigido com limite simples em memoria por IP/e-mail e bloqueio temporario. | Evoluir para store compartilhado se o backend escalar horizontalmente. |
+| Possivel enumeracao de usuario. | Mensagens diferentes podem indicar se e-mail existe. | Medio | Corrigido com mensagens publicas genericas em login e recuperacao. | Manter log tecnico interno sem expor detalhes ao cliente. |
 | Sem logs/auditoria estruturados. | Dificulta investigar alteracoes e falhas. | Alto | Nao ha tabela/service de auditoria identificado. | Criar logs basicos e depois tabela de auditoria. |
 | `APP_PEPPER` opcional. | Hash continua forte com salt/PBKDF2, mas perde camada extra quando pepper nao existe. | Medio | `_pepper()` retorna vazio se variavel ausente. | Exigir em producao ou validar configuracao. |
 | Erro MySQL pode ser retornado ao cliente no registro. | Pode expor detalhe tecnico de banco. | Medio | Rota `/register` retorna `str(erro)` em erro de conector. | Mensagem generica ao cliente e detalhe em log. |
