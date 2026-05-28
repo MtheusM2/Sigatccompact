@@ -1,0 +1,107 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+      - MtheusM2-BackEnd
+  push:
+    branches:
+      - main
+      - MtheusM2-BackEnd
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  PYTHON_VERSION: "3.12"
+  PYTHONDONTWRITEBYTECODE: "1"
+  PYTHONUNBUFFERED: "1"
+  FLASK_ENV: "testing"
+  FLASK_DEBUG: "0"
+  FLASK_SECRET_KEY: "ci-test-secret-key-not-production"
+  APP_PEPPER: "ci-test-pepper-not-production"
+
+jobs:
+  pytest:
+    name: Testes automatizados
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
+
+      - name: Instalar dependências
+        run: |
+          set -euo pipefail
+
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+          if [[ -f requirements-dev.txt ]]; then
+            python -m pip install -r requirements-dev.txt
+          fi
+
+      - name: Verificar estrutura oficial do backend
+        run: |
+          set -euo pipefail
+
+          if [[ ! -d controle_ativos ]]; then
+            echo "::error::A pasta controle_ativos/ é parte oficial do projeto e não foi encontrada."
+            exit 1
+          fi
+
+      - name: Bloquear arquivos proibidos versionados
+        run: |
+          set -euo pipefail
+
+          tracked_bad_files="$(git ls-files | grep -E '(^|/)(__pycache__/|.*\.pyc$|\.env$|\.env\.local$|\.env\.production$|.*\.log$)' || true)"
+
+          if [[ -n "$tracked_bad_files" ]]; then
+            echo "::error::Arquivos sensíveis ou temporários estão versionados:"
+            echo "$tracked_bad_files"
+            exit 1
+          fi
+
+      - name: Validar sintaxe Python
+        run: |
+          set -euo pipefail
+
+          python -m compileall -q controle_ativos
+
+      - name: Executar suíte de testes
+        run: |
+          set -euo pipefail
+
+          test_paths=()
+
+          if [[ -d tests ]]; then
+            test_paths+=(tests)
+          fi
+
+          if [[ -d controle_ativos/tests ]]; then
+            test_paths+=(controle_ativos/tests)
+          fi
+
+          if [[ "${#test_paths[@]}" -eq 0 ]]; then
+            echo "::error::Nenhuma pasta de testes encontrada em tests/ ou controle_ativos/tests/."
+            exit 1
+          fi
+
+          python -m pytest -q "${test_paths[@]}"

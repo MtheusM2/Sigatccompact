@@ -1,0 +1,36 @@
+name: CodeQL
+
+on:
+  push:
+    branches:
+      - main
+      - backend
+      - MtheusM2-BackEnd
+  pull_request:
+    branches:
+      - main
+      - backend
+      - MtheusM2-BackEnd
+  schedule:
+    - cron: "0 4 * * 1"
+
+permissions:
+  actions: read
+  contents: read
+  security-events: write
+
+jobs:
+  analyze:
+    name: Análise CodeQL
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Inicializar CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: python
+
+      - name: Analisar código
+        uses: github/codeql-action/analyze@v3
