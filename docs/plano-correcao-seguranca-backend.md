@@ -10,7 +10,7 @@
 | 4 | Unificar resposta publica de falha de login/recuperacao. | Enumeracao de usuarios. | P0 | Usuario inexistente e senha incorreta retornam mensagem generica e mesmo status publico. (implementado) |
 | 5 | Implementar rate limit simples para login e recuperacao. | Tentativas automatizadas e forca bruta. | P0 | Apos N falhas por IP/e-mail em janela curta, endpoint retorna bloqueio temporario documentado. (implementado) |
 | 6 | Limpar sessao antes de gravar login e manter `session.clear()` no logout. | Fixacao/reuso indevido de sessao. | P0 | Teste confirma sessao antiga removida no login e logout. |
-| 7 | Padronizar tratamento de erros e remover detalhe tecnico do cliente. | Exposicao de internals e respostas inconsistentes. | P1 | Cliente recebe mensagens genericas; detalhes tecnicos ficam somente em log tecnico. |
+| 7 | Padronizar tratamento de erros e remover detalhe tecnico do cliente. | Exposicao de internals e respostas inconsistentes. | P1 | Cliente recebe mensagens genericas; detalhes tecnicos ficam somente em log tecnico. (implementado) |
 | 8 | Criar logs/auditoria basica para eventos sensiveis atuais. | Falta de rastreabilidade para login e CRUD. | P1 | Eventos de login, falha de login, logout e CRUD sao registrados sem senha/resposta/segredo. |
 
 Importacao, exportacao e upload nao existem no backend atual e nao fazem parte das correcoes obrigatorias antes do RBAC. O escopo imediato e backend seguro + RBAC: autenticacao, sessao, CSRF, controle de acesso, tratamento de erros e logs/auditoria basica.

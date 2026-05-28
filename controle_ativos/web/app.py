@@ -5,7 +5,7 @@ import sys
 import secrets
 from pathlib import Path
 import mysql.connector
-from flask import Flask, request, jsonify, session
+from flask import Flask, abort, request, jsonify, session
 from flask import render_template
 from datetime import timedelta
 
@@ -84,6 +84,60 @@ def protect_csrf():
     csrf_error = validate_csrf_request()
     if csrf_error is not None:
         return csrf_error
+
+
+def _should_render_html_error() -> bool:
+    path = (request.path or "").lower()
+    return request.method == "GET" and (
+        path in {"/", "/register", "/recovery"} or path.startswith("/dashboard")
+    )
+
+
+def _public_error_response(status_code: int, mensagem: str, titulo: str):
+    if _should_render_html_error():
+        return (
+            render_template(
+                "errors/generic.html",
+                status_code=status_code,
+                titulo=titulo,
+                mensagem=mensagem,
+            ),
+            status_code,
+        )
+
+    return jsonify({"ok": False, "erro": mensagem}), status_code
+
+
+@app.errorhandler(400)
+def handle_bad_request(_error):
+    return _public_error_response(400, "Requisição inválida.", "Requisição inválida")
+
+
+@app.errorhandler(401)
+def handle_unauthorized(_error):
+    return _public_error_response(401, "Não autenticado.", "Acesso não autenticado")
+
+
+@app.errorhandler(403)
+def handle_forbidden(_error):
+    return _public_error_response(403, "Acesso negado.", "Acesso negado")
+
+
+@app.errorhandler(404)
+def handle_not_found(_error):
+    return _public_error_response(404, "Página não encontrada.", "Página não encontrada")
+
+
+@app.errorhandler(405)
+def handle_method_not_allowed(_error):
+    return _public_error_response(405, "Método não permitido.", "Método não permitido")
+
+
+@app.errorhandler(500)
+def handle_internal_error(error):
+    original_error = getattr(error, "original_exception", None) or error
+    app.logger.exception("Erro interno não tratado", exc_info=original_error)
+    return _public_error_response(500, "Erro interno. Tente novamente mais tarde.", "Erro interno")
 
 
 @app.get("/")
@@ -218,8 +272,8 @@ def register():
     except AuthErro as erro:
         return _erro_json(str(erro), 400)
     except mysql.connector.Error as erro:
-        print(f"Erro no registro: {erro}")
-        return _erro_json(f"Erro ao cadastrar usuário: {str(erro)}", 500)
+        app.logger.exception("Erro no registro de usuário", exc_info=erro)
+        abort(500)
 
 
 @app.post("/login")
