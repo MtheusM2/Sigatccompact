@@ -15,10 +15,10 @@ Legenda: `[x] Atendido`, `[ ] Pendente`, `[~] Parcial`, `[-] Nao aplicavel`.
 ## Sessao
 
 - [x] `FLASK_SECRET_KEY` e obrigatorio no startup.
-- [~] Rotas privadas verificam `user_id`, mas de forma manual.
-- [ ] Decorator central `login_required`.
-- [ ] Limpeza explicita da sessao antes de gravar novo login.
-- [ ] Teste de fixacao/reuso de sessao.
+- [x] Rotas privadas verificam `user_id` com decorator central `login_required`.
+- [x] Decorator central `login_required` implementado e aplicado nas rotas privadas.
+- [x] Limpeza explicita da sessao antes de gravar novo login.
+- [x] Testes automatizados adicionados para limpeza de sessao e protecao de rotas.
 
 ## Cookies
 

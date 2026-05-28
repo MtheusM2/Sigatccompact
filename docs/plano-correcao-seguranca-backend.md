@@ -40,12 +40,12 @@ Importacao, exportacao e upload nao existem no backend atual e nao fazem parte d
 
 ## Ordem sugerida de implementacao
 
-1. Decorator `login_required` e padronizacao de erro nao autenticado.
-2. Configuracao explicita de cookies e segredo/pepper por ambiente.
+1. Decorator `login_required` e padronizacao de erro nao autenticado. (implementado)
+2. Configuracao explicita de cookies e segredo/pepper por ambiente. (implementado)
 3. CSRF em formularios e endpoints mutaveis.
 4. Mensagens genericas de login/recuperacao.
 5. Rate limit em login/recuperacao.
-6. Limpeza de sessao antes do login e no logout.
+6. Limpeza de sessao antes do login e no logout. (implementado)
 7. Tratamento global de erros.
 8. Logs/auditoria basica de eventos sensiveis atuais.
 9. Documentar matriz RBAC.
