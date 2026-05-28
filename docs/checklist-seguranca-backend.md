@@ -29,12 +29,12 @@ Legenda: `[x] Atendido`, `[ ] Pendente`, `[~] Parcial`, `[-] Nao aplicavel`.
 
 ## CSRF
 
-- [ ] Tokens CSRF em formularios.
-- [ ] CSRF em POST `/register`.
-- [ ] CSRF em POST `/login`.
-- [ ] CSRF em POST `/forgot-password`.
-- [ ] CSRF em POST `/ativos`.
-- [ ] CSRF planejado para PUT/DELETE `/ativos/<id>`.
+- [x] Tokens CSRF gerados por sessao e expostos aos templates.
+- [x] CSRF em POST `/register`.
+- [x] CSRF em POST `/login`.
+- [x] CSRF em POST `/forgot-password`.
+- [x] CSRF em POST `/ativos`.
+- [x] CSRF em PUT/DELETE `/ativos/<id>`.
 
 ## Controle de acesso
 

@@ -42,7 +42,7 @@ Importacao, exportacao e upload nao existem no backend atual e nao fazem parte d
 
 1. Decorator `login_required` e padronizacao de erro nao autenticado. (implementado)
 2. Configuracao explicita de cookies e segredo/pepper por ambiente. (implementado)
-3. CSRF em formularios e endpoints mutaveis.
+3. CSRF em formularios e endpoints mutaveis. (implementado)
 4. Mensagens genericas de login/recuperacao.
 5. Rate limit em login/recuperacao.
 6. Limpeza de sessao antes do login e no logout. (implementado)

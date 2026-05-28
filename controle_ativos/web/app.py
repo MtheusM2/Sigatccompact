@@ -16,8 +16,12 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-# Importa o decorator de segurança centralizado (depois de garantir sys.path)
-from controle_ativos.utils.security import login_required
+# Importa os helpers de segurança centralizados (depois de garantir sys.path)
+from controle_ativos.utils.security import (
+    login_required,
+    csrf_token,
+    validate_csrf_request,
+)
 
 # Importa o serviço de autenticação e suas exceções específicas.
 from controle_ativos.services.auth_service import (
@@ -62,6 +66,18 @@ app.config.update(
         "PERMANENT_SESSION_LIFETIME": timedelta(minutes=30),
     }
 )
+
+
+@app.context_processor
+def inject_csrf_token():
+    return {"csrf_token": csrf_token}
+
+
+@app.before_request
+def protect_csrf():
+    csrf_error = validate_csrf_request()
+    if csrf_error is not None:
+        return csrf_error
 
 
 @app.get("/")

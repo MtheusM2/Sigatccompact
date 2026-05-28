@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
      <!-- <link rel="stylesheet" href="index.css"> -->
     <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
 </head>
@@ -33,6 +34,8 @@
     </main>
 
     <script>
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
         function carregarPagina(pagina) {
                 fetch(pagina)
                     .then(res => res.text())
@@ -66,7 +69,10 @@ document.addEventListener("submit", async function(e) {
 
             const response = await fetch('/ativos', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': csrfToken,
+                },
                 body: JSON.stringify({
                     tipo,
                     marca,
