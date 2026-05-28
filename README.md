@@ -10,18 +10,18 @@
 [![Framework](https://img.shields.io/badge/Framework-COBIT_2019-orange)]()
 [![CI](https://github.com/ETEC-Jaragua-MSI/DataAssets/actions/workflows/ci.yml/badge.svg)](https://github.com/ETEC-Jaragua-MSI/DataAssets/actions/workflows/ci.yml)
 [![Security](https://github.com/ETEC-Jaragua-MSI/DataAssets/actions/workflows/security.yml/badge.svg)](https://github.com/ETEC-Jaragua-MSI/DataAssets/actions/workflows/security.yml)
-[![CodeQL](https://github.com/ETEC-Jaragua-MSI/DataAssets/actions/workflows/codeql.yml/badge.svg)](https://github.com/ETEC-Jaragua-MSI/DataAssets/actions/workflows/codeql.yml)
 
 ---
 
 ## Qualidade e Segurança
 
-O repositório usa `pytest` para testes automatizados, `pip-audit` para auditoria de dependências, `Bandit` para análise estática e `CodeQL` quando configurado. A base documental de segurança foi organizada a partir da auditoria OWASP 2025.
+O repositório usa `pytest` para testes automatizados, `pip-audit` para auditoria de dependências e `Bandit` para análise estática. CodeQL está planejado como melhoria futura e será reativado quando o Code Security/Code Scanning estiver disponível no repositório. A base documental de segurança foi organizada a partir da auditoria OWASP 2025.
 
 - [Auditoria OWASP 2025](docs/auditoria-seguranca-owasp-2025.md)
 - [Checklist de segurança](docs/checklist-seguranca-backend.md)
 - [Plano de correção de segurança](docs/plano-correcao-seguranca-backend.md)
 - [Riscos conhecidos](docs/riscos-conhecidos-seguranca.md)
+- [Exemplo de workflow CodeQL](docs/workflows-exemplos/codeql.yml.example)
 
 ---
 

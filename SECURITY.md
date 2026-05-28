@@ -25,6 +25,10 @@ Consulte os documentos abaixo para o contexto de risco e priorização:
 
 Os riscos conhecidos estão documentados em detalhe nos arquivos de segurança do diretório `docs/`. Entre os pontos já assumidos para a fase atual estão a ausência de RBAC, a necessidade de CSRF, o endurecimento de cookies de sessão e a futura consolidação de auditoria persistida.
 
+## CodeQL e Code Scanning
+
+CodeQL está planejado como melhoria futura e não fica ativo neste momento para evitar bloqueio do Pull Request enquanto o Code Security / Code Scanning não estiver liberado para este repositório. Quando a capacidade estiver disponível, o workflow poderá ser reativado a partir do exemplo em [docs/workflows-exemplos/codeql.yml.example](docs/workflows-exemplos/codeql.yml.example).
+
 ## Política de exposição pública
 
 Enquanto houver riscos P0 ou P1 pendentes, o projeto não deve ser exposto publicamente nem tratado como ambiente de produção. A publicação externa só deve ser considerada após revisão dos controles mínimos, validação de segurança e aprovação do mantenedor do TCC.
