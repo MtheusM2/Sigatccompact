@@ -166,7 +166,7 @@ Desenvolver um sistema web para gestão de ativos de TI com segurança básica, 
 |---|:---:|:---:|:---:|:---:|:---:|:---:|
 | SUPER_ADMIN | Sim | Sim | Sim | Sim | Sim | Sim |
 | ADMIN | Sim | Sim | Sim | Sim | Não | Sim/Parcial |
-| USUARIO | Sim | Sim | Sim | Não | Não | Não |
+| USUARIO | Sim | Sim | Sim | Sim | Não | Não |
 | LEITOR | Sim | Não | Não | Não | Não | Não |
 
 ---
