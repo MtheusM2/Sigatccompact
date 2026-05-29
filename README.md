@@ -22,6 +22,7 @@
 - [Resumo e Palavras-chave](#resumo-e-palavras-chave)
 - [Problema e Justificativa](#problema-e-justificativa)
 - [Objetivos](#objetivos)
+- [Cronograma do Projeto](#cronograma-do-projeto)
 - [Metodologia / Estratégia Técnica](#metodologia-tecnica)
 - [Escopo e Delimitações](#escopo-e-delimitacoes)
 - [Funcionalidades Implementadas](#funcionalidades-implementadas)
@@ -103,6 +104,24 @@ Desenvolver um sistema web para gestão de ativos de TI com segurança básica, 
 - Documentar banco, migrations e decisões técnicas (ADRs);
 - Estruturar suíte de testes automatizados com `pytest`;
 - Disponibilizar interface server-rendered funcional para operações básicas.
+
+---
+
+<a id="cronograma-do-projeto"></a>
+## Cronograma do Projeto
+
+| Área | Status |
+|---|---|
+| Backend e banco | ✅ Concluído |
+| Segurança e RBAC | ✅ Concluído |
+| Interface web | 🟡 Em validação |
+| Documentação | 🔵 Em andamento |
+| CI/GitHub | 🟡 Em validação |
+| Apresentação final | ⏳ Pendente |
+
+Para detalhes por fase, entregas e próximos passos, consulte o documento completo:
+
+[📅 Cronograma atualizado do projeto](docs/cronograma-projeto.md)
 
 ---
 
