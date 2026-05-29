@@ -5,7 +5,7 @@ import sys
 import secrets
 from pathlib import Path
 import mysql.connector
-from flask import Flask, request, jsonify, session
+from flask import Flask, abort, request, jsonify, session
 from flask import render_template
 from datetime import timedelta
 
@@ -28,6 +28,8 @@ from controle_ativos.utils.security import (
     register_auth_rate_limit_failure,
     validate_csrf_request,
 )
+
+from controle_ativos.utils.audit import audit_event
 
 # Importa o serviço de autenticação e suas exceções específicas.
 from controle_ativos.services.auth_service import (
@@ -84,6 +86,73 @@ def protect_csrf():
     csrf_error = validate_csrf_request()
     if csrf_error is not None:
         return csrf_error
+
+
+def _should_render_html_error() -> bool:
+    path = (request.path or "").lower()
+    return request.method == "GET" and (
+        path in {"/", "/register", "/recovery"} or path.startswith("/dashboard")
+    )
+
+
+def _public_error_response(status_code: int, mensagem: str, titulo: str):
+    if _should_render_html_error():
+        return (
+            render_template(
+                "errors/generic.html",
+                status_code=status_code,
+                titulo=titulo,
+                mensagem=mensagem,
+            ),
+            status_code,
+        )
+
+    return jsonify({"ok": False, "erro": mensagem}), status_code
+
+
+@app.errorhandler(400)
+def handle_bad_request(_error):
+    return _public_error_response(400, "Requisição inválida.", "Requisição inválida")
+
+
+@app.errorhandler(401)
+def handle_unauthorized(_error):
+    return _public_error_response(401, "Não autenticado.", "Acesso não autenticado")
+
+
+@app.errorhandler(403)
+def handle_forbidden(_error):
+    return _public_error_response(403, "Acesso negado.", "Acesso negado")
+
+
+@app.errorhandler(404)
+def handle_not_found(_error):
+    return _public_error_response(404, "Página não encontrada.", "Página não encontrada")
+
+
+@app.errorhandler(405)
+def handle_method_not_allowed(_error):
+    return _public_error_response(405, "Método não permitido.", "Método não permitido")
+
+
+@app.errorhandler(500)
+def handle_internal_error(error):
+    original_error = getattr(error, "original_exception", None) or error
+    app.logger.exception("Erro interno não tratado", exc_info=original_error)
+    try:
+        audit_event(
+            event="internal_error",
+            result="error",
+            user_id=session.get("user_id"),
+            email=session.get("email"),
+            ip=client_ip(),
+            route=request.path,
+            method=request.method,
+        )
+    except Exception:
+        pass
+
+    return _public_error_response(500, "Erro interno. Tente novamente mais tarde.", "Erro interno")
 
 
 @app.get("/")
@@ -218,8 +287,8 @@ def register():
     except AuthErro as erro:
         return _erro_json(str(erro), 400)
     except mysql.connector.Error as erro:
-        print(f"Erro no registro: {erro}")
-        return _erro_json(f"Erro ao cadastrar usuário: {str(erro)}", 500)
+        app.logger.exception("Erro no registro de usuário", exc_info=erro)
+        abort(500)
 
 
 @app.post("/login")
@@ -237,6 +306,19 @@ def login():
             ip_origem,
             email_normalizado or "-",
         )
+        try:
+            audit_event(
+                event="rate_limit_blocked",
+                result="blocked",
+                user_id=None,
+                email=email_normalizado,
+                ip=ip_origem,
+                route="/login",
+                method="POST",
+            )
+        except Exception:
+            pass
+
         return _erro_json(AUTH_RATE_LIMIT_MESSAGE, 429)
 
     try:
@@ -251,6 +333,18 @@ def login():
         session["email"] = usuario.email
         # session["empresa_id"] = usuario.empresa_id  # reservado para futura multi-tenant
         clear_auth_rate_limit("login", ip_origem, email_normalizado)
+        try:
+            audit_event(
+                event="login_success",
+                result="success",
+                user_id=usuario.id,
+                email=usuario.email,
+                ip=ip_origem,
+                route="/login",
+                method="POST",
+            )
+        except Exception:
+            pass
 
         return jsonify({"ok": True, "email": usuario.email})
     except KeyError as erro:
@@ -263,6 +357,20 @@ def login():
             email_normalizado or "-",
             type(erro).__name__,
         )
+        try:
+            audit_event(
+                event="login_failed",
+                result="failed",
+                user_id=None,
+                email=email_normalizado,
+                ip=ip_origem,
+                route="/login",
+                method="POST",
+                extra={"reason": type(erro).__name__},
+            )
+        except Exception:
+            pass
+
         return _erro_json(LOGIN_PUBLIC_FAILURE_MESSAGE, 401)
     except AuthErro as erro:
         return _erro_json(str(erro), 400)
@@ -273,7 +381,22 @@ def logout():
     """
     Encerra a sessão do usuário autenticado.
     """
+    user_id = session.get("user_id")
+    email = session.get("email")
     session.clear()
+    try:
+        audit_event(
+            event="logout",
+            result="success",
+            user_id=user_id,
+            email=email,
+            ip=client_ip(),
+            route="/logout",
+            method="POST",
+        )
+    except Exception:
+        pass
+
     return jsonify({"ok": True})
 
 
@@ -292,6 +415,19 @@ def forgot_password():
             ip_origem,
             email_normalizado or "-",
         )
+        try:
+            audit_event(
+                event="rate_limit_blocked",
+                result="blocked",
+                user_id=None,
+                email=email_normalizado,
+                ip=ip_origem,
+                route="/forgot-password",
+                method="POST",
+            )
+        except Exception:
+            pass
+
         return _erro_json(AUTH_RATE_LIMIT_MESSAGE, 429)
 
     try:
@@ -312,6 +448,20 @@ def forgot_password():
             email_normalizado or "-",
             type(erro).__name__,
         )
+        try:
+            audit_event(
+                event="login_failed",
+                result="failed",
+                user_id=None,
+                email=email_normalizado,
+                ip=ip_origem,
+                route="/forgot-password",
+                method="POST",
+                extra={"reason": type(erro).__name__},
+            )
+        except Exception:
+            pass
+
         return _erro_json(RECOVERY_PUBLIC_FAILURE_MESSAGE, 401)
     except AuthErro as erro:
         return _erro_json(str(erro), 400)
@@ -358,6 +508,20 @@ def criar_ativo():
         )
 
         ativos_service.criar_ativo(ativo, user_id=user_id)
+        try:
+            audit_event(
+                event="asset_created",
+                result="created",
+                user_id=user_id,
+                email=session.get("email"),
+                ip=client_ip(),
+                route="/ativos",
+                method="POST",
+                extra={"id_ativo": id_ativo},
+            )
+        except Exception:
+            pass
+
         return jsonify({"ok": True}), 201
     except KeyError as erro:
         return _erro_json(f"Campo obrigatório ausente: {erro.args[0]}", 400)
@@ -400,6 +564,20 @@ def atualizar_ativo(id_ativo):
             id_ativo=id_ativo, dados=data, user_id=user_id
         )
 
+        try:
+            audit_event(
+                event="asset_updated",
+                result="updated",
+                user_id=user_id,
+                email=session.get("email"),
+                ip=client_ip(),
+                route=f"/ativos/{id_ativo}",
+                method="PUT",
+                extra={"id_ativo": id_ativo},
+            )
+        except Exception:
+            pass
+
         return jsonify({"ok": True, "ativo": _ativo_para_dict(ativo_atualizado)})
     except AtivoErro as erro:
         return _erro_json(str(erro), 400)
@@ -415,6 +593,20 @@ def remover_ativo(id_ativo):
     user_id = usuario_logado_id()
     try:
         ativos_service.remover_ativo(id_ativo=id_ativo, user_id=user_id)
+        try:
+            audit_event(
+                event="asset_deleted",
+                result="deleted",
+                user_id=user_id,
+                email=session.get("email"),
+                ip=client_ip(),
+                route=f"/ativos/{id_ativo}",
+                method="DELETE",
+                extra={"id_ativo": id_ativo},
+            )
+        except Exception:
+            pass
+
         return jsonify({"ok": True})
     except AtivoErro as erro:
         return _erro_json(str(erro), 400)

@@ -77,10 +77,10 @@ Legenda: `[x] Atendido`, `[ ] Pendente`, `[~] Parcial`, `[-] Nao aplicavel`.
 
 ## Logs/auditoria
 
-- [~] Log estruturado de login.
+- [x] Log estruturado de login.
 - [x] Log tecnico de falha de login e recuperacao sem senha/resposta/segredo.
-- [ ] Log de logout.
-- [ ] Log de criacao, edicao e exclusao de ativos.
+- [x] Log de logout.
+- [x] Log de criacao, edicao e exclusao de ativos.
 - [-] Evolucao futura: Exportacao de logs de auditoria quando a auditoria persistida for implementada.
 - [ ] Log de alteracao de usuario/perfil quando RBAC existir.
 - [ ] Alertas basicos para falhas repetidas.
@@ -89,10 +89,10 @@ Legenda: `[x] Atendido`, `[ ] Pendente`, `[~] Parcial`, `[-] Nao aplicavel`.
 
 - [x] Erros de dominio sao convertidos para respostas JSON em varias rotas.
 - [x] Transacoes fazem rollback em excecao.
-- [~] Status 400/401/404 aparecem nas rotas principais.
-- [ ] Handlers globais para 400, 401, 403, 404 e 500.
-- [ ] Remover detalhe tecnico de erro MySQL retornado ao cliente.
-- [ ] Garantir ausencia de traceback para usuario final.
+- [x] Status 400/401/403/404/405/500 aparecem por handlers globais padronizados.
+- [x] Handlers globais para 400, 401, 403, 404, 405 e 500.
+- [x] Remover detalhe tecnico de erro MySQL retornado ao cliente.
+- [x] Garantir ausencia de traceback para usuario final.
 
 ## Dependencias
 
@@ -113,7 +113,7 @@ Legenda: `[x] Atendido`, `[ ] Pendente`, `[~] Parcial`, `[-] Nao aplicavel`.
 
 ## Testes
 
-- [x] Suite atual: 75 testes aprovados.
+- [x] Suite atual: 76 testes aprovados.
 - [x] Testes cobrem rotas de ativos sem autenticacao.
 - [x] Testes cobrem segredo de sessao obrigatorio.
 - [x] Testes cobrem hash de senha.
@@ -122,3 +122,4 @@ Legenda: `[x] Atendido`, `[ ] Pendente`, `[~] Parcial`, `[-] Nao aplicavel`.
 - [x] Testes de rate limit.
 - [ ] Testes de acesso cruzado usuario A vs usuario B.
 - [ ] Testes de logs/auditoria.
+ - [x] Testes de logs/auditoria.

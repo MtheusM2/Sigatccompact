@@ -18,9 +18,9 @@ Importacao, exportacao e upload de arquivos estao fora do escopo atual porque na
 | Sem RBAC/perfis. | Usuario autenticado tem o mesmo nivel funcional nas rotas de ativos. | Alto | Nao ha perfil no schema nem decorators de permissao. | Implementar RBAC apos base P0. |
 | Sem rate limit/bloqueio temporario. | Login e recuperacao ficam mais expostos a tentativa automatizada. | Alto | Corrigido com limite simples em memoria por IP/e-mail e bloqueio temporario. | Evoluir para store compartilhado se o backend escalar horizontalmente. |
 | Possivel enumeracao de usuario. | Mensagens diferentes podem indicar se e-mail existe. | Medio | Corrigido com mensagens publicas genericas em login e recuperacao. | Manter log tecnico interno sem expor detalhes ao cliente. |
-| Sem logs/auditoria estruturados. | Dificulta investigar alteracoes e falhas. | Alto | Nao ha tabela/service de auditoria identificado. | Criar logs basicos e depois tabela de auditoria. |
+| Sem logs/auditoria estruturados. | Dificulta investigar alteracoes e falhas. | Alto | Corrigido com logs basicos em aplicacao (emitidos ao logger de auditoria). | Criar tabela/service de auditoria para persistencia e exportacao. |
 | `APP_PEPPER` opcional. | Hash continua forte com salt/PBKDF2, mas perde camada extra quando pepper nao existe. | Medio | `_pepper()` retorna vazio se variavel ausente. | Exigir em producao ou validar configuracao. |
-| Erro MySQL pode ser retornado ao cliente no registro. | Pode expor detalhe tecnico de banco. | Medio | Rota `/register` retorna `str(erro)` em erro de conector. | Mensagem generica ao cliente e detalhe em log. |
+| Erro MySQL pode ser retornado ao cliente no registro. | Pode expor detalhe tecnico de banco. | Medio | Corrigido com mensagem generica ao cliente e detalhe apenas em log tecnico. | Manter essa regra nas rotas futuras de cadastro. |
 | `.env.example` ausente. | Novos ambientes podem copiar configuracoes inseguras ou incompletas. | Medio | `.env` e ignorado, mas exemplo nao existe. | Criar exemplo com placeholders. |
 
 ## Riscos aceitos temporariamente no TCC
