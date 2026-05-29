@@ -30,7 +30,8 @@ from controle_ativos.utils.security import (
 
 from controle_ativos.utils.permissions import permission_required, role_required
 
-from controle_ativos.utils.audit import audit_event
+from controle_ativos.utils.audit import audit_event, get_recent_events
+from controle_ativos.utils.validators import validar_email
 
 # Importa o serviço de autenticação e suas exceções específicas.
 from controle_ativos.services.auth_service import (
@@ -50,6 +51,13 @@ from controle_ativos.services.ativos_service import (
     AtivoJaExiste,
     AtivoNaoEncontrado,
     PermissaoNegada,
+)
+from controle_ativos.services.usuarios_service import (
+    AlteracaoNaoPermitida,
+    PerfilInvalido,
+    UsuarioErro as UsuarioGestaoErro,
+    UsuarioNaoEncontrado as UsuarioGestaoNaoEncontrado,
+    UsuariosService,
 )
 
 # Importa o model de domínio do ativo.
@@ -83,6 +91,18 @@ def inject_csrf_token():
     return {"csrf_token": csrf_token}
 
 
+@app.after_request
+def add_auth_cache_headers(response):
+    path = (request.path or "").lower()
+    if request.method == "GET" and path in {"/", "/register", "/recovery"}:
+        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+    elif path == "/logout":
+        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    return response
+
+
 @app.before_request
 def protect_csrf():
     csrf_error = validate_csrf_request()
@@ -93,7 +113,7 @@ def protect_csrf():
 def _should_render_html_error() -> bool:
     path = (request.path or "").lower()
     return request.method == "GET" and (
-        path in {"/", "/register", "/recovery"} or path.startswith("/dashboard")
+        path in {"/", "/register", "/recovery"} or path.startswith("/dashboard") or path.startswith("/usuarios")
     )
 
 
@@ -208,17 +228,40 @@ def dashboard_cadastrar():
 @app.get("/dashboard/editar")
 @role_required("SUPER_ADMIN", "ADMIN", "USUARIO", "LEITOR")
 def dashboard_editar():
-    return _render_pagina_sistema("sistema/editar_ativos.html")
+    ativo_selecionado = None
+    id_ativo = request.args.get("id", "").strip()
+    if id_ativo:
+        try:
+            ativo_selecionado = ativos_service.buscar_ativo(id_ativo=id_ativo, user_id=usuario_logado_id())
+        except Exception:
+            ativo_selecionado = None
+
+    if "user_id" not in session:
+        return render_template("auth/login.html", erro="Faça login para acessar o dashboard.")
+
+    return render_template("sistema/editar_ativos.html", ativo_selecionado=ativo_selecionado)
 
 
 @app.get("/dashboard/excluir")
 @role_required("SUPER_ADMIN", "ADMIN", "USUARIO", "LEITOR")
 def dashboard_excluir():
-    return _render_pagina_sistema("sistema/excluir_ativos.html")
+    ativo_selecionado = None
+    id_ativo = request.args.get("id", "").strip()
+    if id_ativo:
+        try:
+            ativo_selecionado = ativos_service.buscar_ativo(id_ativo=id_ativo, user_id=usuario_logado_id())
+        except Exception:
+            ativo_selecionado = None
+
+    if "user_id" not in session:
+        return render_template("auth/login.html", erro="Faça login para acessar o dashboard.")
+
+    return render_template("sistema/excluir_ativos.html", ativo_selecionado=ativo_selecionado)
 
 
 auth_service = AuthService()
 ativos_service = AtivosService()
+usuarios_service = UsuariosService()
 
 LOGIN_PUBLIC_FAILURE_MESSAGE = "E-mail ou senha inválidos."
 RECOVERY_PUBLIC_FAILURE_MESSAGE = "Não foi possível confirmar seus dados de recuperação."
@@ -253,6 +296,7 @@ def _ativo_para_dict(ativo: Ativo) -> dict:
         "tipo": ativo.tipo,
         "marca": ativo.marca,
         "modelo": ativo.modelo,
+        "email_responsavel": getattr(ativo, "email_responsavel", None),
         "usuario_responsavel": ativo.usuario_responsavel,
         "departamento": ativo.departamento,
         "status": ativo.status,
@@ -480,7 +524,7 @@ def forgot_password():
 
 
 @app.get("/ativos")
-@permission_required("ativos.ver")
+@permission_required("ativos.visualizar")
 def listar_ativos():
     """
     Lista todos os ativos do usuário autenticado.
@@ -490,6 +534,29 @@ def listar_ativos():
     ativos = ativos_service.listar_ativos(user_id=user_id)
 
     return jsonify({"ok": True, "ativos": [_ativo_para_dict(ativo) for ativo in ativos]})
+
+
+@app.get("/ativos/filtrar")
+@permission_required("ativos.visualizar")
+def filtrar_ativos():
+    """
+    Filtra ativos do usuário autenticado usando parâmetros opcionais.
+    """
+    user_id = usuario_logado_id()
+    filtros = request.args.to_dict(flat=True)
+
+    try:
+        ativos = ativos_service.filtrar_ativos(user_id=user_id, filtros=filtros)
+        return jsonify({"ok": True, "ativos": [_ativo_para_dict(ativo) for ativo in ativos]})
+    except AtivoErro as erro:
+        return _erro_json(str(erro), 400)
+
+
+@app.get("/auditoria")
+@permission_required("auditoria.ver")
+def auditoria_page():
+    eventos = get_recent_events(30)
+    return render_template("sistema/auditoria.html", eventos=eventos)
 
 
 @app.post("/ativos")
@@ -511,6 +578,7 @@ def criar_ativo():
             tipo=data["tipo"],
             marca=data["marca"],
             modelo=data["modelo"],
+            email_responsavel=data.get("email_responsavel"),
             usuario_responsavel=data["usuario_responsavel"],
             departamento=data["departamento"],
             status=data["status"],
@@ -544,7 +612,7 @@ def criar_ativo():
 
 
 @app.get("/ativos/<id_ativo>")
-@permission_required("ativos.ver")
+@permission_required("ativos.visualizar")
 def buscar_ativo(id_ativo):
     """
     Busca um ativo específico do usuário autenticado.
@@ -585,7 +653,10 @@ def atualizar_ativo(id_ativo):
                 ip=client_ip(),
                 route=f"/ativos/{id_ativo}",
                 method="PUT",
-                extra={"id_ativo": id_ativo},
+                extra={
+                    "id_ativo": id_ativo,
+                    "edited_by": session.get("email"),
+                },
             )
         except Exception:
             pass
@@ -624,6 +695,152 @@ def remover_ativo(id_ativo):
         return _erro_json(str(erro), 400)
 
 
+@app.get("/usuarios")
+@role_required("SUPER_ADMIN")
+def usuarios_page():
+    usuarios = usuarios_service.listar_usuarios()
+    return render_template(
+        "sistema/usuarios.html",
+        usuarios=usuarios,
+        usuario_logado_id=session.get("user_id"),
+    )
+
+
+@app.post("/usuarios/criar")
+@role_required("SUPER_ADMIN")
+def criar_usuario():
+    data = request.get_json(silent=True) or request.form or {}
+    email = (data.get("email") or "").strip()
+    senha = data.get("senha") or ""
+    pergunta = data.get("pergunta_recuperacao") or ""
+    resposta = data.get("resposta_recuperacao") or ""
+    perfil = data.get("perfil") or "USUARIO"
+    ativo_bruto = data.get("ativo", True)
+    ativo = ativo_bruto if isinstance(ativo_bruto, bool) else str(ativo_bruto).strip().lower() in {"1", "true", "on", "sim"}
+
+    if not validar_email(email):
+        return _erro_json("E-mail inválido.", 400)
+
+    try:
+        usuario_id = auth_service.registrar_usuario(
+            email=email,
+            senha=senha,
+            pergunta=pergunta,
+            resposta=resposta,
+            perfil=perfil,
+            ativo=ativo,
+        )
+        try:
+            audit_event(
+                event="user_created",
+                result="created",
+                user_id=session.get("user_id"),
+                email=session.get("email"),
+                ip=client_ip(),
+                route="/usuarios/criar",
+                method="POST",
+                extra={"target_user_id": usuario_id, "target_email": email.lower(), "perfil": perfil, "ativo": ativo},
+            )
+        except Exception:
+            pass
+
+        if request.is_json:
+            return jsonify({"ok": True, "user_id": usuario_id}), 201
+
+        return render_template(
+            "sistema/usuarios.html",
+            usuarios=usuarios_service.listar_usuarios(),
+            usuario_logado_id=session.get("user_id"),
+            mensagem="Usuário criado com sucesso.",
+        ), 201
+    except KeyError as erro:
+        return _erro_json(f"Campo obrigatório ausente: {erro.args[0]}", 400)
+    except UsuarioJaExiste as erro:
+        return _erro_json(str(erro), 409)
+    except AuthErro as erro:
+        return _erro_json(str(erro), 400)
+    except UsuarioGestaoErro as erro:
+        return _erro_json(str(erro), 400)
+
+
+@app.post("/usuarios/<int:usuario_id>/perfil")
+@role_required("SUPER_ADMIN")
+def atualizar_perfil_usuario(usuario_id: int):
+    data = request.get_json(silent=True) or request.form or {}
+    novo_perfil = data.get("perfil")
+    id_usuario_logado = session.get("user_id")
+
+    try:
+        usuario = usuarios_service.atualizar_perfil(usuario_id, novo_perfil, id_usuario_logado)
+        try:
+            audit_event(
+                event="user_profile_updated",
+                result="updated",
+                user_id=id_usuario_logado,
+                email=session.get("email"),
+                ip=client_ip(),
+                route=f"/usuarios/{usuario_id}/perfil",
+                method="POST",
+                extra={"target_user_id": usuario_id, "new_profile": usuario.perfil},
+            )
+        except Exception:
+            pass
+
+        if request.is_json:
+            return jsonify({"ok": True, "usuario": usuario.to_dict()})
+
+        return render_template("sistema/usuarios.html", usuarios=usuarios_service.listar_usuarios(), usuario_logado_id=id_usuario_logado)
+    except (UsuarioGestaoNaoEncontrado, PerfilInvalido) as erro:
+        return _erro_json(str(erro), 400)
+    except AlteracaoNaoPermitida as erro:
+        return _erro_json(str(erro), 403)
+    except UsuarioGestaoErro as erro:
+        return _erro_json(str(erro), 400)
+
+
+@app.post("/usuarios/<int:usuario_id>/status")
+@role_required("SUPER_ADMIN")
+def atualizar_status_usuario(usuario_id: int):
+    data = request.get_json(silent=True) or request.form or {}
+    ativo_bruto = data.get("ativo")
+    if isinstance(ativo_bruto, str):
+        ativo_normalizado = ativo_bruto.strip().lower() in {"1", "true", "on", "sim", "ativo"}
+    else:
+        ativo_normalizado = bool(ativo_bruto)
+
+    id_usuario_logado = session.get("user_id")
+
+    try:
+        usuario = usuarios_service.alternar_status(usuario_id, ativo_normalizado, id_usuario_logado)
+        try:
+            audit_event(
+                event="user_status_updated",
+                result="updated",
+                user_id=id_usuario_logado,
+                email=session.get("email"),
+                ip=client_ip(),
+                route=f"/usuarios/{usuario_id}/status",
+                method="POST",
+                extra={"target_user_id": usuario_id, "ativo": usuario.ativo},
+            )
+        except Exception:
+            pass
+
+        if request.is_json:
+            return jsonify({"ok": True, "usuario": usuario.to_dict()})
+
+        return render_template("sistema/usuarios.html", usuarios=usuarios_service.listar_usuarios(), usuario_logado_id=id_usuario_logado)
+    except UsuarioGestaoNaoEncontrado as erro:
+        return _erro_json(str(erro), 400)
+    except AlteracaoNaoPermitida as erro:
+        return _erro_json(str(erro), 403)
+    except UsuarioGestaoErro as erro:
+        return _erro_json(str(erro), 400)
+
+
 if __name__ == "__main__":
     debug = os.environ.get("FLASK_DEBUG", "false").lower() == "true"
+    from controle_ativos.database.init_db import inicializar_banco
+
+    inicializar_banco()
     app.run(debug=debug)

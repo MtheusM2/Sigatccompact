@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 
 def test_project_structure_exists():
@@ -10,3 +11,14 @@ def test_project_structure_exists():
     # .gitignore deve existir na raiz do repositório
     repo_root = os.getcwd()
     assert os.path.exists(os.path.join(repo_root, '.gitignore')), '.gitignore ausente na raiz'
+
+
+def test_schema_e_migration_de_email_responsavel():
+    repo_root = Path(__file__).resolve().parents[1]
+    schema = (repo_root / 'database' / 'schema.sql').read_text(encoding='utf-8')
+    migration = (repo_root / 'database' / 'migrations' / '013_email_responsavel_ativos.sql').read_text(encoding='utf-8')
+
+    assert 'email_responsavel VARCHAR(255) NULL' in schema
+    assert 'email_responsavel' in schema
+    assert 'INFORMATION_SCHEMA.COLUMNS' in migration
+    assert 'email_responsavel VARCHAR(255) NULL' in migration

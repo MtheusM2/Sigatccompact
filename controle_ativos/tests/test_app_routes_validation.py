@@ -63,6 +63,18 @@ def test_dashboard_autenticado_renderiza_pagina(client):
     assert response.status_code == 200
 
 
+def test_buscar_ativos_template_usa_selects_vazios(client):
+    _login(client)
+
+    response = client.get("/dashboard/buscar")
+
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    assert '<option value="">Selecione...</option>' in html
+    assert 'value="Todos"' not in html
+    assert 'id="buscar_ativos_form"' in html
+
+
 def test_register_rejeita_payload_sem_email(client):
     response = client.post(
         "/register",
@@ -188,6 +200,7 @@ def test_forgot_password_caminho_sucesso_delega_para_auth_service(client, monkey
         ("get", "/ativos/AT-001"),
         ("put", "/ativos/AT-001"),
         ("delete", "/ativos/AT-001"),
+        ("post", "/usuarios/criar"),
     ],
 )
 def test_rotas_de_ativos_exigem_usuario_autenticado(client, method, path):
@@ -238,6 +251,49 @@ def test_criar_ativo_rejeita_campo_obrigatorio_ausente(client):
     assert "tipo" in response.get_json()["erro"]
 
 
+def test_filtrar_ativos_caminho_sucesso_delega_para_service(client, monkeypatch):
+    _login(client)
+    captured = {}
+
+    def _fake_filtrar_ativos(user_id, filtros, ordenar_por="id", ordem="asc"):
+        captured["user_id"] = user_id
+        captured["filtros"] = filtros
+        captured["ordenar_por"] = ordenar_por
+        captured["ordem"] = ordem
+        return [_ativo()]
+
+    monkeypatch.setattr(app_module.ativos_service, "filtrar_ativos", _fake_filtrar_ativos)
+
+    response = client.get(
+        "/ativos/filtrar",
+        query_string={
+            "departamento": "TI",
+            "status": "Disponível",
+            "marca": "Dell",
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.get_json()["ativos"][0]["id"] == "AT-001"
+    assert captured["user_id"] == 1
+    assert captured["filtros"] == {
+        "departamento": "TI",
+        "status": "Disponível",
+        "marca": "Dell",
+    }
+
+
+def test_dashboard_busca_conta_com_endpoint_filtrado(client):
+    _login(client)
+
+    response = client.get("/dashboard")
+
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    assert "/ativos/filtrar" in html
+    assert "buscar_ativos_form" in html
+
+
 def test_listar_ativos_caminho_sucesso_serializa_ativos(client, monkeypatch):
     _login(client)
     monkeypatch.setattr(app_module.ativos_service, "listar_ativos", lambda user_id: [_ativo()])
@@ -250,6 +306,7 @@ def test_listar_ativos_caminho_sucesso_serializa_ativos(client, monkeypatch):
         "tipo": "Notebook",
         "marca": "Dell",
         "modelo": "Latitude",
+        "email_responsavel": None,
         "usuario_responsavel": "Joao Silva",
         "departamento": "TI",
         "status": "Disponível",
@@ -276,6 +333,7 @@ def test_criar_ativo_caminho_sucesso_delega_para_service(client, monkeypatch):
             "tipo": "Notebook",
             "marca": "Dell",
             "modelo": "Latitude",
+            "email_responsavel": "responsavel@example.com",
             "usuario_responsavel": "Joao Silva",
             "departamento": "TI",
             "status": "Disponível",
@@ -289,6 +347,89 @@ def test_criar_ativo_caminho_sucesso_delega_para_service(client, monkeypatch):
     assert captured["user_id"] == 7
     assert captured["ativo"].id_ativo == "AT-GERADO"
     assert captured["ativo"].criado_por == 7
+    assert captured["ativo"].email_responsavel == "responsavel@example.com"
+
+
+def test_criar_ativo_sem_email_responsavel_continua_valido(client, monkeypatch):
+    _login(client, user_id=7)
+    captured = {}
+
+    def _fake_criar_ativo(ativo, user_id):
+        captured["ativo"] = ativo
+        captured["user_id"] = user_id
+
+    monkeypatch.setattr(app_module, "_gerar_id_ativo", lambda: "AT-GERADO")
+    monkeypatch.setattr(app_module.ativos_service, "criar_ativo", _fake_criar_ativo)
+
+    response = client.post(
+        "/ativos",
+        json={
+            "tipo": "Notebook",
+            "marca": "Dell",
+            "modelo": "Latitude",
+            "usuario_responsavel": "Joao Silva",
+            "departamento": "TI",
+            "status": "Disponível",
+            "data_entrada": "2026-05-27",
+        },
+        headers=_csrf_headers(client),
+    )
+
+    assert response.status_code == 201
+    assert response.get_json() == {"ok": True}
+    assert captured["ativo"].email_responsavel is None
+
+
+def test_dashboard_editar_carrega_ativo_pelo_id_da_tabela(client, monkeypatch):
+    _login(client)
+    monkeypatch.setattr(app_module.ativos_service, "buscar_ativo", lambda **kwargs: _ativo())
+
+    response = client.get("/dashboard/editar?id=AT-001")
+
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    assert 'value="AT-001"' in html
+    assert 'value="Notebook"' in html
+
+
+@pytest.mark.parametrize(
+    "perfil,espera_acao",
+    [
+        ("LEITOR", False),
+        ("USUARIO", True),
+        ("ADMIN", True),
+        ("SUPER_ADMIN", True),
+    ],
+)
+def test_status_de_ativos_exibe_coluna_de_acoes_conforme_perfil(client, perfil, espera_acao):
+    _login(client, perfil=perfil)
+
+    response = client.get("/dashboard/status")
+
+    assert response.status_code == 200
+    if espera_acao:
+        assert b"A\xc3\xa7\xc3\xb5es" in response.data
+    else:
+        assert b"A\xc3\xa7\xc3\xb5es" not in response.data
+
+
+def test_usuarios_criar_rejeita_sem_csrf(client):
+    _login(client, perfil="SUPER_ADMIN")
+
+    response = client.post(
+        "/usuarios/criar",
+        json={
+            "email": "novo@example.com",
+            "senha": "Senha@12345",
+            "pergunta_recuperacao": "Cor favorita?",
+            "resposta_recuperacao": "Azul",
+            "perfil": "USUARIO",
+            "ativo": True,
+        },
+    )
+
+    assert response.status_code == 400
+    assert response.get_json() == {"ok": False, "erro": "CSRF inválido."}
 
 
 def test_buscar_ativo_caminho_sucesso_serializa_ativo(client, monkeypatch):

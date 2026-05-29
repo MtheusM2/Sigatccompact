@@ -79,6 +79,43 @@ def test_logout_clears_session(client):
         assert sess.keys() == set()
 
 
+def test_logout_recarrega_token_csrf_do_login(client, monkeypatch):
+    _login_dummy(monkeypatch)
+
+    client.get("/")
+    with client.session_transaction() as sess:
+        primeiro_token = sess[CSRF_SESSION_KEY]
+        sess["user_id"] = 5
+        sess["email"] = "x@x.com"
+
+    resposta_logout = client.post("/logout", headers={"X-CSRF-Token": primeiro_token})
+    assert resposta_logout.status_code == 200
+    assert "no-store" in resposta_logout.headers.get("Cache-Control", "")
+
+    resposta_login_antigo = client.post(
+        "/login",
+        json={"email": "a@b.com", "senha": "x"},
+        headers={"X-CSRF-Token": primeiro_token},
+    )
+    assert resposta_login_antigo.status_code == 400
+    assert resposta_login_antigo.get_json() == {"ok": False, "erro": "CSRF inválido."}
+
+    resposta_home = client.get("/")
+    assert "no-store" in resposta_home.headers.get("Cache-Control", "")
+
+    with client.session_transaction() as sess:
+        segundo_token = sess[CSRF_SESSION_KEY]
+
+    assert segundo_token != primeiro_token
+
+    resposta_login_novo = client.post(
+        "/login",
+        json={"email": "a@b.com", "senha": "x"},
+        headers={"X-CSRF-Token": segundo_token},
+    )
+    assert resposta_login_novo.status_code == 200
+
+
 def test_logout_without_csrf_is_rejected(client):
     response = client.post("/logout")
 

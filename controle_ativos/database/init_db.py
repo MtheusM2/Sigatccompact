@@ -52,10 +52,36 @@ def _compatibilizar_schema_legado(cur) -> None:
     _permitir_null_se_existir(cur, "usuarios", "nome")
 
 
+def _drenar_resultados_pendentes(cur) -> None:
+    """
+    Consome resultados pendentes do cursor após cada comando executado.
+
+    Isso evita o erro "Unread result found" em mysql-connector quando uma
+    migration mistura comandos que retornam e não retornam linhas.
+    """
+    if getattr(cur, "with_rows", False):
+        cur.fetchall()
+
+    while True:
+        try:
+            has_next = cur.nextset()
+        except AttributeError:
+            break
+        except Exception:
+            raise
+
+        if not has_next:
+            break
+
+        if getattr(cur, "with_rows", False):
+            cur.fetchall()
+
+
 def _executar_sql_texto(cur, sql_texto: str) -> None:
     comandos = [cmd.strip() for cmd in sql_texto.split(";") if cmd.strip()]
     for comando in comandos:
         cur.execute(comando)
+        _drenar_resultados_pendentes(cur)
 
 
 def _aplicar_migracoes(cur) -> None:

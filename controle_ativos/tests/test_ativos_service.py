@@ -110,7 +110,29 @@ def test_criar_ativo_traduz_duplicidade_do_banco(monkeypatch):
         service.criar_ativo(ativo, user_id=1)
 
 
-def test_listar_ativos_retorna_apenas_linhas_do_usuario(monkeypatch):
+def test_criar_ativo_normaliza_email_responsavel_vazio_para_null(monkeypatch):
+    cursor = _patch_cursor(monkeypatch, _RecordingCursor())
+    service = AtivosService()
+    ativo = Ativo(
+        id_ativo="ATIVO-002",
+        tipo="Notebook",
+        marca="Dell",
+        modelo="Latitude",
+        email_responsavel="",
+        usuario_responsavel="Joao Silva",
+        departamento="TI",
+        status="Disponível",
+        data_entrada="2026-05-27",
+        data_saida=None,
+        criado_por=1,
+    )
+
+    service.criar_ativo(ativo, user_id=1)
+
+    assert cursor.executed[0][1][4] is None
+
+
+def test_listar_ativos_retorna_registros_globais(monkeypatch):
     cursor = _patch_cursor(monkeypatch, _RecordingCursor(fetchall_result=[_row_ativo()]))
     service = AtivosService()
 
@@ -118,7 +140,7 @@ def test_listar_ativos_retorna_apenas_linhas_do_usuario(monkeypatch):
 
     assert len(ativos) == 1
     assert ativos[0].id_ativo == "AT-001"
-    assert cursor.executed[0][1] == (1,)
+    assert cursor.executed[0][1] == ()
 
 
 def test_buscar_ativo_rejeita_id_invalido():
@@ -136,12 +158,13 @@ def test_buscar_ativo_traduz_nao_encontrado(monkeypatch):
         service.buscar_ativo("AT-404", user_id=1)
 
 
-def test_buscar_ativo_traduz_permissao_negada(monkeypatch):
+def test_buscar_ativo_retorna_registro_de_outro_criador(monkeypatch):
     _patch_cursor(monkeypatch, _RecordingCursor(fetchone_results=[_row_ativo(criado_por=99)]))
     service = AtivosService()
 
-    with pytest.raises(PermissaoNegada):
-        service.buscar_ativo("AT-001", user_id=1)
+    ativo = service.buscar_ativo("AT-001", user_id=1)
+
+    assert ativo.criado_por == 99
 
 
 def test_buscar_ativo_retorna_ativo_do_usuario(monkeypatch):
@@ -176,6 +199,69 @@ def test_filtrar_ativos_rejeita_data_invalida():
         service.filtrar_ativos(user_id=1, filtros={"data_entrada_inicial": "27/05/2026"})
 
 
+def test_filtrar_ativos_sem_filtros_retorna_todos(monkeypatch):
+    cursor = _patch_cursor(monkeypatch, _RecordingCursor(fetchall_result=[_row_ativo(), _row_ativo(id_ativo="AT-002")]))
+    service = AtivosService()
+
+    ativos = service.filtrar_ativos(user_id=1, filtros={})
+
+    assert len(ativos) == 2
+    assert "WHERE 1 = 1" in cursor.executed[0][0]
+    assert cursor.executed[0][1] == ()
+
+
+def test_filtrar_ativos_ignora_campos_vazios_e_todos(monkeypatch):
+    cursor = _patch_cursor(monkeypatch, _RecordingCursor(fetchall_result=[_row_ativo()]))
+    service = AtivosService()
+
+    ativos = service.filtrar_ativos(
+        user_id=1,
+        filtros={
+            "tipo": "",
+            "marca": "Todos",
+            "modelo": None,
+            "departamento": "Todos",
+            "status": "",
+        },
+    )
+
+    assert len(ativos) == 1
+    assert cursor.executed[0][1] == ()
+
+
+def test_filtrar_ativos_por_departamento(monkeypatch):
+    cursor = _patch_cursor(monkeypatch, _RecordingCursor(fetchall_result=[_row_ativo()]))
+    service = AtivosService()
+
+    ativos = service.filtrar_ativos(user_id=1, filtros={"departamento": "TI"})
+
+    assert len(ativos) == 1
+    assert cursor.executed[0][1] == ("%TI%",)
+
+
+def test_filtrar_ativos_por_status(monkeypatch):
+    cursor = _patch_cursor(monkeypatch, _RecordingCursor(fetchall_result=[_row_ativo()]))
+    service = AtivosService()
+
+    ativos = service.filtrar_ativos(user_id=1, filtros={"status": "disponível"})
+
+    assert len(ativos) == 1
+    assert cursor.executed[0][1] == ("Disponível",)
+
+
+def test_filtrar_ativos_por_departamento_e_status(monkeypatch):
+    cursor = _patch_cursor(monkeypatch, _RecordingCursor(fetchall_result=[_row_ativo()]))
+    service = AtivosService()
+
+    ativos = service.filtrar_ativos(
+        user_id=1,
+        filtros={"departamento": "TI", "status": "Disponível"},
+    )
+
+    assert len(ativos) == 1
+    assert cursor.executed[0][1] == ("%TI%", "Disponível")
+
+
 def test_filtrar_ativos_monta_filtros_parametrizados(monkeypatch):
     cursor = _patch_cursor(monkeypatch, _RecordingCursor(fetchall_result=[_row_ativo()]))
     service = AtivosService()
@@ -200,7 +286,6 @@ def test_filtrar_ativos_monta_filtros_parametrizados(monkeypatch):
     assert len(ativos) == 1
     assert "ORDER BY data_entrada DESC" in sql
     assert params == (
-        1,
         "AT-001",
         "%Joao%",
         "%TI%",
@@ -243,7 +328,7 @@ def test_atualizar_ativo_retorna_ativo_padronizado(monkeypatch):
     assert ativo.marca == "Dell"
     assert ativo.modelo == "XPS 13"
     assert ativo.status == "Em Uso"
-    assert cursor.executed[0][1][-2:] == ("AT-001", 1)
+    assert cursor.executed[0][1][-2:] == (None, "AT-001")
 
 
 def test_remover_ativo_rejeita_id_invalido():
@@ -267,4 +352,4 @@ def test_remover_ativo_executa_delete_parametrizado(monkeypatch):
 
     service.remover_ativo(" AT-001 ", user_id=1)
 
-    assert cursor.executed[0][1] == ("AT-001", 1)
+    assert cursor.executed[0][1] == ("AT-001",)
