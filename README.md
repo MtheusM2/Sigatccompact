@@ -1,207 +1,490 @@
-# Sigatccompact — Sistema de Controle de Ativos
+# 🖥️ Sigatccompact — Sistema de Gestão de Ativos
 
-Sistema acadêmico e técnico para gestão de ativos de TI, com backend Flask/MySQL, autenticação por sessão, CSRF, rate limit em login/recuperação, RBAC por perfil e interface web server-rendered. O objetivo do projeto é apoiar o controle patrimonial escolar com rastreabilidade, segurança básica e documentação de TCC consistente com o estado real do código.
+> Sistema acadêmico/técnico (TCC) para gestão de ativos de TI — backend em Flask, interface server-rendered (Jinja2) e banco MySQL. Foco em segurança aplicada, RBAC e rastreabilidade.
 
-## Visão geral
+<!-- Badges -->
+[![Status](https://img.shields.io/badge/status-Funcional%20(local)-brightgreen)](#)
+[![Curso](https://img.shields.io/badge/curso-Manuten%C3%A7%C3%A3o%20e%20Suporte-blue)](#)
+[![Disciplina](https://img.shields.io/badge/Disciplina-Governan%C3%A7a%20de%20TI-lightgrey)](#)
+[![Semestre](https://img.shields.io/badge/Semestre-2026.1-orange)](#)
+[![Backend](https://img.shields.io/badge/backend-Flask-000000?logo=flask&logoColor=white)](#)
+[![Database](https://img.shields.io/badge/database-MySQL-00758F?logo=mysql&logoColor=white)](#)
+[![Seguran%C3%A7a](https://img.shields.io/badge/seguran%C3%A7a-CSRF%20%2B%20RBAC-blue)](#)
+[![Testes](https://img.shields.io/badge/testes-pytest-4B8BBE)](#)
+[![CI](https://img.shields.io/badge/CI-GitHub%20Actions-2088FF)](#)
+[![TCC](https://img.shields.io/badge/TCC-ETEC%20Jaragu%C3%A1-lightgrey)](#)
 
-O projeto já está funcional no backend e na interface web. Hoje ele cobre cadastro de usuários, login, recuperação de senha, CRUD de ativos, listagem global para usuários autenticados, filtragem de ativos, auditoria básica e gestão simples de usuários para `SUPER_ADMIN`.
+---
 
-O comportamento atual é o seguinte:
+## Índice
 
-- Backend Flask e MySQL funcionando.
-- Autenticação por sessão.
-- CSRF ativo nas rotas mutáveis.
-- Rate limit em login e recuperação.
-- Tratamento global de erros.
-- Auditoria básica com logs e página de eventos recentes.
-- RBAC com `SUPER_ADMIN`, `ADMIN`, `USUARIO` e `LEITOR`.
-- Listagem global de ativos para usuários autenticados.
-- Busca de ativos com filtros parciais e combinados.
-- Campo `email_responsavel` disponível nos ativos.
+- [Sobre o Projeto](#sobre-o-projeto)
+- [Resumo e Palavras-chave](#resumo-e-palavras-chave)
+- [Problema e Justificativa](#problema-e-justificativa)
+- [Objetivos](#objetivos)
+- [Metodologia / Estratégia Técnica](#metodologia-tecnica)
+- [Escopo e Delimitações](#escopo-e-delimitacoes)
+- [Funcionalidades Implementadas](#funcionalidades-implementadas)
+- [Matriz de Perfis e Permissões (RBAC)](#matriz-rbac)
+- [Segurança Aplicada](#seguranca-aplicada)
+- [Banco de Dados e Migrations](#banco-de-dados-e-migrations)
+- [Arquitetura e Tecnologias](#arquitetura-e-tecnologias)
+- [Estrutura do Repositório](#estrutura-do-repositorio)
+- [Como Navegar no Projeto](#como-navegar)
+- [Configuração e Execução](#configuracao-e-execucao)
+- [Criar / Promover SUPER_ADMIN](#super-admin)
+- [Testes e Qualidade](#testes-e-qualidade)
+- [Resultados Técnicos Atuais](#resultados-tecnicos)
+- [Limitações Conhecidas](#limitacoes-conhecidas)
+- [Evoluções Futuras](#evolucoes-futuras)
+- [Glossário](#glossario)
+- [Equipe / Autoria](#equipe-e-autoria)
+- [Licença / Uso Acadêmico](#licenca-uso-academico)
+- [Checklist de Entrega](#checklist-de-entrega)
 
-## Tecnologias usadas
+---
 
-- Python 3.11+
-- Flask
-- MySQL
-- Jinja2
-- HTML, CSS e JavaScript
-- `pytest`
-- `bandit`
-- `pip-audit`
+<a id="sobre-o-projeto"></a>
+## Sobre o Projeto
 
-## Funcionalidades implementadas
+| Campo            | Detalhe                                          |
+| ---------------- | ------------------------------------------------ |
+| Instituição      | ETEC Jaraguá — Centro Paula Souza                |
+| Curso            | Manutenção e Suporte em Informática              |
+| Disciplina       | Governança de TI                                 |
+| Semestre         | 2026.1                                           |
+| Orientadora      | Professora Tainá Barros Batista Oliveira         |
+| Tipo de Trabalho | TCC — Trabalho de Conclusão de Curso             |
+| Projeto          | Sigatccompact — Sistema de Gestão de Ativos      |
+| Stack principal  | Python, Flask, MySQL, Jinja2, Pytest             |
+| Status atual     | Backend e interface web funcionais em ambiente local |
 
-- Cadastro, login, logout e recuperação de senha.
-- CRUD de ativos com validações centralizadas.
-- Filtros por campos operacionais, inclusive `email_responsavel`.
-- Ordenação e listagem global de ativos.
-- Gestão simples de usuários para `SUPER_ADMIN`.
-- Tela simples de auditoria para eventos recentes.
-- Tratamento padronizado de erros HTTP.
-- Inicialização do banco com schema + migrations.
+---
 
-## Segurança implementada
+<a id="resumo-e-palavras-chave"></a>
+## Resumo e Palavras-chave
 
-- Senhas com PBKDF2-SHA256.
-- Salt por senha e comparação segura.
-- CSRF por sessão.
-- Cookies de sessão configurados explicitamente.
-- Rate limit simples para login e recuperação.
-- `login_required` e controle central de acesso.
-- `role_required` e `permission_required`.
-- Logs técnicos de autenticação e operações sensíveis.
-- Tratamento global de erros sem expor detalhes técnicos ao usuário.
+O Sigatccompact substitui controles manuais de inventário por um sistema web que oferece cadastro, autenticação, controle por perfil e rastreabilidade mínima dos ativos. O projeto prioriza segurança aplicada e reprodutibilidade do ambiente para fins de avaliação acadêmica.
 
-## Perfis RBAC
+Palavras-chave: `gestão de ativos`, `TCC`, `Flask`, `MySQL`, `RBAC`, `segurança`, `controle patrimonial`, `rastreabilidade`
 
-| Perfil | Acesso real atual |
-| --- | --- |
-| `SUPER_ADMIN` | Visualiza tudo, cria, edita e exclui ativos, cria usuários, gerencia usuários e acessa a auditoria simples. |
-| `ADMIN` | Visualiza tudo, cria, edita e exclui ativos, e acessa a auditoria simples. |
-| `USUARIO` | Visualiza tudo, cria e edita qualquer ativo, mas não exclui nem gerencia usuários. |
-| `LEITOR` | Visualiza dashboard, quantidades e tabela global, sem criar, editar, excluir ou gerenciar usuários. |
+---
 
-O campo `criado_por` passou a ser metadado de autoria e auditoria. Ele não limita mais a visibilidade da listagem global de ativos.
+<a id="problema-e-justificativa"></a>
+## Problema e Justificativa
 
-## Interface atual
+### Problema
 
-- `base.html` compartilha o layout principal.
-- O dashboard exibe e-mail, perfil e contexto do usuário logado.
-- A tabela de ativos é global para usuários autenticados.
-- As ações de editar e excluir saem da linha selecionada, quando o perfil permite.
-- A busca de ativos foi corrigida: selects começam vazios, campos vazios não filtram, `Todos` não é enviado como filtro real e filtros parciais/combinados funcionam.
-- `SUPER_ADMIN` possui uma tela simples de gestão de usuários.
-- Existe uma tela simples de auditoria com eventos recentes em memória.
+Controles de ativos mantidos em planilhas ou registros manuais dificultam rastreio, atualização, consulta padronizada e responsabilização técnica.
 
-## Banco de dados e migrations
+### Justificativa
 
-O banco recomendado para o TCC é `tcc`.
+- Necessidade de controle centralizado de ativos em ambientes institucionais;
+- Rastreamento de responsável (`email_responsavel`) e autoria (`criado_por`) para auditoria mínima;
+- Aplicação de controle de acesso para operações sensíveis (RBAC);
+- Reprodutibilidade técnica e validação por testes automatizados para TCC.
 
-Não misture essa base com o banco legado `controle_ativos`, que aparece em materiais antigos do projeto e pode carregar suposições já superadas.
+---
 
-### Tabelas e campos relevantes
+<a id="objetivos"></a>
+## Objetivos
 
-- `usuarios`: usuários com perfil, status e dados de autenticação.
-- `ativos`: ativos com identificação, status, responsável, departamento, datas e `email_responsavel`.
+### Objetivo geral
 
-### Migrations relevantes
+Desenvolver um sistema web para gestão de ativos de TI com segurança básica, autenticação, controle de permissões e rastreabilidade, adequado ao escopo de TCC.
 
-- `012_rbac_usuarios.sql`: adiciona a base de RBAC em usuários.
-- `013_email_responsavel_ativos.sql`: adiciona `email_responsavel` aos ativos.
+### Objetivos específicos
 
-O executor de migrations foi corrigido para evitar o erro `Unread result found` ao inicializar o banco.
+- Implementar backend em Flask e modelagem em MySQL;
+- Criar CRUD de ativos com validações centralizadas;
+- Implementar autenticação por sessão e recuperação de senha com rate limit;
+- Aplicar RBAC por perfis e controles de autorização;
+- Habilitar CSRF em rotas mutáveis;
+- Documentar banco, migrations e decisões técnicas (ADRs);
+- Estruturar suíte de testes automatizados com `pytest`;
+- Disponibilizar interface server-rendered funcional para operações básicas.
 
-## Como rodar o projeto
+---
 
-### 1. Criar ambiente virtual
+<a id="metodologia-tecnica"></a>
+## Metodologia / Estratégia Técnica
+
+- Desenvolvimento incremental e modular;
+- Arquitetura em camadas: `models`, `services`, `web`, `database`;
+- Validações centralizadas e padrões de segurança inspirados em OWASP;
+- Testes automatizados com `pytest` e checagens de segurança no CI;
+- Versionamento em Git/GitHub e integração contínua via GitHub Actions.
+
+---
+
+<a id="escopo-e-delimitacoes"></a>
+## Escopo e Delimitações
+
+### Dentro do escopo
+
+- CRUD de ativos;
+- Cadastro/login/logout/recuperação de senha;
+- RBAC por perfis (`SUPER_ADMIN`, `ADMIN`, `USUARIO`, `LEITOR`);
+- Gestão simples de usuários (restrita a `SUPER_ADMIN`);
+- Busca e filtros na listagem de ativos (campos vazios não filtram; "Todos" não é filtro real);
+- Auditoria básica (eventos recentes exibidos na interface);
+- Migrations e inicializador (`init_db.py`);
+- Testes automatizados e documentação técnica.
+
+### Fora do escopo atual
+
+- Frontend SPA (React/Vue) ou mobile app;
+- Permissões customizadas por usuário (além de perfis);
+- Auditoria persistida em banco com histórico completo;
+- Exportação avançada de logs/relatórios;
+- Integrações SSO e API pública.
+
+---
+
+<a id="funcionalidades-implementadas"></a>
+## Funcionalidades Implementadas
+
+| Funcionalidade | Status | Observação |
+|---|---:|---|
+| Autenticação por sessão | Implementado | Login / logout / recuperação |
+| Recuperação de senha | Implementado | Com rate limit |
+| CRUD de ativos | Implementado | Interface web server-rendered |
+| Listagem global | Implementado | Todos usuários autenticados visualizam |
+| Busca / filtros | Implementado | Campos vazios não filtram; filtros combinados funcionam |
+| RBAC | Implementado | 4 perfis (SUPER_ADMIN, ADMIN, USUARIO, LEITOR) |
+| Gestão de usuários | Implementado | Restrito a `SUPER_ADMIN` |
+| Auditoria básica | Parcial | Eventos recentes em memória |
+| CI | Implementado | GitHub Actions (testes + security) |
+| Segurança automatizada | Implementado | Bandit / pip-audit em workflow |
+
+---
+
+<a id="matriz-rbac"></a>
+## Matriz de Perfis e Permissões (RBAC)
+
+| Perfil | Visualizar ativos | Criar ativo | Editar ativo | Excluir ativo | Gerenciar usuários | Auditoria |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|
+| SUPER_ADMIN | Sim | Sim | Sim | Sim | Sim | Sim |
+| ADMIN | Sim | Sim | Sim | Sim | Não | Sim/Parcial |
+| USUARIO | Sim | Sim | Sim | Não | Não | Não |
+| LEITOR | Sim | Não | Não | Não | Não | Não |
+
+---
+
+<a id="seguranca-aplicada"></a>
+## Segurança Aplicada
+
+- Hash de senhas com PBKDF2 (salt; aplicação de pepper opcional);
+- CSRF habilitado para rotas mutáveis;
+- Cookies de sessão configurados com flags apropriadas;
+- Rate limit em endpoints sensíveis (login / recuperação de senha);
+- Tratamento global de erros para evitar exposição de dados internos;
+- Controle central de acesso via decoradores (`login_required`, `role_required`, `permission_required`);
+- Logs técnicos para operações sensíveis;
+- CI com checagens de segurança automatizadas.
+
+---
+
+<a id="banco-de-dados-e-migrations"></a>
+## Banco de Dados e Migrations
+
+- Banco recomendado para o TCC: `tcc`;
+- Tabelas principais: `usuarios`, `ativos` (inclui `email_responsavel`, `criado_por`, status, datas);
+- Migrations relevantes:
+  - `012_rbac_usuarios.sql` — base de RBAC em `usuarios`;
+  - `013_email_responsavel_ativos.sql` — adiciona `email_responsavel` aos ativos;
+- Inicializador: `controle_ativos/database/init_db.py` aplica schema + migrations; executor ajustado para evitar `Unread result found`.
+
+---
+
+<a id="arquitetura-e-tecnologias"></a>
+## Arquitetura e Tecnologias
+
+| Camada | Tecnologia |
+|---|---|
+| Backend | Python 3.11+ + Flask |
+| Templates | Jinja2 |
+| Banco | MySQL |
+| Testes | pytest |
+| Segurança | CSRF, PBKDF2, Bandit, pip-audit |
+| CI/CD | GitHub Actions |
+| Versionamento | Git / GitHub |
+
+Breve mapa de responsabilidades:
+- `controle_ativos/models` — modelos de entidade;
+- `controle_ativos/services` — lógica de negócio;
+- `controle_ativos/database` — conexão, init_db.py e migrations;
+- `controle_ativos/web` — app Flask, templates e static;
+- `controle_ativos/scripts` — utilitários, como `promover_super_admin.py`;
+
+---
+
+<a id="estrutura-do-repositorio"></a>
+## Estrutura do Repositório (resumo)
+
+```text
+controle_ativos/
+├── database/
+├── models/
+├── services/
+├── scripts/
+├── web/
+├── tests/
+├── utils/
+└── README.md
+
+docs/
+.github/workflows/
+requirements.txt
+requirements-dev.txt
+pytest.ini
+```
+
+---
+
+<a id="como-navegar"></a>
+## Como Navegar no Projeto
+
+| Eu quero... | Vá para... |
+|---|---|
+| Entender permissões | [docs/rbac-perfis-permissoes.md](docs/rbac-perfis-permissoes.md) |
+| Ver banco / migrations | [docs/banco-de-dados.md](docs/banco-de-dados.md) |
+| Ver segurança | [docs/seguranca.md](docs/seguranca.md) |
+| Rodar testes | [docs/testes.md](docs/testes.md) |
+| Ver ADRs | [docs/adr/](docs/adr/) |
+| Ver plano de interface e RBAC | [docs/plano-interface-rbac.md](docs/plano-interface-rbac.md) |
+
+---
+
+<a id="configuracao-e-execucao"></a>
+## Configuração e Execução
+
+1. Criar e ativar ambiente virtual
 
 ```powershell
 python -m venv .venv
 .venv\Scripts\Activate.ps1
 ```
 
-### 2. Instalar dependências
+2. Instalar dependências
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 3. Configurar `.env`
-
-Use a raiz do repositório e ajuste os valores para o ambiente local:
+3. Configurar `.env` (exemplo mínimo, **NÃO** commitar credenciais)
 
 ```env
 DB_HOST=localhost
 DB_PORT=3306
 DB_NAME=tcc
-DB_USER=<USUARIO_DO_BANCO>
-DB_PASSWORD=<SENHA_DO_BANCO>
-FLASK_SECRET_KEY=<CHAVE_SECRETA>
-APP_PEPPER=<PEPPER_LOCAL>
+DB_USER=<usuario>
+DB_PASSWORD=<senha>
+FLASK_SECRET_KEY=<chave_secreta>
+APP_PEPPER=<pepper>
 ```
 
-### 4. Inicializar o banco
+4. Inicializar banco e aplicar migrations
 
 ```bash
 python controle_ativos/database/init_db.py
 ```
 
-Esse comando cria o schema, aplica migrations e compatibiliza bancos locais antigos quando necessário.
-
-### 5. Promover o primeiro `SUPER_ADMIN`
+5. (Opcional) Promover o primeiro `SUPER_ADMIN`
 
 ```bash
 python controle_ativos/scripts/promover_super_admin.py
 ```
 
-### 6. Subir a aplicação
+6. Iniciar a aplicação web (principal)
 
 ```bash
-python controle_ativos/web/app.py
+python -m controle_ativos.web.app
 ```
 
-### 7. Executar os testes
+  Alternativa:
+
+  ```bash
+  python controle_ativos/web/app.py
+  ```
+
+7. Executar testes
 
 ```bash
 python -m pytest -q
 ```
 
-## Como aplicar migrations e inicializar o banco
+---
 
-- O fluxo atual usa `controle_ativos/database/init_db.py` como ponto de entrada.
-- O script aplica o schema base e as migrations disponíveis.
-- A migration 013 já faz parte do estado atual do banco e deve ser mantida no repositório.
-- Se o banco local tiver estruturas legadas, o inicializador ajusta apenas o necessário para não quebrar o fluxo atual.
+<a id="super-admin"></a>
+## Criar / Promover o primeiro `SUPER_ADMIN`
 
-## Como criar o primeiro `SUPER_ADMIN`
-
-1. Inicialize o banco.
-2. Configure um usuário válido no banco, se ainda não existir.
+1. Inicialize o banco (`init_db.py`).
+2. Crie um usuário via interface ou insira registro em `usuarios` se necessário.
 3. Execute `python controle_ativos/scripts/promover_super_admin.py`.
-4. Confirme o perfil `SUPER_ADMIN` na tela simples de gestão de usuários.
+4. Valide o perfil `SUPER_ADMIN` na interface de gestão de usuários.
 
-## Testes
+---
 
-O projeto possui suíte automatizada com `pytest`. Os testes cobrem:
+<a id="testes-e-qualidade"></a>
+## Testes e Qualidade
 
-- autenticação e recuperação de senha;
-- CSRF e cookies de sessão;
-- rate limit de login/recuperação;
-- RBAC e permissões por perfil;
-- busca e filtro de ativos;
-- inicialização do banco e migrations;
-- tratamento de erros e rotas principais.
+- Executar localmente: `python -m pytest -q`;
+- Verificar `git diff --check` antes de commitar para detectar normalizações de fim de linha;
+- CI: GitHub Actions roda testes e verificações de segurança.
 
-O estado atual foi validado com `python -m pytest -q`.
+---
 
-## Status atual do projeto
+<a id="resultados-tecnicos"></a>
+## Resultados Técnicos Atuais
 
-- Backend funcional e consistente com a interface web atual.
-- RBAC implementado por perfil.
-- Listagem global de ativos consolidada.
-- Busca de ativos corrigida.
-- Migrations 012 e 013 presentes.
-- Inicialização do banco corrigida contra `Unread result found`.
-- Testes aprovados no estado atual.
+| Área | Resultado |
+|---|---|
+| Backend | Funcional com Flask |
+| Interface | Server-rendered funcional |
+| Segurança | CSRF, rate limit, PBKDF2 e RBAC |
+| Banco | Migrations aplicadas (012 e 013) |
+| Testes | Suíte Pytest disponível |
+| CI | Testes e checagens de segurança em GitHub Actions |
+| Documentação | `README.md` e `docs/` |
 
-## Limitações conhecidas e evoluções futuras
+---
 
-- A auditoria da interface ainda mostra eventos recentes em memória; persistência histórica em banco continua como evolução futura.
-- Permissões customizadas por usuário ainda não existem; o sistema usa perfis padrão.
-- Reautenticação para ações críticas ainda pode ser adicionada depois.
-- Exportação controlada de logs também fica para uma etapa posterior.
-- Headers de segurança mais avançados podem ser incorporados em evolução futura.
-- Uma interface administrativa mais rica para usuários e auditoria pode ser construída depois do TCC.
+<a id="limitacoes-conhecidas"></a>
+## Limitações Conhecidas
 
-## Documentação relacionada
+- Auditoria simples em memória, sem persistência histórica;
+- Permissões por usuário individual ainda não existem;
+- Sem frontend SPA, exportação avançada de logs ou integrações SSO;
+- Hardening HTTP avançado permanece para evolução futura.
 
-- [RBAC - Perfis e Permissões](docs/rbac-perfis-permissoes.md)
-- [Plano de Interface e RBAC](docs/plano-interface-rbac.md)
-- [Auditoria da Interface e Templates](docs/auditoria-interface-templates.md)
-- [Banco de Dados](docs/banco-de-dados.md)
-- [Segurança](docs/seguranca.md)
-- [Checklist de Segurança Backend](docs/checklist-seguranca-backend.md)
-- [Riscos Conhecidos de Segurança](docs/riscos-conhecidos-seguranca.md)
-- [Plano de Correção de Segurança Backend](docs/plano-correcao-seguranca-backend.md)
+---
 
+<a id="evolucoes-futuras"></a>
+## Evoluções Futuras
+
+- Persistência completa de auditoria e exportação de logs;
+- Permissões granulares por usuário;
+- API REST para integrações;
+- Frontend moderno (SPA) e dashboard analítico;
+- Integração SSO e conformidade de privacidade (LGPD).
+
+---
+
+<a id="glossario"></a>
+## Glossário
+
+<details>
+<summary>RBAC</summary>
+
+Role-Based Access Control — controle de acesso por perfis.
+
+</details>
+
+<details>
+<summary>CSRF</summary>
+
+Cross-Site Request Forgery — proteção para rotas mutáveis.
+
+</details>
+
+<details>
+<summary>CRUD</summary>
+
+Create, Read, Update, Delete.
+
+</details>
+
+<details>
+<summary>Migration</summary>
+
+Script versionado que altera o esquema do banco.
+
+</details>
+
+<details>
+<summary>Session</summary>
+
+Autenticação baseada em sessão do servidor (cookies).
+
+</details>
+
+<details>
+<summary>Rate limit</summary>
+
+Limitação de tentativas em endpoints sensíveis.
+
+</details>
+
+<details>
+<summary>SUPER_ADMIN</summary>
+
+Perfil com acesso total ao sistema e gestão de usuários.
+
+</details>
+
+<details>
+<summary>LEITOR</summary>
+
+Perfil apenas de visualização de ativos e dashboard.
+
+</details>
+
+<details>
+<summary>email_responsavel</summary>
+
+Campo do ativo que registra o responsável vinculado.
+
+</details>
+
+<details>
+<summary>auditoria</summary>
+
+Registro básico de eventos recentes de operação.
+
+</details>
+
+<details>
+<summary>criado_por</summary>
+
+Metadado de autoria para rastreabilidade do ativo.
+
+</details>
+
+---
+
+<a id="equipe-e-autoria"></a>
+## Equipe / Autoria
+
+| Nome | Responsabilidade |
+|---|---|
+| Lays Yuri Matukawa | Documentação, apresentação e apoio acadêmico |
+| Vitória Lopes Siqueira | Documentação, apresentação e apoio acadêmico |
+| Geovanny Iago Damasceno Mendes | Documentação e apoio acadêmico |
+| Felipe dos Santos Nascimento | Responsável inicial pela interface / frontend |
+| Matheus Santos do Nascimento |  Desenvolvimento backend, banco, segurança, RBAC, testes e documentação técnica |
+
+**Orientadora:** Professora Tainá Barros Batista Oliveira
+
+---
+
+<a id="licenca-uso-academico"></a>
+## Licença / Uso Acadêmico
+
+Projeto desenvolvido para fins acadêmicos (TCC — ETEC Jaraguá). Uso e reprodução permitidos para fins educacionais, citando os autores.
+
+---
+
+<a id="checklist-de-entrega"></a>
+## Checklist de Entrega
+
+<details>
+<summary>Itens verificados</summary>
+
+- [x] Modelo acadêmico/técnico preservado
+- [x] Índice com âncoras manuais estáveis
+- [x] Links para a documentação convertidos em Markdown real
+- [x] Matriz RBAC conferida
+- [x] Comandos de execução padronizados
+
+</details>
