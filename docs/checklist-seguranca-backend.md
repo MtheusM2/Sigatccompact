@@ -9,7 +9,7 @@ Legenda: `[x] Atendido`, `[ ] Pendente`, `[~] Parcial`, `[-] Nao aplicavel`.
 - [x] Logout limpa a sessao com `session.clear()`.
 - [x] Mensagens de login e recuperacao sao genericas; usuario inexistente nao e enumerado.
 - [x] Rate limit ou bloqueio temporario apos falhas.
-- [ ] Controle de usuario inativo/bloqueado.
+- [x] Controle de usuario inativo/bloqueado.
 - [ ] Reautenticacao para acoes criticas futuras.
 
 ## Sessao
@@ -42,11 +42,11 @@ Legenda: `[x] Atendido`, `[ ] Pendente`, `[~] Parcial`, `[-] Nao aplicavel`.
 - [x] Ativos sao filtrados por `criado_por`.
 - [x] Update/delete usam `id` e `criado_por`.
 - [~] Dashboard exige sessao, mas renderiza login com status 200.
-- [ ] Politica deny-by-default.
-- [ ] Separacao entre visualizar, criar, editar e excluir.
+- [x] Politica deny-by-default.
+- [x] Separacao entre visualizar, criar, editar e excluir.
 - [-] Importar/exportar arquivos nao aplicavel no backend atual. Observacao: Funcionalidade nao implementada no backend atual.
-- [ ] Decorators `role_required` ou `permission_required`.
-- [ ] Matriz futura para `SUPER_ADMIN`, `ADMIN`, `USUARIO` e `LEITOR`.
+- [x] Decorators `role_required` e `permission_required`.
+- [x] Matriz de perfis `SUPER_ADMIN`, `ADMIN`, `USUARIO` e `LEITOR`.
 
 ## Criptografia
 
@@ -63,7 +63,7 @@ Legenda: `[x] Atendido`, `[ ] Pendente`, `[~] Parcial`, `[-] Nao aplicavel`.
 - [x] Conexao usa commit/rollback via context manager.
 - [x] FK de `ativos.criado_por` para `usuarios.id`.
 - [~] Schema tem timestamps, mas nao historico/auditoria completa.
-- [ ] Campo de usuario ativo/bloqueado.
+- [x] Campo de usuario ativo/bloqueado.
 - [ ] Tabela/service de auditoria.
 
 ## Upload/importacao
@@ -113,7 +113,7 @@ Legenda: `[x] Atendido`, `[ ] Pendente`, `[~] Parcial`, `[-] Nao aplicavel`.
 
 ## Testes
 
-- [x] Suite atual: 76 testes aprovados.
+- [x] Suite atual: 111 testes aprovados.
 - [x] Testes cobrem rotas de ativos sem autenticacao.
 - [x] Testes cobrem segredo de sessao obrigatorio.
 - [x] Testes cobrem hash de senha.
@@ -122,4 +122,3 @@ Legenda: `[x] Atendido`, `[ ] Pendente`, `[~] Parcial`, `[-] Nao aplicavel`.
 - [x] Testes de rate limit.
 - [ ] Testes de acesso cruzado usuario A vs usuario B.
 - [ ] Testes de logs/auditoria.
- - [x] Testes de logs/auditoria.

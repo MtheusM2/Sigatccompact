@@ -21,10 +21,12 @@ def _csrf_headers(client, token_override=None):
     return {"X-CSRF-Token": token}
 
 
-def _login(client, user_id=1):
+def _login(client, user_id=1, perfil="USUARIO", ativo=True):
     with client.session_transaction() as sess:
         sess["user_id"] = user_id
         sess["email"] = "tester@example.com"
+        sess["perfil"] = perfil
+        sess["ativo"] = ativo
 
 
 def _capture_event(caplog, name_contains: str):
@@ -122,7 +124,7 @@ def test_internal_error_generates_event(client, monkeypatch, caplog):
 
 
 def test_asset_crud_generates_events_and_no_sensitive_data(client, monkeypatch, caplog):
-    _login(client, user_id=7)
+    _login(client, user_id=7, perfil="ADMIN")
     caplog.set_level("INFO", logger="controle_ativos.audit")
 
     # Create

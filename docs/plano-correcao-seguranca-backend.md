@@ -15,6 +15,8 @@
 
 Importacao, exportacao e upload nao existem no backend atual e nao fazem parte das correcoes obrigatorias antes do RBAC. O escopo imediato e backend seguro + RBAC: autenticacao, sessao, CSRF, controle de acesso, tratamento de erros e logs/auditoria basica.
 
+A base de RBAC ja foi iniciada neste repositório com migration, script de promocao, utilitario central de permissoes, decorators e testes. A evolucao futura passa a ser gestao de usuarios, auditoria persistida e refinamento de escopos administrativos.
+
 ## Correcoes recomendadas para a Fase 1
 
 | Item | Prioridade | Criterio de aceite |
@@ -30,8 +32,8 @@ Importacao, exportacao e upload nao existem no backend atual e nao fazem parte d
 
 | Item | Prioridade | Observacao |
 | ---- | ---------- | ---------- |
-| Implementar RBAC com perfis `SUPER_ADMIN`, `ADMIN`, `USUARIO` e `LEITOR`. | P2 | Fazer somente apos CSRF, sessao e decorators estarem estabilizados. |
-| Criar `role_required`/`permission_required` com matriz por acao. | P2 | Separar visualizar, criar, editar, excluir e administrar usuarios. Importacao/exportacao de arquivos ficam fora do backend atual. |
+| Evoluir RBAC com gestao de usuarios e refinamento de escopos administrativos. | P2 | Base de perfis e decorators ja implementada; evoluir telas/rotas administrativas e restricoes adicionais. |
+| Consolidar matriz por acao e ampliar cobertura administrativa. | P2 | Separar visualizar, criar, editar, excluir e administrar usuarios. Importacao/exportacao de arquivos ficam fora do backend atual. |
 | Exigir reautenticacao para excluir/desativar usuario, alterar perfil e operacoes destrutivas. | P2 | Pode ser simples: confirmar senha atual em tela critica. |
 | Criar fluxo seguro de importacao/upload se a funcionalidade for criada. | P3 | Evolucao futura, nao aplicavel no backend atual; validar extensao, tamanho, conteudo, preview, confirmacao e rollback. |
 | Exportacao controlada de logs/auditoria. | P3 | Exportacao de relatorios de logs sera considerada apenas apos criacao da tabela/service de auditoria. |

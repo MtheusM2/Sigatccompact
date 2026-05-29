@@ -52,18 +52,32 @@ def _compatibilizar_schema_legado(cur) -> None:
     _permitir_null_se_existir(cur, "usuarios", "nome")
 
 
+def _executar_sql_texto(cur, sql_texto: str) -> None:
+    comandos = [cmd.strip() for cmd in sql_texto.split(";") if cmd.strip()]
+    for comando in comandos:
+        cur.execute(comando)
+
+
+def _aplicar_migracoes(cur) -> None:
+    migrations_dir = Path(__file__).with_name("migrations")
+    if not migrations_dir.exists():
+        return
+
+    for migration_path in sorted(migrations_dir.glob("*.sql")):
+        sql = migration_path.read_text(encoding="utf-8")
+        _executar_sql_texto(cur, sql)
+
+
 def inicializar_banco():
     schema_path = Path(__file__).with_name("schema.sql")
     sql = schema_path.read_text(encoding="utf-8")
 
-    comandos = [cmd.strip() for cmd in sql.split(";") if cmd.strip()]
-
     with conexao_mysql(com_database=False) as conn:
         cur = conn.cursor()
         try:
-            for comando in comandos:
-                cur.execute(comando)
+            _executar_sql_texto(cur, sql)
             _compatibilizar_schema_legado(cur)
+            _aplicar_migracoes(cur)
             print("Banco e tabelas criados com sucesso.")
         except Exception as e:
             print("Erro ao criar banco/tabelas:")
