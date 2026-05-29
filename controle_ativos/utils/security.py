@@ -5,6 +5,9 @@ import time
 
 from flask import session, request, render_template, jsonify
 
+# Import audit helper to record security-relevant events without sensitive data
+from controle_ativos.utils.audit import audit_event
+
 
 CSRF_SESSION_KEY = "_csrf_token"
 AUTH_RATE_LIMIT_MAX_FAILURES = 5
@@ -141,6 +144,18 @@ def validate_csrf_request():
     provided_token = _extract_csrf_token()
 
     if not provided_token or not secrets.compare_digest(provided_token, expected_token):
+        try:
+            audit_event(
+                event="csrf_invalid",
+                result="invalid",
+                user_id=session.get("user_id"),
+                email=(request.get_json(silent=True) or {}).get("email") if request.is_json else None,
+                ip=(request.remote_addr or "") if request else None,
+                route=request.path if request else None,
+                method=request.method if request else None,
+            )
+        except Exception:
+            pass
         return jsonify({"ok": False, "erro": "CSRF inválido."}), 400
 
     return None

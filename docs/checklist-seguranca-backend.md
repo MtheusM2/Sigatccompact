@@ -77,10 +77,10 @@ Legenda: `[x] Atendido`, `[ ] Pendente`, `[~] Parcial`, `[-] Nao aplicavel`.
 
 ## Logs/auditoria
 
-- [~] Log estruturado de login.
+- [x] Log estruturado de login.
 - [x] Log tecnico de falha de login e recuperacao sem senha/resposta/segredo.
-- [ ] Log de logout.
-- [ ] Log de criacao, edicao e exclusao de ativos.
+- [x] Log de logout.
+- [x] Log de criacao, edicao e exclusao de ativos.
 - [-] Evolucao futura: Exportacao de logs de auditoria quando a auditoria persistida for implementada.
 - [ ] Log de alteracao de usuario/perfil quando RBAC existir.
 - [ ] Alertas basicos para falhas repetidas.
@@ -122,3 +122,4 @@ Legenda: `[x] Atendido`, `[ ] Pendente`, `[~] Parcial`, `[-] Nao aplicavel`.
 - [x] Testes de rate limit.
 - [ ] Testes de acesso cruzado usuario A vs usuario B.
 - [ ] Testes de logs/auditoria.
+ - [x] Testes de logs/auditoria.
