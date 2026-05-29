@@ -1,18 +1,69 @@
-<section class="cards">
-    <div class="card_total">
-        <small>Total</small>
-        <strong>0</strong>
-    </div>
-    <div class="card_usados">
-         <small>Usados</small>
-        <strong>0</strong>
-    </div>
-    <div class="card_manutencao">
-        <small>Em manutenção</small>
-        <strong>0</strong>
-    </div>
-    <div class="card_disponiveis">
-        <small>Disponíveis</small>
-        <strong>0</strong>
-    </div>
-</section>
+{% extends "base.html" %}
+
+{% block title %}Status dos ativos | Gestão de Ativos{% endblock %}
+
+{% block content %}
+<main class="page-shell">
+    <section class="page-card">
+        <div class="page-header">
+            <p class="eyebrow">Resumo rápido</p>
+            <h1>Status dos ativos</h1>
+            <p class="page-lead">Visão simples do inventário para uso no painel principal.</p>
+        </div>
+
+        <section class="cards">
+            <div class="card_total dashboard-card">
+                <small>Total</small>
+                <strong id="card-total-ativos">0</strong>
+            </div>
+            <div class="card_usados dashboard-card">
+                <small>Usados</small>
+                <strong id="card-ativos-em-uso">0</strong>
+            </div>
+            <div class="card_manutencao dashboard-card">
+                <small>Em manutenção</small>
+                <strong id="card-ativos-manutencao">0</strong>
+            </div>
+            <div class="card_disponiveis dashboard-card">
+                <small>Disponíveis</small>
+                <strong id="card-ativos-disponiveis">0</strong>
+            </div>
+        </section>
+
+        <section class="table-section" data-carrega-ativos="true">
+            <div class="table-heading">
+                <h2>Lista global de ativos</h2>
+                <p>Todos os perfis autenticados visualizam a mesma listagem.</p>
+            </div>
+
+            <div class="table-responsive">
+                <table class="data-table" data-ativos-table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Tipo</th>
+                            <th>Marca</th>
+                            <th>Modelo</th>
+                            <th>E-mail</th>
+                            <th>Responsável</th>
+                            <th>Departamento</th>
+                            <th>Status</th>
+                            <th>Entrada</th>
+                            <th>Criado por</th>
+                            {% set perfil = session.get('perfil', 'USUARIO') %}
+                            {% if perfil in ['USUARIO', 'ADMIN', 'SUPER_ADMIN'] %}
+                                <th>Ações</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody id="ativos-table-body" data-colspan="{{ 11 if perfil in ['USUARIO', 'ADMIN', 'SUPER_ADMIN'] else 10 }}">
+                        <tr>
+                            <td colspan="{{ 11 if perfil in ['USUARIO', 'ADMIN', 'SUPER_ADMIN'] else 10 }}">Carregando ativos...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </section>
+</main>
+{% endblock %}

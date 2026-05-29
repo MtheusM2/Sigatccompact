@@ -1,75 +1,124 @@
-<div class="container_buscar_ativos"></div>
-<h2 class="h2_buscar_ativos">Buscar de Ativos</h2>
+{% extends "base.html" %}
 
+{% block title %}Buscar ativos | Gestão de Ativos{% endblock %}
 
-<form class="form_buscar_ativos" id="buscar_ativos_form">
-    <div class="caixa_buscar_ativos">
-        <div class="linha1">
-            <div class="linhas">
-                
-                <label for="tipo">Tipo:</label>
-                <select class="status_buscar" name="tipo" id="tipo">
-                <option value="">Option1</option>
-                <option value="1">Option2</option>
-                <option value="2">Option3</option>
-                <option value="3">Option4</option>
-            </select>
-            </div>
-            <div class="linhas">
-        <label for="marca">Marca:</label>
-        <input type="text" id="marca" name="marca" required>
-            </div>
-            <div class="linhas">
-        <label for="modelo">Modelo:</label>
-        <input type="text" id="modelo" name="modelo" required>
-            </div>
+{% block content %}
+<main class="page-shell">
+    <section class="page-card form-panel">
+        <div class="page-header">
+            <p class="eyebrow">Consulta rápida</p>
+            <h1>Buscar ativos</h1>
+            <p class="page-lead">Estrutura visual pronta para evolução futura da busca filtrada.</p>
         </div>
-        <br>
 
-        <div class="linha2">
-            <div class="linhas">
-        <label for="usuario_responsavel">Usuário Responsável:</label>
-        <input type="text" id="usuario_responsavel" name="usuario_responsavel" required>
-            </div>
-            <div class="linhas">
-        <label for="departamento">Departamento:</label>
-        <input type="text" id="departamento" name="departamento" required>
-            </div>
-            <div class="linhas">
-            <label for="status">Status:</label>
-                <select class="status_buscar" name="status" id="status">
-                <option value="1">Bom</option>
-                <option value="2">Manutenção</option>
-                <option value="3">Ruim</option>
-            </select>
-        </div>
-        </div>
-        <br>
-        
-    <div class="linha3">
-        <div class="linhas">
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required>
-        </div>
-        <div class="linhas">
-        <label for="data_entrada">Data de Entrada:</label>
-        <input type="date" id="data_entrada" name="data_entrada" required>
-        </div>
-        <div class="linhas">
-        <label for="data_saida">Data de Saída:</label>
-        <input type="date" id="data_saida" name="data_saida" required>
-        </div>
-        </div>
-        <br>
-        <div class="botoes_cadastro">
-            <input class="nome_botao_cadastro" type="submit" value="Pesquisar">
-        </div>
-        
-        
-    
+        <form class="form_buscar_ativos" id="buscar_ativos_form">
+            <div class="caixa_buscar_ativos">
+                <div class="linha1">
+                    <div class="linhas">
+                        <label for="tipo">Tipo:</label>
+                        <select class="status_buscar" name="tipo" id="tipo">
+                            <option value="">Selecione...</option>
+                            <option value="Notebook">Notebook</option>
+                            <option value="Desktop">Desktop</option>
+                            <option value="Monitor">Monitor</option>
+                            <option value="Impressora">Impressora</option>
+                        </select>
+                    </div>
+                    <div class="linhas">
+                        <label for="marca">Marca:</label>
+                        <input type="text" id="marca" name="marca" placeholder="Ex.: Dell">
+                    </div>
+                    <div class="linhas">
+                        <label for="modelo">Modelo:</label>
+                        <input type="text" id="modelo" name="modelo" placeholder="Ex.: Latitude">
+                    </div>
+                </div>
 
-        <!-- <a href="home.html">
-            <button type="button">Entrar</button>
-        </a> -->
-    </div>
-    </form>
+                <div class="linha2">
+                    <div class="linhas">
+                        <label for="email_responsavel">E-mail do responsável:</label>
+                        <input type="email" id="email_responsavel" name="email_responsavel" placeholder="responsavel@exemplo.com">
+                    </div>
+
+                    <div class="linhas">
+                        <label for="usuario_responsavel">Usuário Responsável:</label>
+                        <input type="text" id="usuario_responsavel" name="usuario_responsavel" placeholder="Nome do responsável">
+                    </div>
+                    <div class="linhas">
+                        <label for="departamento">Departamento:</label>
+                        <select class="status_buscar" name="departamento" id="departamento">
+                            <option value="">Selecione...</option>
+                            <option value="TI">TI</option>
+                            <option value="RH">RH</option>
+                            <option value="Administração">Administração</option>
+                            <option value="Financeiro">Financeiro</option>
+                            <option value="Suporte">Suporte</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="linha3">
+                    <div class="linhas">
+                        <label for="status">Status:</label>
+                        <select class="status_buscar" name="status" id="status">
+                            <option value="">Selecione...</option>
+                            <option value="Disponível">Disponível</option>
+                            <option value="Em Uso">Em Uso</option>
+                            <option value="Em Manutenção">Em Manutenção</option>
+                            <option value="Reservado">Reservado</option>
+                            <option value="Baixado">Baixado</option>
+                        </select>
+                    </div>
+                    <div class="linhas">
+                        <label for="data_entrada">Data de Entrada:</label>
+                        <input type="date" id="data_entrada" name="data_entrada">
+                    </div>
+                    <div class="linhas">
+                        <label for="data_saida">Data de Saída:</label>
+                        <input type="date" id="data_saida" name="data_saida">
+                    </div>
+                </div>
+
+                <div class="botoes_cadastro">
+                    <input class="nome_botao_cadastro" type="submit" value="Pesquisar">
+                </div>
+            </div>
+        </form>
+
+        {% set perfil = session.get('perfil', 'USUARIO') %}
+        <section class="table-section" style="margin-top: 2rem;">
+            <div class="table-heading">
+                <h2>Resultados da busca</h2>
+                <p>Os filtros são opcionais e podem ser combinados.</p>
+            </div>
+
+            <div class="table-responsive">
+                <table class="data-table" data-ativos-table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Tipo</th>
+                            <th>Marca</th>
+                            <th>Modelo</th>
+                            <th>E-mail</th>
+                            <th>Responsável</th>
+                            <th>Departamento</th>
+                            <th>Status</th>
+                            <th>Entrada</th>
+                            <th>Criado por</th>
+                            {% if perfil in ['USUARIO', 'ADMIN', 'SUPER_ADMIN'] %}
+                                <th>Ações</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody id="ativos-table-body" data-colspan="{{ 11 if perfil in ['USUARIO', 'ADMIN', 'SUPER_ADMIN'] else 10 }}">
+                        <tr>
+                            <td colspan="{{ 11 if perfil in ['USUARIO', 'ADMIN', 'SUPER_ADMIN'] else 10 }}">Use os filtros acima e clique em Pesquisar.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </section>
+</main>
+{% endblock %}

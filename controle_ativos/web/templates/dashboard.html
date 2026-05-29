@@ -1,105 +1,334 @@
-<!DOCTYPE html>
-<html lang="pt_BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-     <!-- <link rel="stylesheet" href="index.css"> -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
-</head>
-<body class="dashboard">
-    <header class="h_dashboard">
-        <h1>Gestão de Ativos</h1>
-    
+{% extends "base.html" %}
 
-    <section >
-        <select class="ativosOpcoes" onchange="carregarPagina(this.value)">
-            <option value="{{ url_for('dashboard_status') }}">Status dos ativos</option>
-            <option value="{{ url_for('dashboard_buscar') }}">Buscar ativos</option>
-            <option value="{{ url_for('dashboard_cadastrar') }}">Cadastrar ativos</option>
-            <option value="{{ url_for('dashboard_editar') }}">Editar ativos</option>
-            <option value="{{ url_for('dashboard_excluir') }}">Excluir ativos</option>
-        </select>
+{% block title %}Dashboard | Gestão de Ativos{% endblock %}
+
+{% block content %}
+{% set perfil = session.get('perfil', 'USUARIO') %}
+<main class="dashboard-page">
+    <section class="dashboard-hero page-card">
+        <div class="dashboard-hero__copy">
+            <p class="eyebrow">Painel operacional</p>
+            <h1>Gestão de Ativos</h1>
+            <p class="page-lead">Acompanhe o status dos ativos e acesse as operações permitidas para o seu perfil.</p>
+            <div class="dashboard-user-summary">
+                <span class="profile-badge profile-badge--{{ perfil|lower|replace(' ', '-') }}">{{ perfil }}</span>
+                <span class="dashboard-user-email">{{ session.get('email') }}</span>
+            </div>
+            <div class="dashboard-actions">
+                {% if perfil in ['USUARIO', 'ADMIN', 'SUPER_ADMIN'] %}
+                    <button class="btn btn-primary" type="button" onclick="carregarPagina('{{ url_for('dashboard_cadastrar') }}')">Cadastrar ativo</button>
+                {% endif %}
+                {% if perfil == 'SUPER_ADMIN' %}
+                    <a class="btn btn-ghost" href="{{ url_for('usuarios_page') }}">Usuários</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="dashboard-hero__actions">
+            <label class="field-label" for="dashboard-opcoes">Navegação rápida</label>
+            <select class="ativosOpcoes" id="dashboard-opcoes" onchange="carregarPagina(this.value)">
+                <option value="{{ url_for('dashboard_status') }}">Status dos ativos</option>
+                <option value="{{ url_for('dashboard_buscar') }}">Buscar ativos</option>
+                {% if perfil in ['USUARIO', 'ADMIN', 'SUPER_ADMIN'] %}
+                    <option value="{{ url_for('dashboard_cadastrar') }}">Cadastrar ativos</option>
+                {% endif %}
+            </select>
+            <button class="btn btn-secondary dashboard-back" type="button" onclick="history.back();">Voltar</button>
+        </div>
     </section>
 
-    </header>
+    <section class="page-card dashboard-content-card">
+        <main id="conteudo" class="dashboard-content" aria-live="polite"></main>
+    </section>
+</main>
+{% endblock %}
 
-    <div class="entrar_login">
-            <input class="voltar" type="submit" value="Voltar" onclick="history.back();">
-        </div>
-    
-    <main id="conteudo">
-        
-    </main>
+{% block scripts %}
+<script>
+    const perfilAtual = "{{ perfil }}";
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+    const urlEditarAtivoBase = "{{ url_for('dashboard_editar') }}";
+    const urlExcluirAtivoBase = "{{ url_for('dashboard_excluir') }}";
 
-    <script>
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+    const podeCriarAtivo = ['USUARIO', 'ADMIN', 'SUPER_ADMIN'].includes(perfilAtual);
+    const podeEditarAtivo = ['USUARIO', 'ADMIN', 'SUPER_ADMIN'].includes(perfilAtual);
+    const podeExcluirAtivo = ['ADMIN', 'SUPER_ADMIN'].includes(perfilAtual);
 
-        function carregarPagina(pagina) {
-                fetch(pagina)
-                    .then(res => res.text())
-                    .then(html => {
-                        document.getElementById("conteudo").innerHTML = html;
-                    });
+    function extrairConteudo(html) {
+        const documento = new DOMParser().parseFromString(html, 'text/html');
+        const main = documento.querySelector('main');
+        return main ? main.innerHTML : documento.body.innerHTML;
+    }
+
+    function escapeHtml(valor) {
+        return String(valor ?? '')
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#39;');
+    }
+
+    function formatarValor(valor) {
+        return valor === null || valor === undefined || valor === '' ? '-' : escapeHtml(valor);
+    }
+
+    function renderizarAtivos(ativos) {
+        const tbody = document.getElementById('ativos-table-body');
+        if (!tbody) {
+            return;
         }
 
-        window.onload = function() {
-        carregarPagina("{{ url_for('dashboard_status') }}");
+        const colspan = tbody.dataset.colspan || '10';
+
+        const total = Array.isArray(ativos) ? ativos.length : 0;
+        const totaisPorStatus = (ativos || []).reduce((acumulado, ativo) => {
+            const status = String(ativo.status || '').toLowerCase();
+            acumulado.total += 1;
+            if (status.includes('dispon')) acumulado.disponiveis += 1;
+            if (status.includes('uso')) acumulado.em_uso += 1;
+            if (status.includes('manuten')) acumulado.manutencao += 1;
+            return acumulado;
+        }, { total: 0, disponiveis: 0, em_uso: 0, manutencao: 0 });
+
+        const totalEl = document.getElementById('card-total-ativos');
+        const usoEl = document.getElementById('card-ativos-em-uso');
+        const manutencaoEl = document.getElementById('card-ativos-manutencao');
+        const disponiveisEl = document.getElementById('card-ativos-disponiveis');
+
+        if (totalEl) totalEl.textContent = String(totaisPorStatus.total);
+        if (usoEl) usoEl.textContent = String(totaisPorStatus.em_uso);
+        if (manutencaoEl) manutencaoEl.textContent = String(totaisPorStatus.manutencao);
+        if (disponiveisEl) disponiveisEl.textContent = String(totaisPorStatus.disponiveis);
+
+        if (!total) {
+            tbody.innerHTML = `<tr><td colspan="${colspan}">Nenhum ativo cadastrado.</td></tr>`;
+            return;
+        }
+
+        const linhas = ativos.map((ativo) => {
+            const editarBotao = podeEditarAtivo
+                ? `<button type="button" class="btn btn-secondary btn-table" onclick="carregarPagina('${urlEditarAtivoBase}?id=${encodeURIComponent(ativo.id)}')">Editar</button>`
+                : '';
+            const excluirBotao = podeExcluirAtivo
+                ? `<button type="button" class="btn btn-danger btn-table" onclick="carregarPagina('${urlExcluirAtivoBase}?id=${encodeURIComponent(ativo.id)}')">Excluir</button>`
+                : '';
+            const acoes = (editarBotao || excluirBotao)
+                ? `<td><div class="table-actions">${editarBotao}${excluirBotao}</div></td>`
+                : '';
+
+            return `
+                <tr>
+                    <td>${formatarValor(ativo.id)}</td>
+                    <td>${formatarValor(ativo.tipo)}</td>
+                    <td>${formatarValor(ativo.marca)}</td>
+                    <td>${formatarValor(ativo.modelo)}</td>
+                    <td>${formatarValor(ativo.email_responsavel)}</td>
+                    <td>${formatarValor(ativo.usuario_responsavel)}</td>
+                    <td>${formatarValor(ativo.departamento)}</td>
+                    <td>${formatarValor(ativo.status)}</td>
+                    <td>${formatarValor(ativo.data_entrada)}</td>
+                    <td>${formatarValor(ativo.criado_por)}</td>
+                    ${acoes}
+                </tr>
+            `;
+        }).join('');
+
+        tbody.innerHTML = linhas;
     }
-    </script>
-    <!-- script de cadastro de ativos -->
 
-    <script>
-document.addEventListener("submit", async function(e) {
-    if (e.target && e.target.id === "cadastrar_ativos_form") {
-        e.preventDefault();
+    async function carregarAtivosGlobais() {
+        const tabela = document.querySelector('[data-ativos-table]');
+        if (!tabela) {
+            return;
+        }
 
-        const tipo = document.getElementById('tipo').value;
-        const marca = document.getElementById('marca').value;
-        const modelo = document.getElementById('modelo').value;
-        const usuarioResponsavel = document.getElementById('usuario_responsavel').value;
-        const departamento = document.getElementById('departamento').value;
-        const status = document.getElementById('status').value;
-        const dataEntrada = document.getElementById('data_entrada').value;
-        const dataSaida = document.getElementById('data_saida').value;
+        const tbody = document.getElementById('ativos-table-body');
+        if (!tbody) {
+            return;
+        }
+
+        const colspan = tbody.dataset.colspan || '10';
+
+        tbody.innerHTML = `<tr><td colspan="${colspan}">Carregando ativos...</td></tr>`;
 
         try {
-            console.log('Enviando dados para /ativos...');
+            const resposta = await fetch('/ativos');
+            const dados = await resposta.json();
 
-            const response = await fetch('/ativos', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-Token': csrfToken,
-                },
-                body: JSON.stringify({
-                    tipo,
-                    marca,
-                    modelo,
-                    usuario_responsavel: usuarioResponsavel,
-                    departamento,
-                    status,
-                    data_entrada: dataEntrada,
-                    data_saida: dataSaida || null
-                })
-            });
-
-            const data = await response.json();
-            console.log(data);
-
-            if (data.ok) {
-                alert('Ativo cadastrado com sucesso!');
-                carregarPagina("{{ url_for('dashboard_status') }}");
-            } else {
-                alert('Erro: ' + data.erro);
+            if (!resposta.ok || !dados.ok) {
+                throw new Error(dados.erro || 'Falha ao carregar os ativos.');
             }
-        } catch (err) {
-            alert('Erro na requisição: ' + err.message);
+
+            renderizarAtivos(dados.ativos || []);
+        } catch (erro) {
+            tbody.innerHTML = `<tr><td colspan="${colspan}">${escapeHtml(erro.message)}</td></tr>`;
         }
     }
-});
-</script>
 
-</body>
-</html>
+    function carregarPagina(pagina) {
+        fetch(pagina)
+            .then((resposta) => resposta.text())
+            .then((html) => {
+                document.getElementById('conteudo').innerHTML = extrairConteudo(html);
+                if (document.querySelector('#conteudo [data-carrega-ativos="true"]')) {
+                    carregarAtivosGlobais();
+                }
+            })
+            .catch(() => {
+                document.getElementById('conteudo').innerHTML = '<div class="empty-state">Não foi possível carregar a seção solicitada.</div>';
+            });
+    }
+
+    window.addEventListener('load', () => {
+        carregarPagina("{{ url_for('dashboard_status') }}");
+    });
+
+    document.addEventListener('submit', async function (e) {
+        if (e.target && e.target.id === 'cadastrar_ativos_form') {
+            e.preventDefault();
+
+            const tipo = document.getElementById('tipo').value;
+            const marca = document.getElementById('marca').value;
+            const modelo = document.getElementById('modelo').value;
+            const emailResponsavel = document.getElementById('email_responsavel').value;
+            const usuarioResponsavel = document.getElementById('usuario_responsavel').value;
+            const departamento = document.getElementById('departamento').value;
+            const status = document.getElementById('status').value;
+            const dataEntrada = document.getElementById('data_entrada').value;
+            const dataSaida = document.getElementById('data_saida').value;
+
+            try {
+                const response = await fetch('/ativos', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-Token': csrfToken,
+                    },
+                    body: JSON.stringify({
+                        tipo,
+                        marca,
+                        modelo,
+                        email_responsavel: emailResponsavel || null,
+                        usuario_responsavel: usuarioResponsavel,
+                        departamento,
+                        status,
+                        data_entrada: dataEntrada,
+                        data_saida: dataSaida || null,
+                    }),
+                });
+
+                const data = await response.json();
+
+                if (data.ok) {
+                    carregarPagina("{{ url_for('dashboard_status') }}");
+                } else {
+                    alert('Erro: ' + data.erro);
+                }
+            } catch (err) {
+                alert('Erro na requisição: ' + err.message);
+            }
+        }
+
+        if (e.target && e.target.id === 'buscar_ativos_form') {
+            e.preventDefault();
+
+            const formulario = e.target;
+            const parametros = new URLSearchParams();
+
+            for (const [chave, valorBruto] of new FormData(formulario).entries()) {
+                const valor = String(valorBruto || '').trim();
+                if (!valor || valor === 'Todos') {
+                    continue;
+                }
+                parametros.set(chave, valor);
+            }
+
+            const tbody = document.getElementById('ativos-table-body');
+            const colspan = tbody ? (tbody.dataset.colspan || '10') : '10';
+            if (tbody) {
+                tbody.innerHTML = `<tr><td colspan="${colspan}">Pesquisando ativos...</td></tr>`;
+            }
+
+            try {
+                const url = parametros.toString() ? `/ativos/filtrar?${parametros.toString()}` : '/ativos/filtrar';
+                const resposta = await fetch(url);
+                const dados = await resposta.json();
+
+                if (!resposta.ok || !dados.ok) {
+                    throw new Error(dados.erro || 'Falha ao filtrar os ativos.');
+                }
+
+                renderizarAtivos(dados.ativos || []);
+            } catch (err) {
+                if (tbody) {
+                    tbody.innerHTML = `<tr><td colspan="${colspan}">${escapeHtml(err.message)}</td></tr>`;
+                }
+            }
+        }
+
+        if (e.target && e.target.id === 'editar_ativos_form') {
+            e.preventDefault();
+
+            const id = document.getElementById('id_ativo').value.trim();
+            const payload = {
+                tipo: document.getElementById('tipo').value,
+                marca: document.getElementById('marca').value,
+                modelo: document.getElementById('modelo').value,
+                email_responsavel: document.getElementById('email_responsavel').value,
+                usuario_responsavel: document.getElementById('usuario_responsavel').value,
+                departamento: document.getElementById('departamento').value,
+                status: document.getElementById('status').value,
+                data_entrada: document.getElementById('data_entrada').value,
+                data_saida: document.getElementById('data_saida').value || null,
+            };
+
+            try {
+                const response = await fetch(`/ativos/${encodeURIComponent(id)}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-Token': csrfToken,
+                    },
+                    body: JSON.stringify(payload),
+                });
+
+                const data = await response.json();
+                if (data.ok) {
+                    carregarPagina("{{ url_for('dashboard_status') }}");
+                } else {
+                    alert('Erro: ' + data.erro);
+                }
+            } catch (err) {
+                alert('Erro na requisição: ' + err.message);
+            }
+        }
+
+        if (e.target && e.target.id === 'excluir_ativos_form') {
+            e.preventDefault();
+
+            const id = document.getElementById('id_ativo_excluir').value.trim();
+
+            try {
+                const response = await fetch(`/ativos/${encodeURIComponent(id)}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-Token': csrfToken,
+                    },
+                });
+
+                const data = await response.json();
+                if (data.ok) {
+                    carregarPagina("{{ url_for('dashboard_status') }}");
+                } else {
+                    alert('Erro: ' + data.erro);
+                }
+            } catch (err) {
+                alert('Erro na requisição: ' + err.message);
+            }
+        }
+    });
+
+    window.carregarPagina = carregarPagina;
+</script>
+{% endblock %}
