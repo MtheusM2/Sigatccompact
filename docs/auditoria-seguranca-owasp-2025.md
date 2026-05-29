@@ -2,9 +2,11 @@
 
 ## Resumo executivo
 
-Esta auditoria analisou o backend Flask/Python do sistema de Controle de Ativos com foco em autenticacao, sessao, controle de acesso, validacao, banco MySQL, dependencias e documentacao tecnica. O estado atual tem fundamentos importantes: senhas e respostas de recuperacao sao armazenadas com PBKDF2, salt e suporte a pepper; as principais queries usam parametros; as rotas de ativos exigem sessao; e os servicos filtram ativos por `criado_por`, reduzindo risco de IDOR no CRUD atual.
+Esta auditoria analisou o backend Flask/Python do sistema de Controle de Ativos em um momento anterior ao ciclo mais recente de correcoes. Ela deve ser lida como baseline historico de seguranca, nao como fotografia do estado atual do repositório.
 
-Os principais riscos antes da evolucao para RBAC sao: ausencia de CSRF em formularios e endpoints mutaveis, configuracoes de cookies de sessao nao explicitadas, falta de decorators centralizados de autenticacao/permissao, ausencia de rate limit/bloqueio temporario no login, mensagens que podem permitir enumeracao de usuario, falta de logs/auditoria de eventos sensiveis e ausencia de reautenticacao para acoes criticas. Nao foi identificada vulnerabilidade critica evidente no codigo analisado, mas ha riscos altos que devem ser tratados antes do RBAC.
+Naquele recorte, o backend ja tinha fundamentos importantes: senhas e respostas de recuperacao eram armazenadas com PBKDF2, salt e suporte a pepper; as principais queries usavam parametros; as rotas de ativos exigiam sessao; e os servicos filtravam ativos por `criado_por`, reduzindo risco de IDOR no CRUD original.
+
+Os principais riscos apontados naquele recorte eram: ausencia de CSRF em formularios e endpoints mutaveis, configuracoes de cookies de sessao nao explicitadas, falta de decorators centralizados de autenticacao/permissao, ausencia de rate limit/bloqueio temporario no login, mensagens que podiam permitir enumeracao de usuario, falta de logs/auditoria de eventos sensiveis e ausencia de reautenticacao para acoes criticas. Naquele momento, nao foi identificada vulnerabilidade critica evidente, mas havia riscos altos a tratar.
 
 ## Escopo da auditoria
 
@@ -19,6 +21,7 @@ Os principais riscos antes da evolucao para RBAC sao: ausencia de CSRF em formul
 
 ## Limitacoes da auditoria
 
+- Este documento reflete um baseline historico; os arquivos de documentacao mais recentes descrevem o estado real atual do backend, interface, RBAC, banco e testes.
 - Auditoria estatica e funcional local; nao houve teste exploratorio em navegador real, pentest ativo contra banco real ou ambiente publicado.
 - Nao foram alterados backend, arquitetura, banco ou RBAC nesta etapa.
 - Arquivo `.env` existe localmente, mas esta ignorado pelo Git; nao foram expostos valores sensiveis neste documento.

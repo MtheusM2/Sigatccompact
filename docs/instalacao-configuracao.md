@@ -26,7 +26,7 @@ Crie um arquivo `.env` na raiz com este exemplo (use placeholders):
 ```
 DB_HOST=localhost
 DB_PORT=3306
-DB_NAME=controle_ativos
+DB_NAME=tcc
 DB_USER=<USUARIO_DO_BANCO>
 DB_PASSWORD=<SENHA_DO_BANCO>
 FLASK_SECRET_KEY=<CHAVE_SECRETA>
@@ -43,7 +43,7 @@ Assegure que o MySQL está em execução e execute:
 python controle_ativos/database/init_db.py
 ```
 
-Esse comando também compatibiliza bancos locais antigos: se existirem colunas legadas como `empresa_id` ou `nome` obrigatórias, elas passam a aceitar `NULL` para não bloquear o fluxo atual de cadastro.
+Esse comando também aplica as migrations atuais, incluindo `012_rbac_usuarios.sql` e `013_email_responsavel_ativos.sql`, além de compatibilizar bancos locais antigos sem alterar o comportamento real do TCC.
 
 Executar aplicação
 
@@ -57,7 +57,14 @@ Executar testes
 python -m pytest -q
 ```
 
+Promover o primeiro SUPER_ADMIN
+
+```bash
+python controle_ativos/scripts/promover_super_admin.py
+```
+
 Notas
 
 - Nunca commite o arquivo `.env`.
 - Use `.env.example` com placeholders para facilitar contribuições.
+- O banco recomendado para o TCC é `tcc`, não `controle_ativos`.

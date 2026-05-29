@@ -2,31 +2,43 @@
 
 Visão geral
 
-O projeto adota medidas de segurança, com foco em armazenamento seguro de credenciais e controle básico de acesso.
+O projeto adota medidas de segurança com foco em autenticação por sessão, proteção de formulários, RBAC por perfil, registro básico de eventos e redução de exposição de detalhes técnicos.
 
 Medidas aplicadas
 
-- Hash de senhas no armazenamento (não armazenar senhas em texto claro).
-- Política mínima de senha forte (validadores no código).
+- Hash de senhas no armazenamento com PBKDF2-SHA256.
+- Salt por senha e comparação segura.
+- Política mínima de senha validada no código.
 - Sessão Flask para navegação e autenticação operacional nas rotas do sistema.
-- Logout limpa a sessão do usuário autenticado.
+- CSRF ativo em rotas mutáveis.
+- Cookies de sessão configurados explicitamente.
+- Rate limit simples em login e recuperação.
+- RBAC por perfil com `SUPER_ADMIN`, `ADMIN`, `USUARIO` e `LEITOR`.
+- Gestão simples de usuários restrita ao `SUPER_ADMIN`.
+- Log técnico e tela simples de auditoria com eventos recentes.
 - `FLASK_SECRET_KEY`, `APP_PEPPER` e credenciais de banco são lidos por variáveis de ambiente via `.env` local não versionado.
 
-Compatibilidade e migração
+Estado atual
 
-O sistema usa sessão Flask no estado atual do projeto. A migração para Bearer Token pode ser retomada no futuro, mas não faz parte do fluxo ativo hoje.
+- O sistema usa sessão Flask no estado atual do projeto.
+- A listagem de ativos é global para usuários autenticados.
+- `criado_por` é metadado de autoria e auditoria, não regra de visibilidade.
+- A busca de ativos já trabalha com filtros parciais e combinados.
 
 Riscos conhecidos
 
-- Implementação não substitui controles formais de produção (ex.: WAF, rotinas de rotação de secrets, monitoramento centralizado).
-- Algumas áreas (permissões finas, logs de auditoria) precisam de evolução antes de uso em ambientes regulados.
+- Auditoria persistida ainda não existe; a tela atual mostra eventos recentes em memória.
+- `APP_PEPPER` ainda pode ser opcional em alguns ambientes e merece validação mais rígida se o projeto for levado além do TCC.
+- Headers de segurança mais avançados ainda podem ser adicionados em evolução futura.
+- Permissões customizadas por usuário ainda não existem.
 
 Próximos passos de segurança
 
-- Implementar rate limit no endpoint de login para reduzir tentativas automatizadas.
-- Avaliar futuramente se a migração para Bearer Token ainda faz sentido para o escopo final do TCC.
-- Implementar rotação de chaves/pepper e armazenamento seguro para secrets.
-- Adicionar logs de auditoria e controle de acesso por função.
+- Persistir auditoria em banco se a necessidade histórica existir após o TCC.
+- Adicionar permissões customizadas por usuário apenas se houver demanda real.
+- Adicionar reautenticação para ações críticas em fase futura.
+- Incorporar headers de segurança mais avançados em outra etapa.
+- Revisar `APP_PEPPER` e rotação de secrets se o projeto sair do contexto acadêmico.
 
 Não exponha segredos
 

@@ -39,14 +39,16 @@ Legenda: `[x] Atendido`, `[ ] Pendente`, `[~] Parcial`, `[-] Nao aplicavel`.
 ## Controle de acesso
 
 - [x] Rotas de ativos exigem usuario autenticado.
-- [x] Ativos sao filtrados por `criado_por`.
-- [x] Update/delete usam `id` e `criado_por`.
+- [x] Ativos sao listados globalmente para usuarios autenticados; `criado_por` permanece como autoria.
+- [x] Update/delete usam `id` e permissao de perfil.
 - [~] Dashboard exige sessao, mas renderiza login com status 200.
 - [x] Politica deny-by-default.
 - [x] Separacao entre visualizar, criar, editar e excluir.
 - [-] Importar/exportar arquivos nao aplicavel no backend atual. Observacao: Funcionalidade nao implementada no backend atual.
 - [x] Decorators `role_required` e `permission_required`.
 - [x] Matriz de perfis `SUPER_ADMIN`, `ADMIN`, `USUARIO` e `LEITOR`.
+- [x] Gestao simples de usuarios restrita ao `SUPER_ADMIN`.
+- [x] Tela de auditoria simples em `/auditoria` com eventos recentes em memoria.
 
 ## Criptografia
 
@@ -64,7 +66,7 @@ Legenda: `[x] Atendido`, `[ ] Pendente`, `[~] Parcial`, `[-] Nao aplicavel`.
 - [x] FK de `ativos.criado_por` para `usuarios.id`.
 - [~] Schema tem timestamps, mas nao historico/auditoria completa.
 - [x] Campo de usuario ativo/bloqueado.
-- [ ] Tabela/service de auditoria.
+- [~] Tabela/service de auditoria: painel em memoria para eventos recentes; persistencia dedicada ainda pendente.
 
 ## Upload/importacao
 
@@ -81,8 +83,9 @@ Legenda: `[x] Atendido`, `[ ] Pendente`, `[~] Parcial`, `[-] Nao aplicavel`.
 - [x] Log tecnico de falha de login e recuperacao sem senha/resposta/segredo.
 - [x] Log de logout.
 - [x] Log de criacao, edicao e exclusao de ativos.
+- [x] Log de alteracao de usuario/perfil/status para gestao administrativa simples.
+- [x] Tela simples de auditoria no frontend com eventos recentes em memoria.
 - [-] Evolucao futura: Exportacao de logs de auditoria quando a auditoria persistida for implementada.
-- [ ] Log de alteracao de usuario/perfil quando RBAC existir.
 - [ ] Alertas basicos para falhas repetidas.
 
 ## Tratamento de erros
@@ -113,7 +116,7 @@ Legenda: `[x] Atendido`, `[ ] Pendente`, `[~] Parcial`, `[-] Nao aplicavel`.
 
 ## Testes
 
-- [x] Suite atual: 111 testes aprovados.
+- [x] Suite atual validada com `python -m pytest -q`.
 - [x] Testes cobrem rotas de ativos sem autenticacao.
 - [x] Testes cobrem segredo de sessao obrigatorio.
 - [x] Testes cobrem hash de senha.

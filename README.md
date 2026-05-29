@@ -1,470 +1,207 @@
-# Assests
+# Sigatccompact — Sistema de Controle de Ativos
 
-# 📋 Sigatccompact — Sistema de Controle de Ativos
+Sistema acadêmico e técnico para gestão de ativos de TI, com backend Flask/MySQL, autenticação por sessão, CSRF, rate limit em login/recuperação, RBAC por perfil e interface web server-rendered. O objetivo do projeto é apoiar o controle patrimonial escolar com rastreabilidade, segurança básica e documentação de TCC consistente com o estado real do código.
 
-> **Sistema acadêmico e técnico para gestão de ativos de TI, criado para apoiar o controle patrimonial escolar e estruturar uma base confiável para cadastro, rastreabilidade, autenticação e futura evolução web.**
+## Visão geral
 
-[![Status](https://img.shields.io/badge/Status-Em_Desenvolvimento-yellow)]()
-[![Curso](https://img.shields.io/badge/Curso-Manutenção%20e%20Suporte-blue)]()
-[![Disciplina](https://img.shields.io/badge/Disciplina-Governança%20de%20TI-purple)]()
-[![Framework](https://img.shields.io/badge/Framework-COBIT_2019-orange)]()
-[![CI](https://github.com/ETEC-Jaragua-MSI/DataAssets/actions/workflows/ci.yml/badge.svg)](https://github.com/ETEC-Jaragua-MSI/DataAssets/actions/workflows/ci.yml)
-[![Security](https://github.com/ETEC-Jaragua-MSI/DataAssets/actions/workflows/security.yml/badge.svg)](https://github.com/ETEC-Jaragua-MSI/DataAssets/actions/workflows/security.yml)
+O projeto já está funcional no backend e na interface web. Hoje ele cobre cadastro de usuários, login, recuperação de senha, CRUD de ativos, listagem global para usuários autenticados, filtragem de ativos, auditoria básica e gestão simples de usuários para `SUPER_ADMIN`.
 
----
+O comportamento atual é o seguinte:
 
-## Qualidade e Segurança
+- Backend Flask e MySQL funcionando.
+- Autenticação por sessão.
+- CSRF ativo nas rotas mutáveis.
+- Rate limit em login e recuperação.
+- Tratamento global de erros.
+- Auditoria básica com logs e página de eventos recentes.
+- RBAC com `SUPER_ADMIN`, `ADMIN`, `USUARIO` e `LEITOR`.
+- Listagem global de ativos para usuários autenticados.
+- Busca de ativos com filtros parciais e combinados.
+- Campo `email_responsavel` disponível nos ativos.
 
-O repositório usa `pytest` para testes automatizados, `pip-audit` para auditoria de dependências e `Bandit` para análise estática. CodeQL está planejado como melhoria futura e será reativado quando o Code Security/Code Scanning estiver disponível no repositório. A base documental de segurança foi organizada a partir da auditoria OWASP 2025.
+## Tecnologias usadas
 
-- [Auditoria OWASP 2025](docs/auditoria-seguranca-owasp-2025.md)
-- [Checklist de segurança](docs/checklist-seguranca-backend.md)
-- [Plano de correção de segurança](docs/plano-correcao-seguranca-backend.md)
-- [Riscos conhecidos](docs/riscos-conhecidos-seguranca.md)
-- [Exemplo de workflow CodeQL](docs/workflows-exemplos/codeql.yml.example)
+- Python 3.11+
+- Flask
+- MySQL
+- Jinja2
+- HTML, CSS e JavaScript
+- `pytest`
+- `bandit`
+- `pip-audit`
 
----
+## Funcionalidades implementadas
 
-## 📑 Índice
+- Cadastro, login, logout e recuperação de senha.
+- CRUD de ativos com validações centralizadas.
+- Filtros por campos operacionais, inclusive `email_responsavel`.
+- Ordenação e listagem global de ativos.
+- Gestão simples de usuários para `SUPER_ADMIN`.
+- Tela simples de auditoria para eventos recentes.
+- Tratamento padronizado de erros HTTP.
+- Inicialização do banco com schema + migrations.
 
-- [Sobre o Projeto](#-sobre-o-projeto)
-- [Problema e Justificativa](#-problema-e-justificativa)
-- [Objetivos](#-objetivos)
-- [Framework / Metodologia Adotada](#-framework--metodologia-adotada)
-- [Escopo e Delimitações](#-escopo-e-delimitações)
-- [Entregáveis](#-entregáveis)
-- [Cronograma](#-cronograma)
-- [Estrutura do Repositório](#-estrutura-do-repositório)
-- [Como Navegar este Projeto](#-como-navegar-este-projeto)
-- [Resultados e Conclusões](#-resultados-e-conclusões)
-- [Referências](#-referências)
-- [Glossário de Termos Técnicos](#-glossário-de-termos-técnicos)
-- [Equipe](#-equipe)
+## Segurança implementada
 
----
+- Senhas com PBKDF2-SHA256.
+- Salt por senha e comparação segura.
+- CSRF por sessão.
+- Cookies de sessão configurados explicitamente.
+- Rate limit simples para login e recuperação.
+- `login_required` e controle central de acesso.
+- `role_required` e `permission_required`.
+- Logs técnicos de autenticação e operações sensíveis.
+- Tratamento global de erros sem expor detalhes técnicos ao usuário.
 
-## 🎯 Sobre o Projeto
+## Perfis RBAC
 
-| Campo | Detalhe |
-|-------|---------|
-| **Instituição** | ETEC Jaraguá |
-| **Curso** | Manutenção e Suporte em Informática |
-| **Disciplina** | Governança de TI |
-| **Semestre** | 2026.1 |
-| **Orientador(a)** | Professora Tainá Barros Batista Oliveira |
-| **Tipo de Trabalho** | TCC – Trabalho de Conclusão de Curso |
+| Perfil | Acesso real atual |
+| --- | --- |
+| `SUPER_ADMIN` | Visualiza tudo, cria, edita e exclui ativos, cria usuários, gerencia usuários e acessa a auditoria simples. |
+| `ADMIN` | Visualiza tudo, cria, edita e exclui ativos, e acessa a auditoria simples. |
+| `USUARIO` | Visualiza tudo, cria e edita qualquer ativo, mas não exclui nem gerencia usuários. |
+| `LEITOR` | Visualiza dashboard, quantidades e tabela global, sem criar, editar, excluir ou gerenciar usuários. |
 
-**Resumo:**
+O campo `criado_por` passou a ser metadado de autoria e auditoria. Ele não limita mais a visibilidade da listagem global de ativos.
 
-O projeto Sigatccompact surgiu a partir da necessidade de modernizar o controle patrimonial e administrativo de ativos em ambiente escolar, com foco inicial na realidade da ETEC Jaraguá. A proposta parte de um problema recorrente em instituições educacionais: controles descentralizados, baixa padronização cadastral, dificuldade de localizar equipamentos por setor e pouca visibilidade sobre o estado real dos bens, como itens em uso, manutenção, reserva ou baixa.
+## Interface atual
 
-Como resposta, foi desenvolvida uma base técnica em Python com persistência em MySQL, autenticação de usuários, validações centralizadas e arquitetura modular separada por responsabilidades. O sistema já contempla cadastro, login, recuperação de senha, CRUD de ativos, filtros por múltiplos critérios, ordenação e controle de acesso por usuário autenticado. Além da operação em terminal, o projeto já possui camada web em Flask com rotas para autenticação e manipulação de ativos, telas HTML/CSS em evolução, carregamento de `.env` pela raiz do repositório e compatibilidade para bancos locais legados. O resultado atual é uma fundação funcional e rastreável, pronta para consolidação final, integração visual, validações complementares e documentação acadêmica. 
+- `base.html` compartilha o layout principal.
+- O dashboard exibe e-mail, perfil e contexto do usuário logado.
+- A tabela de ativos é global para usuários autenticados.
+- As ações de editar e excluir saem da linha selecionada, quando o perfil permite.
+- A busca de ativos foi corrigida: selects começam vazios, campos vazios não filtram, `Todos` não é enviado como filtro real e filtros parciais/combinados funcionam.
+- `SUPER_ADMIN` possui uma tela simples de gestão de usuários.
+- Existe uma tela simples de auditoria com eventos recentes em memória.
 
+## Banco de dados e migrations
 
+O banco recomendado para o TCC é `tcc`.
 
----
+Não misture essa base com o banco legado `controle_ativos`, que aparece em materiais antigos do projeto e pode carregar suposições já superadas.
 
-## ❗ Problema e Justificativa
+### Tabelas e campos relevantes
 
-### Problema
+- `usuarios`: usuários com perfil, status e dados de autenticação.
+- `ativos`: ativos com identificação, status, responsável, departamento, datas e `email_responsavel`.
 
-> A gestão de ativos em ambiente escolar tende a sofrer com registros descentralizados, baixa padronização de informações e dificuldade de rastrear equipamentos por setor e por responsável. No contexto da ETEC Jaraguá, o projeto foi concebido justamente para atacar essa lacuna, estruturando uma base digital que substitua controles manuais e reduza a perda de visibilidade sobre o ciclo de vida dos ativos.
+### Migrations relevantes
 
-### Justificativa
+- `012_rbac_usuarios.sql`: adiciona a base de RBAC em usuários.
+- `013_email_responsavel_ativos.sql`: adiciona `email_responsavel` aos ativos.
 
-- 📊 **Dados do cenário atual:**
-  - Controle patrimonial tradicionalmente dependente de processos manuais e baixa rastreabilidade institucional.
-  - Necessidade de padronização de cadastro, autenticação, status operacionais e filtros por setor, responsável e datas.
-  - O projeto já evoluiu para arquitetura modular com autenticação, CRUD funcional, integração com MySQL e camada web iniciada.
-- 💰 **Impacto no negócio:**
-  - Redução de retrabalho administrativo e melhora na confiabilidade do inventário interno.
-  - Criação de base para manutenção, auditoria, planejamento de reposição e controle operacional mais seguro.
-- 📖 **Relevância acadêmica:**
-  - Integra conteúdos de governança de TI, modelagem de dados, autenticação, organização por camadas, persistência relacional e evolução controlada de software.
-  - Gera um artefato aplicável a cenário real, com valor prático para a escola e potencial de adaptação para outras instituições.
+O executor de migrations foi corrigido para evitar o erro `Unread result found` ao inicializar o banco.
 
----
+## Como rodar o projeto
 
-## 🎯 Objetivos
+### 1. Criar ambiente virtual
 
-### Objetivo Geral
-
-Desenvolver um sistema de controle de ativos com autenticação de usuários e persistência em banco MySQL, estruturado de forma modular e alinhado à disciplina de Governança de TI, para apoiar o controle patrimonial escolar e preparar a solução para evolução web, documentação acadêmica e uso operacional mais seguro.
-
-### Objetivos Específicos
-
-1. [x] Desenvolver a estrutura modular do sistema separando modelos, serviços, banco de dados, utilitários e interface.
-2. [x] Implementar autenticação com cadastro, login e recuperação de senha por pergunta de segurança.
-3. [x] Implementar CRUD de ativos com regras de negócio, validações, filtros e ordenação.
-4. [🔨] Consolidar a camada web em Flask com integração entre rotas, sessão e interface HTML/CSS inicial.
-5. [🔨] Organizar a documentação técnica e acadêmica do projeto para entrega final do TCC.
-6. [x] Estabilizar carregamento de `.env`, inicialização do banco e compatibilidade de schema sem exigir `empresa_id`.
-
-[![Status](https://img.shields.io/badge/Status-Em%20desenvolvimento-yellowgreen)]() [![TCC](https://img.shields.io/badge/Tipo-TCC-blue)]() [![Tech](https://img.shields.io/badge/Stack-Python%20|%20Flask%20|%20MySQL-lightgrey)]()
-
-Resumo
-
-Projeto acadêmico (TCC) para controle de ativos de TI. Fornece cadastro, consulta, edição e remoção de ativos, com autenticação de usuários e uma base para migração progressiva para APIs com Bearer Token.
-
-| Framework | Versão | Processos/Domínios Utilizados | Papel no Projeto |
-|-----------|--------|-------------------------------|------------------|
-| COBIT | 2019 | APO01, BAI03, DSS01, MEA01 | Principal |
-| ITIL | v4 | Gestão de serviços, controle operacional, suporte e melhoria contínua | Complementar |
-| ISO/IEC | 27001 / 27002 | Princípios de proteção de credenciais e dados sensíveis | Complementar |
-| PMBOK | 7ª ed. | Planejamento, cronograma, riscos e acompanhamento de entregas | Complementar |
-
-### Detalhamento das Práticas Aplicadas
-
-| Prática / Processo | O que diz o framework | Como foi aplicado no seu projeto |
-|--------------------|----------------------|----------------------------------|
-| **Gestão de ativos de TI** | Organiza identificação, controle e rastreabilidade dos recursos | Estruturação de cadastro, status, responsável, departamento, datas e filtros operacionais para cada ativo |
-| **Controle de acesso** | Garante uso autorizado de recursos e segregação mínima | Implementação de autenticação, sessão, vínculo entre usuário autenticado e ativos criados |
-| **Qualidade e controle operacional** | Exige regras claras, validações e previsibilidade de processo | Centralização de validadores, padronização de exceções e tratamento das regras de status e datas |
-| **Melhoria contínua** | Promove evolução incremental baseada em lacunas e riscos | Projeto evoluiu de CRUD simples para arquitetura modular com MySQL, segurança reforçada e base web em refinamento |
-
-Reduz a dependência de planilhas dispersas, melhora rastreabilidade de equipamentos e organiza um inventário único para a gestão de ativos.
-
-- **Tipo:** Pesquisa aplicada com estudo de caso
-- **Abordagem:** Qualitativa, com apoio técnico-documental
-- **Coleta de dados:** análise do cenário escolar, levantamento funcional do problema, definição de requisitos, registro evolutivo do desenvolvimento e documentação técnica do projeto
-- **Amostra/participantes:** equipe do TCC e contexto institucional da ETEC Jaraguá
-- **Ferramentas:** Python, Flask, MySQL, SQL, HTML, CSS, JavaScript, GitHub, documentação técnica e relatórios acadêmicos
-- **Período de coleta:** fevereiro de 2026 a maio de 2026
-
----
-
-## 🔲 Escopo e Delimitações
-
-### ✅ Dentro do Escopo
-
-- Cadastro de usuários com e-mail, senha e pergunta de recuperação.
-- Login, logout e recuperação de senha com resposta de segurança.
-- CRUD de ativos com identificação, tipo, marca, modelo, responsável, departamento, status e datas.
-- Listagem, busca por ID, filtros por responsável, departamento, status e datas, além de ordenação.
-- Integração com banco MySQL e estrutura SQL própria.
-- Estruturação de camada web com Flask e telas iniciais de autenticação.
-- Versionamento e rastreabilidade do desenvolvimento via GitHub.
-
-### ❌ Fora do Escopo
-
-- Implantação produtiva completa dentro da instituição — depende de homologação e consolidação final.
-- Dashboard analítico completo e relatórios gerenciais avançados — etapa futura após estabilização da base.
-- Gestão completa de estoque e movimentação de outros domínios além dos ativos atuais — ampliação planejada para evolução posterior.
-
-### ⚠️ Premissas e Restrições
-
-| Tipo | Descrição |
-|------|-----------|
-| Premissa | O projeto será desenvolvido com base em ferramentas acessíveis ao contexto acadêmico. |
-| Premissa | O sistema deve servir como artefato técnico e acadêmico do TCC. |
-| Restrição | Prazo limitado ao calendário letivo e à data de entrega final. |
-| Restrição | Camada web ainda em consolidação, o que limita a maturidade visual atual. |
-| Restrição | Dados pessoais devem ser tratados com cuidado, em linha com preocupações de LGPD. |
-
----
-
-## 📦 Entregáveis
-
-| # | Entregável | Formato | Localização no Repo | Status |
-|---|-----------|---------|---------------------|--------|
-| 1 | README técnico e acadêmico do projeto | MD | `README.md` | ✅ Concluído |
-| 2 | Estrutura de banco de dados | SQL | `database/schema.sql` | ✅ Concluído |
-| 3 | Script de inicialização do banco | PY | `database/init_db.py` | ✅ Concluído |
-| 4 | Módulo de autenticação | PY | `services/auth_service.py` | ✅ Concluído |
-| 5 | Módulo de ativos com regras de negócio | PY | `services/ativos_service.py` | ✅ Concluído |
-| 6 | Interface terminal do sistema | PY | `main.py` e `services/sistema_ativos.py` | ✅ Concluído |
-| 7 | Base da camada web Flask | PY | `web/app.py` | 🔨 Em andamento |
-| 8 | Telas iniciais de autenticação | HTML/CSS | `templates/` e `static/` | ✅ Concluído |
-| 9 | Relatório técnico / monografia TCC | DOCX / PDF | `docs/` | 🔨 Em andamento |
-| 10 | Slides da defesa | PPTX | `apresentacao/slides-defesa.pptx` | 🔲 Pendente |
-
-- [x] Levantamento do problema e escopo do TCC.
-- [x] Estruturação da documentação técnica em `docs/`.
-- [x] Diagrama AS-IS do processo analisado (documentado em [Arquitetura](docs/arquitetura.md)).
-- [x] Definição do fluxo alvo (TO-BE) para evolução da solução.
-- [x] Implementação das funcionalidades centrais (cadastro, consulta, edição, exclusão).
-- [x] Endurecimento inicial de segurança (hash de senha, política mínima de senha, sessão Flask e variáveis de ambiente).
-- [x] Suíte de testes automatizados e validação da aplicação.
-- [x] Compatibilização do banco local para não depender de `empresa_id` no fluxo atual.
-- [x] Inclusão de índice principal e organização final para apresentação do TCC.
-
-Cronograma detalhado
-
-| Fase | Atividade | Início | Fim | Entregável Associado | Status |
-|------|-----------|--------|-----|---------------------|--------|
-| 1 | Definição do tema, narrativa do problema e escopo inicial | 11/02/2026 | 02/03/2026 | Estrutura inicial do projeto | ✅ |
-| 2 | Modelagem inicial e organização modular | 02/03/2026 | 15/03/2026 | Arquitetura por camadas | ✅ |
-| 3 | Implementação de autenticação e persistência | 16/03/2026 | 24/03/2026 | Módulo de usuários + banco MySQL | ✅ |
-| 4 | Consolidação do CRUD de ativos e refinamento de regras | 24/03/2026 | 27/03/2026 | CRUD funcional em terminal | ✅ |
-| 5 | Estabilização técnica do backend | 27/03/2026 | 10/06/2026 | Backend consolidado e alinhado | ✅ |
-| 6 | Evolução visual e refinamento da interface | 11/04/2026 | 20/05/2026 | Login refinado e estrutura principal | 🔲 |
-| 7 | Integração entre telas e backend | 21/04/2026 | 27/05/2026 | Fluxos web parcialmente validados | 🔨 |
-| 8 | Testes, documentação e evidências | 28/04/2026 | 30/06/2026 | Relatórios, prints e revisão final | 🔨 |
-| 9 | Preparação da apresentação | 01/05/2026 | 03/06/2026 | Slides e roteiro | 🔲 |
-| 10 | **Entrega / apresentação final** | 04/05/2026 | 04/06/2026 | Projeto final | 🔲 |
-
----
-
-## 📁 Estrutura do Repositório
-
-```text
-sigatccompact/
-│
-├── README.md
-│
-├── database/
-│   ├── connection.py
-│   ├── init_db.py
-│   └── schema.sql
-│
-├── models/
-│   ├── ativos.py
-│   └── usuario.py
-│
-├── services/
-│   ├── ativos_service.py
-│   ├── auth_service.py
-│   └── sistema_ativos.py
-│
-├── utils/
-│   ├── crypto.py
-│   └── validators.py
-│
-├── web/
-│   └── app.py
-│
-├── templates/
-│   ├── index.html
-│   ├── register.html
-│   └── recovery.html
-│
-├── static/
-│   └── index.css
-│
-├── docs/
-│   ├── relatorio-tecnico.docx
-│   ├── mini-relatorio-crud.docx
-│   └── monografia-tcc.pdf
-│
-├── main.py
-├── .env                  # local, não versionado
-├── .gitignore
-└── requirements.txt
-```
-controle_ativos/
-	├─ web/ (Flask app and templates)
-	├─ services/ (business logic)
-	├─ models/ (data models)
-	├─ database/ (connection and schema)
-	└─ utils/ (helpers, crypto, validators)
-
-docs/ (documentação organizada para TCC)
-tests/ (pytest)
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1
 ```
 
+### 2. Instalar dependências
 
-Contribuição e contato
+```bash
+pip install -r requirements.txt
+```
 
-Este repositório é mantido pelo autor do TCC. Para contribuições, siga o fluxo de branches e Pull Requests. Para dúvidas, abra uma issue.
+### 3. Configurar `.env`
 
-Equipe
+Use a raiz do repositório e ajuste os valores para o ambiente local:
 
-| Nome | Função / Responsabilidade |
-|---|---|
-| Mateus Santos | Backend e Segurança |
-| Felipe | Frontend |
-| Giovane | Documentação: proposta de vendas |
-| Laís | Documentação completa (monografia) |
-| Vitória | Documentação: problemas e propostas de solução |
+```env
+DB_HOST=localhost
+DB_PORT=3306
+DB_NAME=tcc
+DB_USER=<USUARIO_DO_BANCO>
+DB_PASSWORD=<SENHA_DO_BANCO>
+FLASK_SECRET_KEY=<CHAVE_SECRETA>
+APP_PEPPER=<PEPPER_LOCAL>
+```
 
-Licença / Observação acadêmica
+### 4. Inicializar o banco
 
----
+```bash
+python controle_ativos/database/init_db.py
+```
 
-## 🧭 Como Navegar este Projeto
+Esse comando cria o schema, aplica migrations e compatibiliza bancos locais antigos quando necessário.
 
-| Eu quero... | Vá para... |
-|-------------|-----------|
-| Entender o objetivo do sistema | [Sobre o Projeto](#-sobre-o-projeto) |
-| Ver o problema e justificativa | [Problema e Justificativa](#-problema-e-justificativa) |
-| Entender o recorte acadêmico | [Framework / Metodologia Adotada](#-framework--metodologia-adotada) |
-| Ver a estrutura técnica do backend | `database/`, `models/`, `services/`, `utils/` |
-| Rodar a versão terminal | `main.py` |
-| Evoluir a versão web | `web/app.py`, `templates/`, `static/` |
-| Entender as regras de negócio dos ativos | `services/ativos_service.py` e `utils/validators.py` |
-| Revisar a base de autenticação e segurança | `services/auth_service.py` e `utils/crypto.py` |
+### 5. Promover o primeiro `SUPER_ADMIN`
 
----
+```bash
+python controle_ativos/scripts/promover_super_admin.py
+```
 
-## 📊 Resultados e Conclusões
+### 6. Subir a aplicação
 
-### Principais Resultados
+```bash
+python controle_ativos/web/app.py
+```
 
-| Métrica / Indicador | AS-IS (antes) | TO-BE (depois/projetado) | Variação |
-|---------------------|---------------|--------------------------|----------|
-| Controle patrimonial | Manual / disperso | Digital / padronizado | Melhoria estrutural |
-| Rastreabilidade dos ativos | Baixa | Média a alta (projetada) | Ganho funcional |
-| Cadastro e autenticação | Inexistente no sistema | Implementado | +100% |
-| CRUD de ativos | Inexistente no sistema | Funcional em terminal | +100% |
-| Camada web | Não existente | Base criada e em evolução | Em progresso |
+### 7. Executar os testes
 
-### Conclusões
+```bash
+python -m pytest -q
+```
 
-1. O projeto já ultrapassou a fase de protótipo conceitual e possui base técnica funcional para autenticação, persistência e gestão de ativos.
-2. A arquitetura modular adotada favorece manutenção, evolução e alinhamento entre banco, regras de negócio e interfaces.
-3. O sistema já demonstra aderência prática ao problema proposto, atacando a falta de padronização e rastreabilidade de ativos.
-4. A principal limitação atual não está no núcleo do backend, mas na conclusão da camada web, na documentação acadêmica definitiva e nas evidências finais para apresentação.
+## Como aplicar migrations e inicializar o banco
 
-### Trabalhos Futuros
+- O fluxo atual usa `controle_ativos/database/init_db.py` como ponto de entrada.
+- O script aplica o schema base e as migrations disponíveis.
+- A migration 013 já faz parte do estado atual do banco e deve ser mantida no repositório.
+- Se o banco local tiver estruturas legadas, o inicializador ajusta apenas o necessário para não quebrar o fluxo atual.
 
-- Concluir a integração web ponta a ponta com autenticação e gestão de ativos em interface gráfica.
-- Ampliar testes de integração/end-to-end e documentação complementar de API e fluxos.
-- Evoluir o sistema para dashboard, relatórios gerenciais e possíveis módulos adicionais, como estoque e movimentação.
-- Revisar controles de segurança, LGPD, perfis de acesso e trilhas de auditoria.
+## Como criar o primeiro `SUPER_ADMIN`
 
----
+1. Inicialize o banco.
+2. Configure um usuário válido no banco, se ainda não existir.
+3. Execute `python controle_ativos/scripts/promover_super_admin.py`.
+4. Confirme o perfil `SUPER_ADMIN` na tela simples de gestão de usuários.
 
-## 📚 Referências
+## Testes
 
-1. ISACA. **COBIT 2019 Framework: Introduction and Methodology**. Schaumburg: ISACA, 2018.
-2. AXELOS. **ITIL Foundation: ITIL 4 Edition**. London: TSO, 2019.
-3. ASSOCIAÇÃO BRASILEIRA DE NORMAS TÉCNICAS. **ABNT NBR ISO/IEC 27001** — Segurança da informação, cibersegurança e proteção da privacidade. Rio de Janeiro: ABNT.
-4. PRESSMAN, Roger S.; MAXIM, Bruce R. **Engenharia de Software**. 8. ed. Porto Alegre: AMGH.
-5. SOMMERVILLE, Ian. **Engenharia de Software**. 10. ed. São Paulo: Pearson.
-6. SILBERSCHATZ, Abraham; KORTH, Henry F.; SUDARSHAN, S. **Sistema de Banco de Dados**. Porto Alegre: Bookman.
-7. MACHADO, Felipe Nery Rodrigues. **Banco de Dados: Projeto e Implementação**. São Paulo: Érica.
-8. Documentação técnica interna do projeto Sigatccompact.
+O projeto possui suíte automatizada com `pytest`. Os testes cobrem:
 
-> 📝 Lista bibliográfica final pode ser consolidada em `docs/referencias.bib`
+- autenticação e recuperação de senha;
+- CSRF e cookies de sessão;
+- rate limit de login/recuperação;
+- RBAC e permissões por perfil;
+- busca e filtro de ativos;
+- inicialização do banco e migrations;
+- tratamento de erros e rotas principais.
 
----
+O estado atual foi validado com `python -m pytest -q`.
 
-## 📖 Glossário de Termos Técnicos
+## Status atual do projeto
 
-### Termos Específicos deste Projeto
+- Backend funcional e consistente com a interface web atual.
+- RBAC implementado por perfil.
+- Listagem global de ativos consolidada.
+- Busca de ativos corrigida.
+- Migrations 012 e 013 presentes.
+- Inicialização do banco corrigida contra `Unread result found`.
+- Testes aprovados no estado atual.
 
-| Termo | Definição no contexto deste projeto |
-|-------|-------------------------------------|
-| **Ativo** | Equipamento ou recurso de TI cadastrado no sistema, com identificação, responsável, departamento, status e datas de controle. |
-| **Usuário responsável** | Pessoa vinculada ao uso operacional ou guarda do ativo no cadastro. |
-| **Status do ativo** | Estado operacional padronizado do item: Disponível, Em Uso, Em Manutenção, Reservado ou Baixado. |
-| **Pergunta de recuperação** | Campo usado como segunda camada de validação para redefinição de senha. |
-| **CRUD** | Conjunto de operações de criação, leitura, atualização e remoção aplicadas aos ativos. |
-| **Camada de serviço** | Parte do sistema onde ficam as regras de negócio e o controle das operações principais. |
-| **Camada web** | Estrutura em Flask responsável pela futura interface visual e exposição dos fluxos do sistema. |
+## Limitações conhecidas e evoluções futuras
 
-### Governança e Gestão de TI
+- A auditoria da interface ainda mostra eventos recentes em memória; persistência histórica em banco continua como evolução futura.
+- Permissões customizadas por usuário ainda não existem; o sistema usa perfis padrão.
+- Reautenticação para ações críticas ainda pode ser adicionada depois.
+- Exportação controlada de logs também fica para uma etapa posterior.
+- Headers de segurança mais avançados podem ser incorporados em evolução futura.
+- Uma interface administrativa mais rica para usuários e auditoria pode ser construída depois do TCC.
 
-| Termo | Definição |
-|-------|-----------|
-| **Governança de TI** | Estruturas, processos e mecanismos que garantem que a TI sustente e estenda a estratégia da organização. |
-| **Gestão de TI** | Execução operacional dos recursos, serviços e controles definidos para a área de tecnologia. |
-| **Alinhamento Estratégico** | Relação entre as necessidades institucionais e as soluções tecnológicas adotadas. |
-| **Compliance** | Conformidade com normas, políticas e exigências legais aplicáveis. |
-| **Maturidade** | Nível de evolução de um processo ou solução ao longo do tempo. |
-| **Stakeholder** | Parte interessada afetada pelo projeto, como equipe, escola, orientador e usuários. |
+## Documentação relacionada
 
-### COBIT 2019
-
-| Termo | Definição |
-|-------|-----------|
-| **COBIT** | Framework de governança e gestão de TI voltado a controle, valor, risco e alinhamento. |
-| **APO** | Domínio de alinhar, planejar e organizar. |
-| **BAI** | Domínio de construir, adquirir e implementar. |
-| **DSS** | Domínio de entregar, servir e suportar. |
-| **MEA** | Domínio de monitorar, avaliar e analisar. |
-| **RACI** | Matriz de responsabilidades: Responsible, Accountable, Consulted, Informed. |
-
-### ITIL v4
-
-| Termo | Definição |
-|-------|-----------|
-| **ITIL** | Conjunto de boas práticas para gerenciamento de serviços de TI. |
-| **Serviço** | Meio de entregar valor ao usuário sem transferir a ele todos os riscos e custos. |
-| **Incidente** | Interrupção não planejada ou redução da qualidade de um serviço. |
-| **Melhoria Contínua** | Prática de revisar e aperfeiçoar processos, rotinas e resultados de forma recorrente. |
-| **Service Desk** | Ponto central de contato entre usuário e suporte. |
-| **Catálogo de Serviços** | Lista estruturada de serviços oferecidos pela TI. |
-
-### Segurança da Informação
-
-| Termo | Definição |
-|-------|-----------|
-| **Hash** | Representação criptográfica usada para armazenar senhas e respostas sem manter o texto puro. |
-| **Pepper** | Segredo adicional aplicado ao processo de hash para reforço de segurança. |
-| **PBKDF2** | Algoritmo de derivação de chave usado para proteger credenciais com múltiplas iterações. |
-| **LGPD** | Lei Geral de Proteção de Dados, aplicável ao tratamento de dados pessoais. |
-| **Sessão** | Mecanismo para manter o usuário autenticado entre requisições na camada web. |
-| **Variável de ambiente** | Configuração sensível separada do código-fonte, usada para credenciais e segredos. |
-
-### Desenvolvimento e Arquitetura
-
-| Termo | Definição |
-|-------|-----------|
-| **Arquitetura modular** | Organização do projeto em partes independentes por responsabilidade. |
-| **Model** | Camada que representa as entidades principais do sistema, como usuário e ativo. |
-| **Service** | Camada de lógica de negócio, validações operacionais e integração com persistência. |
-| **Schema SQL** | Definição estrutural do banco de dados. |
-| **Context manager** | Recurso usado para gerenciar abertura e fechamento seguro de conexões e cursores. |
-| **Validação centralizada** | Estratégia de manter regras de consistência em utilitários únicos para reduzir duplicidade. |
-
----
-
-## 👥 Equipe
-
-| Nome | RA/Matrícula | Função no Projeto | Contato |
-|------|-------------|-------------------|---------|
-| Matheus Santos do Nascimento | 09862 | Back-end / Arquitetura / Integração técnica | matheus.nascimento237@etec.sp.gov.br |
-| Felipe dos Santos Nascimento | 10624 | Front-end / Interface visual | felipe.nascimento227@etec.sp.gov.br |
-| Lays Yuri Matukawa | 10413 | Documentação acadêmica | lays.matukawa@etec.sp.gov.br |
-| Vitória Lopes Siqueira | 10568 | Revisão e documentação | vitoria.siqueira24@etec.sp.gov.br |
-| Geovanny Iago Damasceno Mendes | 10522 | Organização e apoio documental | geovanny.mendes@etec.sp.gov.br |
-
----
-
-## 📄 Licença
-
-Este trabalho é de natureza acadêmica e foi desenvolvido como requisito parcial para conclusão do curso de **Manutenção e Suporte em Informática** na disciplina de **Governança de TI**.
-
-© 2026 ETEC Jaraguá — Todos os direitos reservados.
-
----
-
-## Checklist de Entrega do TCC
-
-### Documentação
-- [x] README.md preenchido e atualizado
-- [ ] Monografia/relatório revisado e formatado (ABNT)
-- [ ] Referências bibliográficas completas e verificadas
-- [x] Glossário contém os principais termos técnicos do trabalho
-
-### Artefatos Técnicos
-- [ ] Diagrama AS-IS do processo analisado
-- [ ] Diagrama TO-BE com a proposta de melhoria
-- [x] Artefato principal do projeto estruturado em código funcional
-- [ ] Matriz RACI preenchida
-- [ ] Plano de implementação com cronograma e responsáveis
-
-### Dados e Evidências
-- [ ] Dados de pesquisa/coleta organizados e anonimizados
-- [ ] Métricas de baseline documentadas com fonte
-- [ ] Resultados/projeções tabulados com justificativa
-- [ ] Instrumentos de coleta disponíveis
-
-### Apresentação
-- [ ] Slides da defesa preparados
-- [ ] Ensaio da apresentação realizado
-- [ ] Material de apoio para perguntas da banca
-
-### Repositório
-- [ ] Todos os arquivos no local correto conforme estrutura de pastas
-- [ ] `.gitignore` configurado adequadamente
-- [ ] Sem arquivos desnecessários ou temporários
-- [ ] Nomes de arquivos em padrão consistente
-
-### Verificação Final
-- [x] O README foi convertido do modelo para conteúdo real
-- [ ] Links internos do README revisados no repositório final
-- [ ] Todos os arquivos referenciados no README existem na estrutura final do GitHub
-- [ ] Revisão final de conformidade com LGPD
+- [RBAC - Perfis e Permissões](docs/rbac-perfis-permissoes.md)
+- [Plano de Interface e RBAC](docs/plano-interface-rbac.md)
+- [Auditoria da Interface e Templates](docs/auditoria-interface-templates.md)
+- [Banco de Dados](docs/banco-de-dados.md)
+- [Segurança](docs/seguranca.md)
+- [Checklist de Segurança Backend](docs/checklist-seguranca-backend.md)
+- [Riscos Conhecidos de Segurança](docs/riscos-conhecidos-seguranca.md)
+- [Plano de Correção de Segurança Backend](docs/plano-correcao-seguranca-backend.md)
 

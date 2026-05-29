@@ -6,7 +6,7 @@ Aceito
 
 ## Contexto
 
-O backend ja possui autenticacao, cookies explicitos, CSRF, mensagens genericas, rate limit, tratamento global de erros e auditoria basica. A proxima etapa de seguranca e separar o acesso por perfil sem reescrever a arquitetura nem introduzir gestao completa de usuarios.
+O backend ja possui autenticacao, cookies explicitos, CSRF, mensagens genericas, rate limit, tratamento global de erros, auditoria basica e interface web funcional. A necessidade atual e separar o acesso por perfil sem reescrever a arquitetura nem introduzir permissões customizadas por usuario.
 
 ## Decisao
 
@@ -19,6 +19,7 @@ A primeira migracao RBAC adiciona os campos `perfil`, `ativo`, `ultimo_login` e 
 - O controle de acesso fica declarativo nas rotas principais.
 - O login passa a gravar perfil e status ativo na sessao.
 - O usuario inativo nao consegue autenticar.
-- O CRUD atual continua funcionando com o filtro de propriedade por `criado_por` nesta fase.
+- A listagem de ativos passa a ser global para usuarios autenticados e `criado_por` permanece como metadado de autoria e auditoria.
 - O projeto ganha um caminho seguro para inicializar o primeiro `SUPER_ADMIN` sem hardcode.
-- A gestao de usuarios e a auditoria persistida continuam para fases posteriores.
+- A gestao simples de usuarios fica restrita ao `SUPER_ADMIN`.
+- A auditoria persistida e permissões customizadas continuam como evolucao futura.

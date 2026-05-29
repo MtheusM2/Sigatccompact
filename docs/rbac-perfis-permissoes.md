@@ -2,82 +2,79 @@
 
 ## Objetivo
 
-Introduzir controle de acesso por perfil no backend Flask sem refatorar a arquitetura inteira e sem quebrar o CRUD atual de ativos.
+Documentar a matriz real de acesso atualmente implementada no backend Flask, sem limitar a listagem global de ativos por autoria e sem prometer permissões customizadas que ainda não existem.
 
 ## Perfis
 
 ### SUPER_ADMIN
 
-- Acesso total nas rotas cobertas nesta fase.
-- Pode visualizar, criar, editar e excluir ativos.
-- Pode futuramente gerenciar usuarios e alterar perfis.
-- Pode acessar auditoria administrativa.
-- Nao pode ser rebaixado por ADMIN.
+- Visualiza todos os ativos.
+- Cria, edita e exclui ativos.
+- Cria usuários.
+- Gerencia usuários.
+- Acessa a auditoria simples.
 
 ### ADMIN
 
-- Pode visualizar, criar, editar e excluir ativos.
-- Pode acessar logs/auditoria basica, se a rota existir.
-- Nao pode alterar perfis nesta fase.
-- Nao pode gerenciar SUPER_ADMIN.
+- Visualiza todos os ativos.
+- Cria, edita e exclui ativos.
+- Não gerencia usuários.
+- Acessa a auditoria simples.
 
 ### USUARIO
 
-- Pode visualizar ativos.
-- Pode criar ativos.
-- Pode editar ativos permitidos pelo fluxo atual.
-- Nao pode excluir ativos.
-- Nao pode acessar gestao de usuarios.
-- Nao pode acessar auditoria administrativa.
+- Visualiza todos os ativos.
+- Cria ativos.
+- Edita qualquer ativo.
+- Não exclui ativos.
+- Não gerencia usuários.
+- Não acessa a gestão de usuários.
 
 ### LEITOR
 
-- Pode apenas visualizar dashboard, listagem e detalhes.
-- Nao pode criar, editar ou excluir ativos.
-- Nao pode acessar auditoria administrativa.
-- Nao pode gerenciar usuarios.
+- Visualiza dashboard, quantidades e tabela global.
+- Não cria, edita ou exclui ativos.
+- Não gerencia usuários.
+- Não acessa a auditoria administrativa.
 
 ## Matriz de permissoes
 
 | Permissao | SUPER_ADMIN | ADMIN | USUARIO | LEITOR |
 | --- | --- | --- | --- | --- |
 | `dashboard.acessar` | x | x | x | x |
-| `ativos.ver` | x | x | x | x |
+| `ativos.visualizar` | x | x | x | x |
 | `ativos.criar` | x | x | x | - |
 | `ativos.editar` | x | x | x | - |
 | `ativos.excluir` | x | x | - | - |
 | `auditoria.ver` | x | x | - | - |
+| `usuarios.criar` | x | - | - | - |
 | `usuarios.gerenciar` | x | - | - | - |
-| `usuarios.alterar_perfil` | x | - | - | - |
 
-## Decisoes de seguranca
+## Decisoes de modelagem e auditoria
 
-- As verificacoes de acesso sao centralizadas em `controle_ativos/utils/permissions.py`.
+- As verificacoes de acesso continuam centralizadas em `controle_ativos/utils/permissions.py`.
 - O login grava `perfil` e `ativo` na sessao, e o logout limpa a sessao inteira.
 - Usuario inativo nao autentica.
-- O primeiro SUPER_ADMIN e promovido por script seguro, sem hardcode de e-mail ou senha.
-- A fase atual nao cria tela complexa de gestao de usuarios.
-- A fase atual nao cria exportacao de logs, importacao, upload ou schema de auditoria persistida.
-- O controle por `criado_por` continua valido nos servicos de ativos nesta fase para reduzir risco de regressao.
+- A listagem de ativos e global para usuarios autenticados; `criado_por` agora e somente metadado de autoria e auditoria.
+- As operacoes de criar, editar e excluir sao registradas em logs tecnicos e refletem na trilha simples de auditoria da interface.
+- O primeiro `SUPER_ADMIN` continua sendo promovido por script, sem hardcode de credenciais.
+- A gestao de usuarios desta fase e simples e restrita ao `SUPER_ADMIN`.
 
-## Limitacoes desta fase
+## Limitacoes atuais
 
-- Nao existe ainda interface administrativa para usuarios.
-- Nao existe troca de perfil por rota publica.
-- Nao existe persistencia de auditoria em tabela dedicada.
-- O escopo de ativos continua limitado pelo fluxo atual de propriedade.
-- A gestao de bloqueio temporal por usuario ainda e apenas estrutural.
+- Nao existe permissao customizada por usuario.
+- Nao existe tabela persistida de auditoria historica.
+- A tela de auditoria mostra apenas eventos recentes em memoria.
+- Nao existe reautenticacao para acoes criticas.
 
 ## Proximos passos
 
-- Criar rotas administrativas seguras para gestao de usuarios.
-- Evoluir auditoria para tabela persistida quando houver demanda de consulta historica.
-- Reavaliar o escopo de `criado_por` para SUPER_ADMIN/ADMIN em uma proxima fase.
-- Se necessario, transformar `bloqueado_ate` em bloqueio temporal efetivo por usuario.
-- Adicionar exportacao controlada de auditoria apenas quando a persistencia existir.
+- Evoluir permissões customizadas apenas se houver necessidade real depois do TCC.
+- Persistir auditoria em banco quando houver demanda de consulta historica.
+- Adicionar reautenticacao para operações criticas em fase posterior.
 
 ## Referencias
 
-- Migration: `controle_ativos/database/migrations/012_rbac_usuarios.sql`
-- Script de promocao: `controle_ativos/scripts/promover_super_admin.py`
-- Utilitario central: `controle_ativos/utils/permissions.py`
+- Migrations: [012_rbac_usuarios.sql](../controle_ativos/database/migrations/012_rbac_usuarios.sql) e [013_email_responsavel_ativos.sql](../controle_ativos/database/migrations/013_email_responsavel_ativos.sql)
+- Script de promocao: [promover_super_admin.py](../controle_ativos/scripts/promover_super_admin.py)
+- Utilitario central: [permissions.py](../controle_ativos/utils/permissions.py)
