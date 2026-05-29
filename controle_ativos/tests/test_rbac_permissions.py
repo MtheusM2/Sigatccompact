@@ -58,6 +58,19 @@ def test_leitor_acessa_dashboard_e_listagem(client, monkeypatch):
     assert response_dashboard.status_code == 200
     assert response_listagem.status_code == 200
     assert response_listagem.get_json()["ativos"][0]["id"] == "AT-001"
+    assert b"Cadastrar ativos" not in response_dashboard.data
+    assert b"Editar ativos" not in response_dashboard.data
+    assert b"Excluir ativos" not in response_dashboard.data
+
+
+def test_dashboard_exibe_dados_do_usuario(client):
+    _login(client, perfil="USUARIO")
+
+    response = client.get("/dashboard")
+
+    assert response.status_code == 200
+    assert b"tester@example.com" in response.data
+    assert b"USUARIO" in response.data
 
 
 @pytest.mark.parametrize("perfil", ["LEITOR", "GUEST"])
@@ -163,6 +176,51 @@ def test_perfil_autorizado_exclui_ativo(client, monkeypatch, perfil):
 
     assert response.status_code == 200
     assert captured == {"id_ativo": "AT-001", "user_id": 1}
+
+
+@pytest.mark.parametrize(
+    "perfil,espera_excluir",
+    [
+        ("LEITOR", False),
+        ("USUARIO", False),
+        ("ADMIN", True),
+        ("SUPER_ADMIN", True),
+    ],
+)
+def test_dashboard_exibe_excluir_apenas_para_perfis_admin(client, perfil, espera_excluir):
+    _login(client, perfil=perfil)
+
+    response = client.get("/dashboard")
+
+    assert response.status_code == 200
+    assert b"Excluir ativos" not in response.data
+
+
+@pytest.mark.parametrize("perfil", ["SUPER_ADMIN", "ADMIN", "USUARIO", "LEITOR"])
+def test_todos_os_perfis_autenticados_visualizam_ativos_globais(client, monkeypatch, perfil):
+    _login(client, perfil=perfil)
+    monkeypatch.setattr(
+        app_module.ativos_service,
+        "listar_ativos",
+        lambda user_id: [_ativo(id_ativo="AT-001", criado_por=1), _ativo(id_ativo="AT-002", criado_por=2)],
+    )
+
+    response = client.get("/ativos")
+
+    assert response.status_code == 200
+    ativos = response.get_json()["ativos"]
+    assert [ativo["id"] for ativo in ativos] == ["AT-001", "AT-002"]
+    assert {ativo["criado_por"] for ativo in ativos} == {1, 2}
+
+
+@pytest.mark.parametrize("perfil", ["ADMIN", "USUARIO", "LEITOR"])
+def test_gestao_de_usuarios_rejeita_perfis_nao_super_admin(client, perfil):
+    _login(client, perfil=perfil)
+
+    response = client.get("/usuarios")
+
+    assert response.status_code == 403
+    assert b"Acesso negado" in response.data
 
 
 def test_usuario_inativo_nao_autentica(client, monkeypatch):

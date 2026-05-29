@@ -41,16 +41,23 @@ def test_404_html_retorna_pagina_controlada(client):
 
 
 def test_403_html_retorna_pagina_controlada(client, monkeypatch):
+    with client.session_transaction() as sess:
+        sess["user_id"] = 1
+        sess["email"] = "tester@example.com"
+        sess["perfil"] = "ADMIN"
+        sess["ativo"] = True
+
     def _raise_forbidden():
         raise Forbidden()
 
-    monkeypatch.setitem(app_module.app.view_functions, "home", _raise_forbidden)
+    monkeypatch.setitem(app_module.app.view_functions, "dashboard_page", _raise_forbidden)
 
-    response = client.get("/")
+    response = client.get("/dashboard")
 
     assert response.status_code == 403
     assert response.content_type.startswith("text/html")
-    assert b"Acesso negado" in response.data
+    assert b"Acesso negado. Seu perfil n" in response.data
+    assert b"Voltar ao dashboard" in response.data
 
 
 def test_405_api_retorna_resposta_controlada(client):

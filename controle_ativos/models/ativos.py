@@ -14,6 +14,7 @@ class Ativo:
         status,
         data_entrada,
         data_saida=None,
+        email_responsavel=None,
         criado_por=None
     ):
         self.id_ativo = id_ativo
@@ -25,6 +26,7 @@ class Ativo:
         self.status = status
         self.data_entrada = data_entrada
         self.data_saida = data_saida
+        self.email_responsavel = email_responsavel
         self.criado_por = criado_por
         # empresa_id reservado para futura evolução multi-tenant.
 
@@ -37,6 +39,7 @@ class Ativo:
             "tipo": self.tipo,
             "marca": self.marca,
             "modelo": self.modelo,
+            "email_responsavel": self.email_responsavel,
             "usuario_responsavel": self.usuario_responsavel,
             "departamento": self.departamento,
             "status": self.status,

@@ -8,9 +8,14 @@ from controle_ativos.utils.audit import audit_event
 
 PERFIS_VALIDOS = ("SUPER_ADMIN", "ADMIN", "USUARIO", "LEITOR")
 
+_ALIAS_PERMISSOES = {
+    "ativos.ver": "ativos.visualizar",
+}
+
 PERMISSOES_POR_PERFIL = {
     "SUPER_ADMIN": {
         "dashboard.acessar",
+        "ativos.visualizar",
         "ativos.ver",
         "ativos.criar",
         "ativos.editar",
@@ -21,6 +26,7 @@ PERMISSOES_POR_PERFIL = {
     },
     "ADMIN": {
         "dashboard.acessar",
+        "ativos.visualizar",
         "ativos.ver",
         "ativos.criar",
         "ativos.editar",
@@ -29,12 +35,14 @@ PERMISSOES_POR_PERFIL = {
     },
     "USUARIO": {
         "dashboard.acessar",
+        "ativos.visualizar",
         "ativos.ver",
         "ativos.criar",
         "ativos.editar",
     },
     "LEITOR": {
         "dashboard.acessar",
+        "ativos.visualizar",
         "ativos.ver",
     },
 }
@@ -86,7 +94,9 @@ def has_permission(usuario, permissao: str) -> bool:
     perfil = _perfil_normalizado(usuario)
     if perfil not in PERFIS_VALIDOS:
         return False
-    return permissao in PERMISSOES_POR_PERFIL.get(perfil, set())
+    permissao_normalizada = _ALIAS_PERMISSOES.get(permissao, permissao)
+    permissoes = PERMISSOES_POR_PERFIL.get(perfil, set())
+    return permissao in permissoes or permissao_normalizada in permissoes
 
 
 def is_super_admin(usuario) -> bool:

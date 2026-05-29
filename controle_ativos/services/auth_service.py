@@ -42,8 +42,17 @@ class AuthService:
     Serviço responsável por cadastro, autenticação e recuperação de senha.
     """
 
-    def registrar_usuario(self, email: str, senha: str, pergunta: str, resposta: str) -> int:
+    def registrar_usuario(
+        self,
+        email: str,
+        senha: str,
+        pergunta: str,
+        resposta: str,
+        perfil: str = "USUARIO",
+        ativo: bool = True,
+    ) -> int:
         email_norm = _normalizar_email(email)
+        perfil_norm = (perfil or "USUARIO").strip().upper()
 
         if not validar_email(email_norm):
             raise AuthErro("E-mail inválido.")
@@ -73,10 +82,10 @@ class AuthService:
 
             cur.execute(
                 """
-                INSERT INTO usuarios (email, senha_hash, pergunta_recuperacao, resposta_recuperacao_hash)
-                VALUES (%s, %s, %s, %s)
+                INSERT INTO usuarios (email, senha_hash, pergunta_recuperacao, resposta_recuperacao_hash, perfil, ativo)
+                VALUES (%s, %s, %s, %s, %s, %s)
                 """,
-                (email_norm, senha_hash, pergunta.strip(), resposta_hash)
+                (email_norm, senha_hash, pergunta.strip(), resposta_hash, perfil_norm, 1 if ativo else 0)
             )
 
             return int(cur.lastrowid)

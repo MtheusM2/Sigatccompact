@@ -171,6 +171,8 @@ def test_asset_crud_generates_events_and_no_sensitive_data(client, monkeypatch, 
     )
     assert response.status_code == 200
     assert _capture_event(caplog, '"event": "asset_updated"')
+    assert '"id_ativo": "AT-001"' in caplog.text
+    assert '"edited_by": "tester@example.com"' in caplog.text
 
     # Delete
     monkeypatch.setattr(app_module.ativos_service, "remover_ativo", lambda id_ativo, user_id: None)

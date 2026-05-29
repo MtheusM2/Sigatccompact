@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}Gestão de usuários | Gestão de Ativos{% endblock %}
+
+{% block content %}
+{% set perfil_atual = session.get('perfil', 'USUARIO') %}
+<main class="page-shell">
+    <section class="page-card form-panel">
+        <div class="page-header">
+            <p class="eyebrow">SUPER_ADMIN</p>
+            <h1>Gestão de usuários</h1>
+            <p class="page-lead">Altere perfil e status de usuários sem sair da interface simples do sistema.</p>
+            <p class="page-note">O próprio SUPER_ADMIN não pode se desativar nem remover o próprio perfil SUPER_ADMIN.</p>
+        </div>
+
+        {% if mensagem %}
+            <p class="page-note">{{ mensagem }}</p>
+        {% endif %}
+
+        <section class="page-card page-card--nested">
+            <div class="page-header">
+                <p class="eyebrow">Criação simples</p>
+                <h2>Novo usuário</h2>
+                <p class="page-lead">Cadastro direto para SUPER_ADMIN, sem fluxo avançado.</p>
+            </div>
+
+            <form class="form_cadastro_ativos" method="post" action="{{ url_for('criar_usuario') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="caixa_cadastro_ativos">
+                    <div class="linha1">
+                        <div class="linhas">
+                            <label for="email">E-mail:</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        <div class="linhas">
+                            <label for="senha">Senha inicial:</label>
+                            <input type="password" id="senha" name="senha" required>
+                        </div>
+                        <div class="linhas">
+                            <label for="perfil">Perfil:</label>
+                            <select class="status_cadastro" id="perfil" name="perfil">
+                                <option value="ADMIN">ADMIN</option>
+                                <option value="USUARIO" selected>USUARIO</option>
+                                <option value="LEITOR">LEITOR</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="linha2">
+                        <div class="linhas">
+                            <label for="pergunta_recuperacao">Pergunta de recuperação:</label>
+                            <input type="text" id="pergunta_recuperacao" name="pergunta_recuperacao" required>
+                        </div>
+                        <div class="linhas">
+                            <label for="resposta_recuperacao">Resposta de recuperação:</label>
+                            <input type="text" id="resposta_recuperacao" name="resposta_recuperacao" required>
+                        </div>
+                        <div class="linhas">
+                            <label for="ativo">Status:</label>
+                            <select class="status_cadastro" id="ativo" name="ativo">
+                                <option value="1" selected>Ativo</option>
+                                <option value="0">Inativo</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="botoes_cadastro">
+                        <input class="nome_botao_cadastro" type="submit" value="Criar usuário">
+                    </div>
+                </div>
+            </form>
+        </section>
+
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>E-mail</th>
+                        <th>Perfil</th>
+                        <th>Status</th>
+                        <th>Alterar perfil</th>
+                        <th>Ação de status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for usuario in usuarios %}
+                        {% set is_self = usuario.id == usuario_logado_id %}
+                        <tr>
+                            <td>{{ usuario.email }}</td>
+                            <td><span class="profile-badge profile-badge--{{ usuario.perfil|lower|replace(' ', '-') }}">{{ usuario.perfil }}</span></td>
+                            <td>{{ 'Ativo' if usuario.ativo else 'Inativo' }}</td>
+                            <td>
+                                <form class="inline-form" method="post" action="{{ url_for('atualizar_perfil_usuario', usuario_id=usuario.id) }}">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <select name="perfil" {% if is_self and usuario.perfil == 'SUPER_ADMIN' %}disabled{% endif %}>
+                                        <option value="ADMIN" {% if usuario.perfil == 'ADMIN' %}selected{% endif %}>ADMIN</option>
+                                        <option value="USUARIO" {% if usuario.perfil == 'USUARIO' %}selected{% endif %}>USUARIO</option>
+                                        <option value="LEITOR" {% if usuario.perfil == 'LEITOR' %}selected{% endif %}>LEITOR</option>
+                                    </select>
+                                    <button class="btn btn-secondary" type="submit" {% if is_self and usuario.perfil == 'SUPER_ADMIN' %}disabled{% endif %}>Salvar perfil</button>
+                                </form>
+                            </td>
+                            <td>
+                                <form class="inline-form" method="post" action="{{ url_for('atualizar_status_usuario', usuario_id=usuario.id) }}">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <input type="hidden" name="ativo" value="{{ '0' if usuario.ativo else '1' }}">
+                                    <button class="btn {% if usuario.ativo %}btn-danger{% else %}btn-primary{% endif %}" type="submit" {% if is_self and usuario.perfil == 'SUPER_ADMIN' %}disabled{% endif %}>
+                                        {% if usuario.ativo %}Desativar{% else %}Ativar{% endif %}
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+{% endblock %}

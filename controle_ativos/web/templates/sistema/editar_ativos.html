@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Editar ativos | Gestão de Ativos{% endblock %}
+
+{% block content %}
+{% set ativo = ativo_selecionado %}
+<main class="page-shell">
+	<section class="page-card form-panel">
+		<div class="page-header">
+			<p class="eyebrow">Operação permitida</p>
+			<h1>Editar ativos</h1>
+			<p class="page-lead">Atualize qualquer ativo permitido pelo seu perfil. Selecione um registro na tabela para carregar o formulário.</p>
+			<p class="page-note">O ID vem da listagem e permanece somente leitura.</p>
+		</div>
+
+		<form class="form_cadastro_ativos" id="editar_ativos_form">
+			<div class="caixa_cadastro_ativos">
+				<div class="linha1">
+					<div class="linhas">
+						<label for="id_ativo">ID do ativo:</label>
+						<input type="text" id="id_ativo" name="id_ativo" value="{{ ativo.id_ativo if ativo else '' }}" readonly required>
+					</div>
+					<div class="linhas">
+						<label for="tipo">Tipo:</label>
+						<select class="status_cadastro" name="tipo" id="tipo" required>
+							<option value="Notebook" {% if ativo and ativo.tipo == 'Notebook' %}selected{% endif %}>Notebook</option>
+							<option value="Desktop" {% if ativo and ativo.tipo == 'Desktop' %}selected{% endif %}>Desktop</option>
+							<option value="Monitor" {% if ativo and ativo.tipo == 'Monitor' %}selected{% endif %}>Monitor</option>
+							<option value="Impressora" {% if ativo and ativo.tipo == 'Impressora' %}selected{% endif %}>Impressora</option>
+							<option value="Periférico" {% if ativo and ativo.tipo == 'Periférico' %}selected{% endif %}>Periférico</option>
+						</select>
+					</div>
+					<div class="linhas">
+						<label for="marca">Marca:</label>
+						<input type="text" id="marca" name="marca" value="{{ ativo.marca if ativo else '' }}" required>
+					</div>
+				</div>
+
+				<div class="linha2">
+					<div class="linhas">
+						<label for="modelo">Modelo:</label>
+						<input type="text" id="modelo" name="modelo" value="{{ ativo.modelo if ativo else '' }}" required>
+					</div>
+					<div class="linhas">
+						<label for="email_responsavel">E-mail do responsável:</label>
+						<input type="email" id="email_responsavel" name="email_responsavel" value="{{ ativo.email_responsavel if ativo and ativo.email_responsavel else '' }}" placeholder="responsavel@exemplo.com">
+					</div>
+					<div class="linhas">
+						<label for="usuario_responsavel">Usuário Responsável:</label>
+						<input type="text" id="usuario_responsavel" name="usuario_responsavel" value="{{ ativo.usuario_responsavel if ativo else '' }}" required>
+					</div>
+				</div>
+
+				<div class="linha3">
+					<div class="linhas">
+						<label for="departamento">Departamento:</label>
+						<select class="status_cadastro" name="departamento" id="departamento" required>
+							<option value="TI" {% if ativo and ativo.departamento == 'TI' %}selected{% endif %}>TI</option>
+							<option value="RH" {% if ativo and ativo.departamento == 'RH' %}selected{% endif %}>RH</option>
+							<option value="Administração" {% if ativo and ativo.departamento == 'Administração' %}selected{% endif %}>Administração</option>
+							<option value="Financeiro" {% if ativo and ativo.departamento == 'Financeiro' %}selected{% endif %}>Financeiro</option>
+							<option value="Suporte" {% if ativo and ativo.departamento == 'Suporte' %}selected{% endif %}>Suporte</option>
+						</select>
+					</div>
+					<div class="linhas">
+						<label for="status">Status:</label>
+						<select class="status_cadastro" name="status" id="status" required>
+							<option value="Disponível" {% if ativo and ativo.status == 'Disponível' %}selected{% endif %}>Disponível</option>
+							<option value="Em Uso" {% if ativo and ativo.status == 'Em Uso' %}selected{% endif %}>Em Uso</option>
+							<option value="Em Manutenção" {% if ativo and ativo.status == 'Em Manutenção' %}selected{% endif %}>Em Manutenção</option>
+							<option value="Reservado" {% if ativo and ativo.status == 'Reservado' %}selected{% endif %}>Reservado</option>
+							<option value="Baixado" {% if ativo and ativo.status == 'Baixado' %}selected{% endif %}>Baixado</option>
+						</select>
+					</div>
+					<div class="linhas">
+						<label for="data_entrada">Data de Entrada:</label>
+						<input type="date" id="data_entrada" name="data_entrada" value="{{ ativo.data_entrada if ativo else '' }}" required>
+					</div>
+					<div class="linhas">
+						<label for="data_saida">Data de Saída:</label>
+						<input type="date" id="data_saida" name="data_saida" value="{{ ativo.data_saida if ativo and ativo.data_saida else '' }}">
+					</div>
+				</div>
+
+				<div class="botoes_cadastro">
+					<input class="nome_botao_cadastro" type="submit" value="Salvar alterações">
+				</div>
+			</div>
+		</form>
+	</section>
+</main>
+{% endblock %}

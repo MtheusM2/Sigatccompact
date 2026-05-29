@@ -85,6 +85,21 @@ def validar_texto_obrigatorio(valor: str, nome_campo: str, tamanho_maximo: int =
     return True, ""
 
 
+def validar_texto_opcional(valor: str, nome_campo: str, tamanho_maximo: int = 100) -> tuple[bool, str]:
+    """
+    Valida campos textuais opcionais.
+    """
+    valor = (valor or "").strip()
+
+    if not valor:
+        return True, ""
+
+    if len(valor) > tamanho_maximo:
+        return False, f"O campo {nome_campo} deve ter no máximo {tamanho_maximo} caracteres."
+
+    return True, ""
+
+
 def padronizar_texto(valor: str, modo: str = "title") -> str:
     """
     Padroniza texto de acordo com o modo informado.
@@ -196,10 +211,16 @@ def validar_ativo(ativo) -> None:
         (ativo.tipo, "tipo"),
         (ativo.marca, "marca"),
         (ativo.modelo, "modelo"),
+        (getattr(ativo, "email_responsavel", None), "email_responsavel"),
         (ativo.usuario_responsavel, "usuario_responsavel"),
         (ativo.departamento, "departamento"),
     ]:
-        ok, msg = validar_texto_obrigatorio(valor, nome)
+        if nome == "email_responsavel":
+            ok, msg = validar_texto_opcional(valor, nome, 255)
+            if ok and (valor or "").strip() and not validar_email(valor):
+                raise ValueError("E-mail do responsável inválido.")
+        else:
+            ok, msg = validar_texto_obrigatorio(valor, nome)
         if not ok:
             raise ValueError(msg)
 

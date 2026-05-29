@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Excluir ativos | Gestão de Ativos{% endblock %}
+
+{% block content %}
+{% set ativo = ativo_selecionado %}
+<main class="page-shell">
+	<section class="page-card form-panel">
+		<div class="page-header">
+			<p class="eyebrow">Ação restrita</p>
+			<h1>Excluir ativos</h1>
+			<p class="page-lead">Confirme o ativo carregado pela tabela antes de excluir. Apenas ADMIN e SUPER_ADMIN podem prosseguir.</p>
+			<p class="page-note">USUARIO e LEITOR não possuem acesso a esta operação.</p>
+		</div>
+
+		<form class="form_cadastro_ativos" id="excluir_ativos_form">
+			<div class="caixa_cadastro_ativos">
+				<div class="linha1">
+					<div class="linhas">
+						<label for="id_ativo_excluir">ID do ativo:</label>
+						<input type="text" id="id_ativo_excluir" name="id_ativo_excluir" value="{{ ativo.id_ativo if ativo else '' }}" readonly required>
+					</div>
+					<div class="linhas">
+						<label for="resumo_ativo">Resumo:</label>
+						<input type="text" id="resumo_ativo" value="{{ ativo.tipo if ativo else '' }}{{ ' - ' + ativo.modelo if ativo and ativo.modelo else '' }}" readonly>
+					</div>
+				</div>
+
+				<div class="botoes_cadastro">
+					<input class="nome_botao_cadastro btn-danger" type="submit" value="Excluir ativo">
+				</div>
+			</div>
+		</form>
+	</section>
+</main>
+{% endblock %}

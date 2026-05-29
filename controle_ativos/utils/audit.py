@@ -1,10 +1,12 @@
 import logging
+from collections import deque
 from datetime import datetime
 from typing import Any, Dict, Optional
 import json
 
 LOGGER_NAME = "controle_ativos.audit"
 logger = logging.getLogger(LOGGER_NAME)
+RECENT_EVENTS = deque(maxlen=50)
 
 
 def _scrub_dict(d: Dict[str, Any]) -> Dict[str, Any]:
@@ -56,9 +58,12 @@ def audit_event(
     if extra:
         payload["extra"] = _scrub_dict(extra)
 
-    try:
-        # Ensure message is JSON for easier parsing in logs.
-        logger.info(json.dumps(payload, ensure_ascii=False))
-    except Exception:
-        # Fallback to string representation to avoid raising during request handling.
-        logger.info(str(payload))
+    logger.info(json.dumps(payload, ensure_ascii=False, default=str))
+
+    RECENT_EVENTS.appendleft(payload)
+
+
+def get_recent_events(limit: int = 20) -> list[Dict[str, Any]]:
+    """Retorna uma janela recente dos eventos de auditoria disponíveis."""
+    limit = max(0, min(int(limit), len(RECENT_EVENTS)))
+    return list(RECENT_EVENTS)[:limit]
