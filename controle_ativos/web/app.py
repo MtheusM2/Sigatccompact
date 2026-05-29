@@ -21,13 +21,14 @@ from controle_ativos.utils.security import (
     AUTH_RATE_LIMIT_MESSAGE,
     clear_auth_rate_limit,
     client_ip,
-    login_required,
     csrf_token,
     is_auth_rate_limited,
     normalize_email_for_rate_limit,
     register_auth_rate_limit_failure,
     validate_csrf_request,
 )
+
+from controle_ativos.utils.permissions import permission_required, role_required
 
 from controle_ativos.utils.audit import audit_event
 
@@ -39,6 +40,7 @@ from controle_ativos.services.auth_service import (
     UsuarioNaoEncontrado,
     CredenciaisInvalidas,
     RecuperacaoInvalida,
+    UsuarioInativo,
 )
 
 # Importa o serviço de ativos e suas exceções específicas.
@@ -173,7 +175,7 @@ def recovery_form():
 
 
 @app.get("/dashboard")
-@login_required
+@role_required("SUPER_ADMIN", "ADMIN", "USUARIO", "LEITOR")
 def dashboard_page():
     """Retorna a página do dashboard, que lista os ativos."""
     return _render_pagina_sistema("dashboard.html")
@@ -186,31 +188,31 @@ def _render_pagina_sistema(template_name: str):
 
 
 @app.get("/dashboard/status")
-@login_required
+@role_required("SUPER_ADMIN", "ADMIN", "USUARIO", "LEITOR")
 def dashboard_status():
     return _render_pagina_sistema("sistema/status_ativos.html")
 
 
 @app.get("/dashboard/buscar")
-@login_required
+@role_required("SUPER_ADMIN", "ADMIN", "USUARIO", "LEITOR")
 def dashboard_buscar():
     return _render_pagina_sistema("sistema/buscar_ativos.html")
 
 
 @app.get("/dashboard/cadastrar")
-@login_required
+@role_required("SUPER_ADMIN", "ADMIN", "USUARIO", "LEITOR")
 def dashboard_cadastrar():
     return _render_pagina_sistema("sistema/cadastrar_ativos.html")
 
 
 @app.get("/dashboard/editar")
-@login_required
+@role_required("SUPER_ADMIN", "ADMIN", "USUARIO", "LEITOR")
 def dashboard_editar():
     return _render_pagina_sistema("sistema/editar_ativos.html")
 
 
 @app.get("/dashboard/excluir")
-@login_required
+@role_required("SUPER_ADMIN", "ADMIN", "USUARIO", "LEITOR")
 def dashboard_excluir():
     return _render_pagina_sistema("sistema/excluir_ativos.html")
 
@@ -327,12 +329,22 @@ def login():
             senha=data["senha"],
         )
 
+        if not getattr(usuario, "ativo", True):
+            raise UsuarioInativo("Usuário inativo.")
+
         # Limpa qualquer dado de sessão existente antes de gravar novo usuário
         session.clear()
         session["user_id"] = usuario.id
         session["email"] = usuario.email
+        session["perfil"] = getattr(usuario, "perfil", "USUARIO")
+        session["ativo"] = bool(getattr(usuario, "ativo", True))
+        session["bloqueado_ate"] = getattr(usuario, "bloqueado_ate", None)
         # session["empresa_id"] = usuario.empresa_id  # reservado para futura multi-tenant
         clear_auth_rate_limit("login", ip_origem, email_normalizado)
+        try:
+            auth_service.registrar_ultimo_login(usuario.id)
+        except Exception:
+            pass
         try:
             audit_event(
                 event="login_success",
@@ -349,7 +361,7 @@ def login():
         return jsonify({"ok": True, "email": usuario.email})
     except KeyError as erro:
         return _erro_json(f"Campo obrigatório ausente: {erro.args[0]}", 400)
-    except (UsuarioNaoEncontrado, CredenciaisInvalidas) as erro:
+    except (UsuarioNaoEncontrado, CredenciaisInvalidas, UsuarioInativo) as erro:
         register_auth_rate_limit_failure("login", ip_origem, email_normalizado)
         app.logger.warning(
             "Falha de login: ip=%s email=%s motivo=%s",
@@ -468,7 +480,7 @@ def forgot_password():
 
 
 @app.get("/ativos")
-@login_required
+@permission_required("ativos.ver")
 def listar_ativos():
     """
     Lista todos os ativos do usuário autenticado.
@@ -481,7 +493,7 @@ def listar_ativos():
 
 
 @app.post("/ativos")
-@login_required
+@permission_required("ativos.criar")
 def criar_ativo():
     """
     Cria um novo ativo para o usuário autenticado.
@@ -532,7 +544,7 @@ def criar_ativo():
 
 
 @app.get("/ativos/<id_ativo>")
-@login_required
+@permission_required("ativos.ver")
 def buscar_ativo(id_ativo):
     """
     Busca um ativo específico do usuário autenticado.
@@ -549,7 +561,7 @@ def buscar_ativo(id_ativo):
 
 
 @app.put("/ativos/<id_ativo>")
-@login_required
+@permission_required("ativos.editar")
 def atualizar_ativo(id_ativo):
     """
     Atualiza um ativo do usuário autenticado.
@@ -584,7 +596,7 @@ def atualizar_ativo(id_ativo):
 
 
 @app.delete("/ativos/<id_ativo>")
-@login_required
+@permission_required("ativos.excluir")
 def remover_ativo(id_ativo):
     """
     Remove um ativo do usuário autenticado.

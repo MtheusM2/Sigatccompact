@@ -24,11 +24,13 @@ def _csrf_headers(client, token_override=None):
     return {"X-CSRF-Token": token}
 
 
-def _login(client, user_id=1):
+def _login(client, user_id=1, perfil="USUARIO", ativo=True):
     """Cria uma sessão autenticada sem depender do banco de dados."""
     with client.session_transaction() as sess:
         sess["user_id"] = user_id
         sess["email"] = "tester@example.com"
+        sess["perfil"] = perfil
+        sess["ativo"] = ativo
 
 
 def _ativo(id_ativo="AT-001", criado_por=1):
@@ -135,6 +137,8 @@ def test_login_caminho_sucesso_grava_sessao(client, monkeypatch):
     with client.session_transaction() as sess:
         assert sess["user_id"] == 9
         assert sess["email"] == "tester@example.com"
+        assert sess["perfil"] == "USUARIO"
+        assert sess["ativo"] is True
 
 
 def test_forgot_password_rejeita_payload_incompleto(client):
@@ -347,7 +351,7 @@ def test_buscar_ativo_nao_encontrado_retorna_404(client, monkeypatch):
 
 
 def test_remover_ativo_traduz_erro_do_servico(client, monkeypatch):
-    _login(client)
+    _login(client, perfil="ADMIN")
 
     def _fake_remover_ativo(*args, **kwargs):
         raise app_module.AtivoErro("Não foi possível remover o ativo.")
@@ -367,7 +371,7 @@ def test_remover_ativo_traduz_erro_do_servico(client, monkeypatch):
 
 
 def test_remover_ativo_caminho_sucesso_delega_para_service(client, monkeypatch):
-    _login(client, user_id=7)
+    _login(client, user_id=7, perfil="ADMIN")
     captured = {}
 
     def _fake_remover_ativo(id_ativo, user_id):

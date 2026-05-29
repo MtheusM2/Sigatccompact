@@ -2,7 +2,7 @@
 
 ## Contexto
 
-O sistema esta em fase de TCC e deve ser tratado como aplicacao interna/controlada, nao exposta publicamente. O objetivo imediato e consolidar a base Flask/MySQL com autenticacao e CRUD de ativos antes de implementar RBAC com os perfis `SUPER_ADMIN`, `ADMIN`, `USUARIO` e `LEITOR`.
+O sistema esta em fase de TCC e deve ser tratado como aplicacao interna/controlada, nao exposta publicamente. O objetivo imediato e consolidar a base Flask/MySQL com autenticacao, CRUD de ativos e RBAC com os perfis `SUPER_ADMIN`, `ADMIN`, `USUARIO` e `LEITOR`.
 
 Esta lista registra riscos conhecidos para evitar falsa sensacao de seguranca e orientar a ordem de evolucao.
 
@@ -15,7 +15,7 @@ Importacao, exportacao e upload de arquivos estao fora do escopo atual porque na
 | Ausencia de CSRF em formularios e endpoints mutaveis. | Um site externo poderia tentar acionar POST/PUT/DELETE usando a sessao do navegador. | Alto | Corrigido com token por sessao e validacao global nas rotas mutaveis. | Manter cobertura de testes ao criar novos endpoints mutaveis. |
 | Cookies de sessao nao configurados explicitamente. | Dependencia de defaults e falta de politica clara para HTTPS/producao. | Alto | Corrigido com `SESSION_COOKIE_HTTPONLY`, `SESSION_COOKIE_SAMESITE` e `SESSION_COOKIE_SECURE`. | Revisar apenas se o ambiente HTTPS mudar. |
 | Falta de decorator central de autenticacao. | Novas rotas podem esquecer validacao de sessao. | Alto | Corrigido com `login_required` aplicado nas rotas privadas. | Manter padrao deny-by-default em rotas novas. |
-| Sem RBAC/perfis. | Usuario autenticado tem o mesmo nivel funcional nas rotas de ativos. | Alto | Nao ha perfil no schema nem decorators de permissao. | Implementar RBAC apos base P0. |
+| RBAC/perfis basicos. | Usuario autenticado passa a ter niveis diferentes por rota, mas o escopo de ativos ainda e limitado por `criado_por` nesta fase. | Medio | Implementado com campos de perfil, decorators e testes; a gestao de usuarios ainda nao existe. | Evoluir usuarios, auditoria persistida e escopos administrativos em fase posterior. |
 | Sem rate limit/bloqueio temporario. | Login e recuperacao ficam mais expostos a tentativa automatizada. | Alto | Corrigido com limite simples em memoria por IP/e-mail e bloqueio temporario. | Evoluir para store compartilhado se o backend escalar horizontalmente. |
 | Possivel enumeracao de usuario. | Mensagens diferentes podem indicar se e-mail existe. | Medio | Corrigido com mensagens publicas genericas em login e recuperacao. | Manter log tecnico interno sem expor detalhes ao cliente. |
 | Sem logs/auditoria estruturados. | Dificulta investigar alteracoes e falhas. | Alto | Corrigido com logs basicos em aplicacao (emitidos ao logger de auditoria). | Criar tabela/service de auditoria para persistencia e exportacao. |
@@ -27,7 +27,7 @@ Importacao, exportacao e upload de arquivos estao fora do escopo atual porque na
 
 | Risco aceito | Justificativa tecnica | Condicao de aceite |
 | ------------ | --------------------- | ------------------ |
-| Ausencia de RBAC no momento. | O pedido atual e auditar e documentar antes de criar perfis; o CRUD atual limita ativos por `criado_por`. | Nao expor publicamente e corrigir P0 antes de implementar RBAC. |
+| Escopo administrativo incompleto. | O pedido atual introduz RBAC basico, mas o CRUD continua limitado por `criado_por` e nao existe gestao completa de usuarios. | Manter o escopo atual, criar rotas administrativas apenas em fase posterior e revisar o modelo de acesso quando necessario. |
 | Sem auditoria completa em banco. | Criar tabela e fluxo de auditoria altera modelo de dados, o que foi excluido desta etapa. | Registrar risco e planejar para Fase 1. |
 | Importacao/exportacao/upload de arquivos fora do escopo atual. | Codigo atual nao mostra endpoints de importacao, exportacao ou upload; implementar exportacao agora criaria superficie de ataque desnecessaria. | Manter fora do escopo. Evolucao futura apenas para exportacao controlada de logs/auditoria para `SUPER_ADMIN` ou `ADMIN`, depois da auditoria persistida. |
 | Politica de senha simples. | Para ambiente interno/TCC, comprimento minimo ja reduz senhas muito fracas sem criar alta friccao. | Reavaliar antes de uso real por terceiros. |

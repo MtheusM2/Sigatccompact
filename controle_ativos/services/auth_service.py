@@ -1,6 +1,8 @@
-from controle_ativos.models.usuario import Usuario
+import mysql.connector
+
 from controle_ativos.database.connection import cursor_mysql
-from controle_ativos.utils.crypto import gerar_hash, verificar_hash, normalizar_resposta_recuperacao
+from controle_ativos.models.usuario import Usuario
+from controle_ativos.utils.crypto import gerar_hash, normalizar_resposta_recuperacao, verificar_hash
 from controle_ativos.utils.validators import validar_email, validar_senha, validar_texto_obrigatorio
 
 
@@ -22,6 +24,10 @@ class CredenciaisInvalidas(AuthErro):
 
 class RecuperacaoInvalida(AuthErro):
     """Erro para recuperação inválida."""
+
+
+class UsuarioInativo(AuthErro):
+    """Erro para usuário inativo ou bloqueado."""
 
 
 def _normalizar_email(email: str) -> str:
@@ -80,11 +86,7 @@ class AuthService:
 
         with cursor_mysql(dictionary=True) as (_conn, cur):
             cur.execute(
-                """
-                SELECT id, email, senha_hash, pergunta_recuperacao, resposta_recuperacao_hash
-                FROM usuarios
-                WHERE email = %s
-                """,
+                "SELECT * FROM usuarios WHERE email = %s",
                 (email_norm,)
             )
             row = cur.fetchone()
@@ -95,13 +97,59 @@ class AuthService:
         if not verificar_hash(senha, row["senha_hash"]):
             raise CredenciaisInvalidas("E-mail ou senha inválidos.")
 
+        if not bool(row.get("ativo", 1)):
+            raise UsuarioInativo("Usuário inativo.")
+
+        if row.get("bloqueado_ate"):
+            raise UsuarioInativo("Usuário bloqueado temporariamente.")
+
         return Usuario(
             usuario_id=row["id"],
             email=row["email"],
             senha_hash=row["senha_hash"],
             pergunta_recuperacao=row["pergunta_recuperacao"],
-            resposta_recuperacao_hash=row["resposta_recuperacao_hash"]
+            resposta_recuperacao_hash=row["resposta_recuperacao_hash"],
+            perfil=row.get("perfil", "USUARIO"),
+            ativo=row.get("ativo", True),
+            ultimo_login=row.get("ultimo_login"),
+            bloqueado_ate=row.get("bloqueado_ate"),
+            criado_em=row.get("criado_em"),
+            atualizado_em=row.get("atualizado_em"),
         )
+
+    def obter_usuario_por_id(self, usuario_id: int) -> Usuario | None:
+        with cursor_mysql(dictionary=True) as (_conn, cur):
+            cur.execute("SELECT * FROM usuarios WHERE id = %s", (usuario_id,))
+            row = cur.fetchone()
+
+        if row is None:
+            return None
+
+        return Usuario(
+            usuario_id=row["id"],
+            email=row["email"],
+            senha_hash=row["senha_hash"],
+            pergunta_recuperacao=row["pergunta_recuperacao"],
+            resposta_recuperacao_hash=row["resposta_recuperacao_hash"],
+            perfil=row.get("perfil", "USUARIO"),
+            ativo=row.get("ativo", True),
+            ultimo_login=row.get("ultimo_login"),
+            bloqueado_ate=row.get("bloqueado_ate"),
+            criado_em=row.get("criado_em"),
+            atualizado_em=row.get("atualizado_em"),
+        )
+
+    def registrar_ultimo_login(self, usuario_id: int) -> None:
+        try:
+            with cursor_mysql(dictionary=True) as (_conn, cur):
+                cur.execute(
+                    "UPDATE usuarios SET ultimo_login = CURRENT_TIMESTAMP WHERE id = %s",
+                    (usuario_id,),
+                )
+        except mysql.connector.Error as erro:
+            if getattr(erro, "errno", None) == 1054:
+                return
+            raise
 
     def obter_pergunta_recuperacao(self, email: str) -> str:
         email_norm = _normalizar_email(email)
