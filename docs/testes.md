@@ -25,7 +25,8 @@ python -m pytest -q
 
 Estado atual
 
-- Suíte validada no estado atual com `python -m pytest -q`.
+- Suíte completa validada no estado atual com `python -m pytest -q`.
+- Existem testes funcionais por perfil para `SUPER_ADMIN`, `ADMIN`, `USUARIO` e `LEITOR`.
 - Os benchmarks de performance continuam desativados por padrão e só executam com `RUN_PERF_TESTS=1`.
 - A camada Flask possui testes de importação, segredo de sessão, campos obrigatórios, proteção das rotas de ativos e caminhos de sucesso com serviços mockados.
 - `AuthService` e `AtivosService` possuem testes unitários com cursores fake para validar erros, permissões, filtros, RBAC e atualizações sem depender do MySQL real.

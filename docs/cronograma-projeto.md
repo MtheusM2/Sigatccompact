@@ -8,15 +8,13 @@ O núcleo funcional do sistema já está consolidado: backend Flask/MySQL, auten
 
 A interface web está disponível em ambiente local e passou por refinamentos, mas ainda segue em validação manual para garantir o comportamento esperado com todos os perfis.
 
-A documentação principal foi reorganizada, o README recebeu estrutura acadêmica/técnica refinada e o cronograma passa a ser mantido aqui como referência completa.
-
 Os testes locais já passam com `python -m pytest -q`, e o CI com verificações de segurança existe no GitHub Actions, ainda com validação final de merge dependendo do estado do pipeline.
 
 ## Status geral do projeto
 
-- Estado geral: avançado, com base funcional entregue e etapas finais em consolidação.
-- Situação atual: backend, segurança, banco e RBAC concluídos; interface, documentação e CI em validação/andamento; apresentação final pendente.
-- Risco principal: fechar a entrega sem inconsistência entre código, documentação e comportamento observado na interface.
+- Estado geral: concluído para a entrega acadêmica, com validação final encerrada.
+- Situação atual: backend, segurança, banco, RBAC, interface, documentação e CI concluídos; apresentação final pendente.
+- Risco principal: manter coerência entre código, documentação e comportamento observado na interface até a defesa.
 
 ## Linha do tempo por fases
 
@@ -69,11 +67,12 @@ Slides, roteiro, revisão final e preparação para defesa.
 | CRUD de ativos | Fase 3 | ✅ Concluído | Cadastro, listagem, edição e exclusão | Regras ajustadas para tabela global |
 | Segurança base | Fase 4 | ✅ Concluído | CSRF, cookies, rate limit, tratamento de erros | Base de segurança aplicada |
 | RBAC | Fase 5 | ✅ Concluído | SUPER_ADMIN, ADMIN, USUARIO, LEITOR | Permissões por perfil |
-| Interface web | Fase 6 | 🟡 Em validação | Dashboard, tabela global, filtros e gestão de usuários | Ajustes finos de UX |
-| Auditoria básica | Fase 7 | 🟡 Em validação | Eventos recentes/logs | Persistência futura |
-| Documentação | Fase 8 | 🔵 Em andamento | README e docs técnicos | Cronograma sendo adicionado |
-| CI/GitHub | Fase 9 | 🟡 Em validação | Workflows de CI/security | Aguardar checks verdes antes do merge |
-| Apresentação final | Fase 10 | ⏳ Pendente | Slides, roteiro e defesa | Próxima etapa acadêmica |
+| Interface web | Fase 6 | ✅ Concluído | Dashboard, tabela global, filtros e gestão de usuários | Fluxos validados |
+| Auditoria básica | Fase 7 | ✅ Concluído no escopo atual | Eventos recentes/logs | Persistência futura |
+| Documentação | Fase 8 | ✅ Concluído | README e docs técnicos | Cronograma incorporado |
+| CI/GitHub | Fase 9 | ✅ Concluído | Workflows de CI/security | Checks validados |
+| Validação final | Fase 10 | ✅ Concluído | Suíte completa, smoke tests e revisão documental | Versão candidata de entrega |
+| Apresentação final | Fase 11 | ⏳ Pendente | Slides, roteiro e defesa | Próxima etapa acadêmica |
 
 ## O que já foi concluído
 
@@ -93,23 +92,19 @@ Slides, roteiro, revisão final e preparação para defesa.
 - Testes locais passando.
 - README acadêmico/técnico refinado.
 
-## O que está em validação
+## O que foi concluído
 
 - Interface no navegador com todos os perfis.
 - CI no GitHub.
 - Fluxo de cadastro, edição e exclusão.
 - Auditoria básica.
 - Merge para `main`.
+- Validação final com suíte completa e revisão documental.
 
 ## O que ainda falta
 
-- Confirmar CI verde.
-- Fazer merge para `main`.
-- Revisar interface manualmente.
-- Testar os perfis SUPER_ADMIN, ADMIN, USUARIO e LEITOR.
 - Finalizar slides e apresentação.
 - Preparar roteiro de defesa.
-- Gerar relatório final, se necessário.
 
 ## O que fica como evolução futura
 

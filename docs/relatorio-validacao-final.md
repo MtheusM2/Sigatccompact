@@ -10,6 +10,8 @@
 
 O sistema **Sigatccompact** foi validado com sucesso em sua versão candidata. Todos os testes automatizados passaram, o sistema foi subido localmente sem erros, e os fluxos principais dos 4 perfis (SUPER_ADMIN, ADMIN, USUARIO, LEITOR) foram testados manualmente via navegador.
 
+A documentação principal foi revisada após a validação final para manter coerência com o estado real do projeto.
+
 **Conclusão**: A aplicação está **estável, segura e pronta para demonstração final** do TCC.
 
 ---

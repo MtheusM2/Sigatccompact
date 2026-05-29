@@ -25,7 +25,7 @@ Documentar a matriz real de acesso atualmente implementada no backend Flask, sem
 
 - Visualiza todos os ativos.
 - Cria ativos.
-- Edita qualquer ativo.
+- Edita ativos.
 - Não exclui ativos.
 - Não gerencia usuários.
 - Não acessa a gestão de usuários.

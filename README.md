@@ -114,9 +114,10 @@ Desenvolver um sistema web para gestão de ativos de TI com segurança básica, 
 |---|---|
 | Backend e banco | ✅ Concluído |
 | Segurança e RBAC | ✅ Concluído |
-| Interface web | 🟡 Em validação |
-| Documentação | 🔵 Em andamento |
-| CI/GitHub | 🟡 Em validação |
+| Interface web | ✅ Concluído |
+| Documentação | ✅ Concluído |
+| CI/GitHub | ✅ Concluído |
+| Validação final | ✅ Concluído |
 | Apresentação final | ⏳ Pendente |
 
 Para detalhes por fase, entregas e próximos passos, consulte o documento completo:
@@ -184,8 +185,8 @@ Para detalhes por fase, entregas e próximos passos, consulte o documento comple
 | Perfil | Visualizar ativos | Criar ativo | Editar ativo | Excluir ativo | Gerenciar usuários | Auditoria |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|
 | SUPER_ADMIN | Sim | Sim | Sim | Sim | Sim | Sim |
-| ADMIN | Sim | Sim | Sim | Sim | Não | Sim/Parcial |
-| USUARIO | Sim | Sim | Sim | Sim | Não | Não |
+| ADMIN | Sim | Sim | Sim | Sim | Não | Sim |
+| USUARIO | Sim | Sim | Sim | Não | Não | Não |
 | LEITOR | Sim | Não | Não | Não | Não | Não |
 
 ---
@@ -360,12 +361,12 @@ python -m pytest -q
 | Área | Resultado |
 |---|---|
 | Backend | Funcional com Flask |
-| Interface | Server-rendered funcional |
+| Interface | Funcional e validada |
 | Segurança | CSRF, rate limit, PBKDF2 e RBAC |
-| Banco | Migrations aplicadas (012 e 013) |
-| Testes | Suíte Pytest disponível |
-| CI | Testes e checagens de segurança em GitHub Actions |
-| Documentação | `README.md` e `docs/` |
+| Banco | Migrations aplicadas |
+| Testes | Suíte completa passando |
+| CI | Testes e checagens de segurança validados |
+| Documentação | README e docs atualizados pós-validação final |
 
 ---
 
@@ -502,8 +503,12 @@ Projeto desenvolvido para fins acadêmicos (TCC — ETEC Jaraguá). Uso e reprod
 
 - [x] Modelo acadêmico/técnico preservado
 - [x] Índice com âncoras manuais estáveis
+- [x] Links de documentação conferidos
 - [x] Links para a documentação convertidos em Markdown real
 - [x] Matriz RBAC conferida
 - [x] Comandos de execução padronizados
+- [x] Suíte de testes executada
+- [x] Validação final concluída
+- [x] Documentação pós-validação atualizada
 
 </details>

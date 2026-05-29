@@ -6,24 +6,23 @@ O projeto adota medidas de segurança com foco em autenticação por sessão, pr
 
 Medidas aplicadas
 
-- Hash de senhas no armazenamento com PBKDF2-SHA256.
+- Hash de senhas com PBKDF2-SHA256.
 - Salt por senha e comparação segura.
 - Política mínima de senha validada no código.
-- Sessão Flask para navegação e autenticação operacional nas rotas do sistema.
 - CSRF ativo em rotas mutáveis.
 - Cookies de sessão configurados explicitamente.
-- Rate limit simples em login e recuperação.
+- Rate limit em login e recuperação.
 - RBAC por perfil com `SUPER_ADMIN`, `ADMIN`, `USUARIO` e `LEITOR`.
-- Gestão simples de usuários restrita ao `SUPER_ADMIN`.
+- Gestão de usuários restrita ao `SUPER_ADMIN`.
 - Log técnico e tela simples de auditoria com eventos recentes.
 - `FLASK_SECRET_KEY`, `APP_PEPPER` e credenciais de banco são lidos por variáveis de ambiente via `.env` local não versionado.
 
 Estado atual
 
-- O sistema usa sessão Flask no estado atual do projeto.
+- O sistema usa autenticação por sessão no estado atual do projeto.
 - A listagem de ativos é global para usuários autenticados.
 - `criado_por` é metadado de autoria e auditoria, não regra de visibilidade.
-- A busca de ativos já trabalha com filtros parciais e combinados.
+- A busca de ativos trabalha com filtros parciais e combinados.
 
 Riscos conhecidos
 

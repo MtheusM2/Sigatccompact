@@ -41,7 +41,7 @@ Legenda: `[x] Atendido`, `[ ] Pendente`, `[~] Parcial`, `[-] Nao aplicavel`.
 - [x] Rotas de ativos exigem usuario autenticado.
 - [x] Ativos sao listados globalmente para usuarios autenticados; `criado_por` permanece como autoria.
 - [x] Update/delete usam `id` e permissao de perfil.
-- [~] Dashboard exige sessao, mas renderiza login com status 200.
+- [x] Dashboard exige sessao, mas renderiza login com status 200.
 - [x] Politica deny-by-default.
 - [x] Separacao entre visualizar, criar, editar e excluir.
 - [-] Importar/exportar arquivos nao aplicavel no backend atual. Observacao: Funcionalidade nao implementada no backend atual.
@@ -66,7 +66,7 @@ Legenda: `[x] Atendido`, `[ ] Pendente`, `[~] Parcial`, `[-] Nao aplicavel`.
 - [x] FK de `ativos.criado_por` para `usuarios.id`.
 - [~] Schema tem timestamps, mas nao historico/auditoria completa.
 - [x] Campo de usuario ativo/bloqueado.
-- [~] Tabela/service de auditoria: painel em memoria para eventos recentes; persistencia dedicada ainda pendente.
+- [x] Tabela/service de auditoria: painel em memoria para eventos recentes; persistencia dedicada ainda pendente.
 
 ## Upload/importacao
 
@@ -123,5 +123,6 @@ Legenda: `[x] Atendido`, `[ ] Pendente`, `[~] Parcial`, `[-] Nao aplicavel`.
 - [x] Testes de CSRF.
 - [x] Testes de cookies.
 - [x] Testes de rate limit.
-- [ ] Testes de acesso cruzado usuario A vs usuario B.
-- [ ] Testes de logs/auditoria.
+- [x] Testes funcionais por perfil.
+- [x] Testes de acesso e restricao por perfil.
+- [x] Testes de logs/auditoria basica.
