@@ -72,7 +72,7 @@ Slides, roteiro, revisão final e preparação para defesa.
 | Documentação | Fase 8 | ✅ Concluído | README e docs técnicos | Cronograma incorporado |
 | CI/GitHub | Fase 9 | ✅ Concluído | Workflows de CI/security | Checks validados |
 | Validação final | Fase 10 | ✅ Concluído | Suíte completa, smoke tests e revisão documental | Versão candidata de entrega |
-| Apresentação final | Fase 11 | ⏳ Pendente | Slides, roteiro e defesa | Próxima etapa acadêmica |
+| Apresentação final | Fase 11 | ✅ Concluído | Slides, roteiro e defesa | Próxima etapa acadêmica |
 
 ## O que já foi concluído
 
