@@ -118,7 +118,7 @@ Desenvolver um sistema web para gestão de ativos de TI com segurança básica, 
 | Documentação | ✅ Concluído |
 | CI/GitHub | ✅ Concluído |
 | Validação final | ✅ Concluído |
-| Apresentação final | ⏳ Pendente |
+| Apresentação final | ✅ Concluído |
 
 Para detalhes por fase, entregas e próximos passos, consulte o documento completo:
 
